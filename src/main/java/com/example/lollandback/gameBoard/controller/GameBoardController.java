@@ -18,20 +18,22 @@ public class GameBoardController {
     private final GameBoardService gameboardService;
 
     @PostMapping("add")
-    public ResponseEntity add(@RequestBody GameBoard gameboard) {
+    public ResponseEntity add(@RequestBody GameBoard gameboard
+                              ) {
+
         if (!gameboardService.validate(gameboard)) {
 
             return ResponseEntity.ok().build();
         }
-        if(gameboardService.save(gameboard)){
+        if (gameboardService.save(gameboard)) {
             return ResponseEntity.ok().build();
-        }else{
+        } else {
             return ResponseEntity.ok().build();
         }
     }
 
     @GetMapping("list")
-    public List<GameBoard> list(){
+    public List<GameBoard> list() {
         return gameboardService.list();
     }
 
@@ -40,9 +42,27 @@ public class GameBoardController {
         return gameboardService.get(id);
     }
 
-    @PutMapping("edit")
-    public void edit(@RequestBody GameBoard gameBoard) {
-        gameboardService.update(gameBoard);
+    @DeleteMapping("remove/{id}")
+    public ResponseEntity delete(@PathVariable Integer id) {
+        if(gameboardService.delete(id)){
+            return ResponseEntity.ok().build();
+        }else{
+            return ResponseEntity.internalServerError().build();
+        }
     }
+
+    @PutMapping("edit")
+    public ResponseEntity edit(@RequestBody GameBoard gameBoard) {
+        if(gameboardService.validate(gameBoard)){
+            if(gameboardService.update(gameBoard)){
+                return ResponseEntity.ok().build();
+            }else{
+                return ResponseEntity.internalServerError().build();
+            }
+        }else{
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
 
 }

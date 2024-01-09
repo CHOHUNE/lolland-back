@@ -23,9 +23,7 @@ public class GameBoardService {
         if(gameBoard.getContent() == null || gameBoard.getContent().isBlank()){
             return false;
         }
-        if(gameBoard.getWriter() == null || gameBoard.getWriter().isBlank()){
-            return false;
-        }
+
         if(gameBoard.getTitle() == null || gameBoard.getTitle().isBlank()){
             return false;
         }
@@ -41,8 +39,13 @@ public class GameBoardService {
         return mapper.selectById(id);
     }
 
-    public void update(GameBoard gameBoard){
-        mapper.update(board);
+    public boolean update(GameBoard gameBoard){
+      return mapper.update(gameBoard)==1;
+    }
+
+    public boolean delete(Integer id) {
+        return mapper.deleteById(id) ==1;
+
     }
 
 }

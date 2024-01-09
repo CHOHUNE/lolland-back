@@ -11,7 +11,8 @@ public class GameBoard {
     private String content;
     private String writer;
     private Integer bgId;
-    private LocalDateTime inserted;
+    private LocalDateTime regTime;
+    private String Category;
 
 
 }
