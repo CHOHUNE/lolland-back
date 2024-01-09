@@ -9,6 +9,6 @@ public class Answer {
     private Long answer_id;
     private Long question_id;
     private String answer_content;
-    private Long supplier_id;
+    private Long member_id;
     private LocalDateTime answer_reg_time;
 }
