@@ -1,4 +1,4 @@
 package com.example.lollandback.board.review.mapper;
 
-public class ReviewMapper {
+public interface ReviewMapper {
 }
