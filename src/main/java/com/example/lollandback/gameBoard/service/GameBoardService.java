@@ -18,13 +18,16 @@ public class GameBoardService {
     }
     public boolean validate(GameBoard gameBoard){
         if(gameBoard == null){
+            System.out.println("board null");
             return false;
         }
-        if(gameBoard.getContent() == null || gameBoard.getContent().isBlank()){
+        if(gameBoard.getBoard_content() == null || gameBoard.getBoard_content().isBlank()){
+            System.out.println("content error");
             return false;
         }
 
         if(gameBoard.getTitle() == null || gameBoard.getTitle().isBlank()){
+            System.out.println("title error");
             return false;
         }
         return true;

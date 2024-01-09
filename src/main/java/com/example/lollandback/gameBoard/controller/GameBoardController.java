@@ -11,28 +11,26 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/gameBoard")
+@RequestMapping("/api/gameboard")
 public class GameBoardController {
-
 
     private final GameBoardService gameboardService;
 
-    @PostMapping("add")
-    public ResponseEntity add(@RequestBody GameBoard gameboard
-                              ) {
+    @PostMapping("/write")
+    public ResponseEntity add(@RequestBody GameBoard gameboard){
 
         if (!gameboardService.validate(gameboard)) {
-
-            return ResponseEntity.ok().build();
+            return ResponseEntity.badRequest().body("Invaild request body");
         }
         if (gameboardService.save(gameboard)) {
             return ResponseEntity.ok().build();
         } else {
-            return ResponseEntity.ok().build();
+            return ResponseEntity.internalServerError().body("글 작성 실패");
         }
+
     }
 
-    @GetMapping("list")
+    @GetMapping
     public List<GameBoard> list() {
         return gameboardService.list();
     }
