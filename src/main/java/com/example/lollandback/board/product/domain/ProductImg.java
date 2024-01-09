@@ -4,8 +4,8 @@ import lombok.Data;
 
 @Data
 public class ProductImg {
-    private Long product_img_id;
+    private Long main_img_id;
     private Long product_id;
-    private Long product_options_id;
-    private String product_img_fileUrl;
+    private Long option_id;
+    private String main_img_uri;
 }

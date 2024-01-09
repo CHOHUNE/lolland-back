@@ -8,12 +8,12 @@ import java.time.LocalDateTime;
 public class Product {
     private Long product_id;
     private Long category_id;
-    private Long subCategory_id;
+    private Long subcategory_id;
     private Long company_id;
-    private String name;
-    private Double price;
+    private String product_name;
+    private String product_content;
+    private Double product_price;
     private Long total_stock;
     private Double average_rate;
-    private String product_content;
-    private LocalDateTime product_regTime;
+    private LocalDateTime product_reg_time;
 }

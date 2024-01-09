@@ -10,5 +10,5 @@ public class Answer {
     private Long question_id;
     private String answer_content;
     private Long supplier_id;
-    private LocalDateTime answer_regTime;
+    private LocalDateTime answer_reg_time;
 }
