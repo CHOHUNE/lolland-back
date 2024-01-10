@@ -23,4 +23,14 @@ public class MemberService {
     public void addUser(Member member) {
         mapper.insertUser(member);
     }
+
+    public boolean loginUser(Member member) {
+        Member dbMember = mapper.selectById(member.getMember_login_id());
+        if (dbMember != null ) {
+            if(dbMember.getMember_password().equals(member.getMember_password())){
+                return true;
+            }
+        }
+        return false;
+    }
 }

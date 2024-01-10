@@ -3,6 +3,7 @@ package com.example.lollandback.member.mapper;
 import com.example.lollandback.member.domain.Member;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
 @Mapper
 public interface MemberMapper {
@@ -25,4 +26,11 @@ public interface MemberMapper {
         )
         """)
     void insertUser(Member member);
+
+    @Select("""
+        SELECT member_login_id 
+        FROM member 
+        WHERE member_login_id = #{memberLoginId} 
+    """)
+    Member selectById(String memberLoginId);
 }
