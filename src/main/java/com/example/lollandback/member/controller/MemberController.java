@@ -2,6 +2,7 @@ package com.example.lollandback.member.controller;
 
 import com.example.lollandback.member.domain.Member;
 import com.example.lollandback.member.service.MemberService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ public class MemberController {
         service.addUser(member);
     }
 
+    // 회원 로그인
     @PostMapping("login")
     public ResponseEntity login(@RequestBody Member member, WebRequest request){
 
@@ -32,6 +34,14 @@ public class MemberController {
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
+    // 회원 로그아웃
+    @PostMapping("logout")
+    public void logout(HttpSession session) {
+        if(session != null) {
+            session.invalidate();
         }
     }
 }
