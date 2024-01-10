@@ -1,13 +1,22 @@
 package com.example.lollandback.member.controller;
 
+import com.example.lollandback.member.domain.Member;
 import com.example.lollandback.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
-@RequestMapping("/")
+@RequestMapping("/api/member/")
 public class MemberController {
-    private MemberService service;
+    private final MemberService service;
+
+    @PostMapping("signUp")
+    public void addUser(@RequestBody Member member) {
+        service.addUser(member);
+    }
 }

@@ -1,4 +1,4 @@
-package com.example.lollandback.member.dto;
+package com.example.lollandback.member.domain;
 
 import lombok.Data;
 
@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 
 @Data
 public class MemberAddress {
-    private Long id;
     private String member_address_name;
     private String member_address;
     private String member_detail_address;

@@ -1,4 +1,4 @@
-package com.example.lollandback.member.dto;
+package com.example.lollandback.member.domain;
 
 import lombok.Data;
 
@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 
 @Data
 public class Admin {
-    private Long id;
     private String admin_login_id;
     private String admin_password;
     private String admin_department;
