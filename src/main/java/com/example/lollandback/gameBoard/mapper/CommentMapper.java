@@ -2,10 +2,7 @@ package com.example.lollandback.gameBoard.mapper;
 
 import com.example.lollandback.gameBoard.domain.Comment;
 import lombok.Data;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -25,7 +22,13 @@ SELECT * FROM gameboardcomment WHERE game_board_id=#{game_board_id}
     List<Comment> selectByBoardId(Integer boardId);
 
     @Delete("""
-DELETE FROM gameboardcomment WHERE game_board_id=#{game_board_id}
+DELETE FROM gameboardcomment WHERE id=#{id}
 """)
-    void deleteByBoardId(Integer boardId);
+    void deleteByBoardId(Integer id);
+
+
+    @Update("""
+UPDATE gameboardcomment SET comment_content=#{comment_content} WHERE id=#{id}
+""")
+    boolean update(Comment comment);
 }

@@ -42,5 +42,6 @@ WHERE id= #{id}
 """)
     int update(GameBoard gameBoard);
 
-
+    @Update("UPDATE gameboard SET board_count = board_count + 0.5 WHERE id = #{id}")
+    void boardCount(Integer id);
 }

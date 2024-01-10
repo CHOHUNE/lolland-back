@@ -37,6 +37,7 @@ public class GameBoardController {
 
     @GetMapping("/id/{id}")
     public GameBoard get(@PathVariable Integer id) {
+        gameboardService.boardCount(id);
         return gameboardService.get(id);
     }
 

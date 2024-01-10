@@ -16,25 +16,34 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping("add")
-    public ResponseEntity add(@RequestBody Comment comment){
+    public ResponseEntity add(@RequestBody Comment comment) {
 
 
-        if(commentService.validate(comment)){
-            if(commentService.add(comment)){
+        if (commentService.validate(comment)) {
+            if (commentService.add(comment)) {
                 return ResponseEntity.ok().build();
-            }else{
+            } else {
                 return ResponseEntity.internalServerError().build();
             }
-        }else{
+        } else {
             return ResponseEntity.badRequest().build();
 
         }
     }
+
     @GetMapping("list/{id}")
-    public List<Comment> list(@PathVariable Integer id){
+    public List<Comment> list(@PathVariable Integer id) {
+
         return commentService.list(id);
     }
 
+    @DeleteMapping("{id}")
+    public void remove(@PathVariable Integer id) {
+        commentService.remove(id);
+    }
 
-
+    @PutMapping("edit")
+    public void update(@RequestBody Comment comment) {
+        commentService.update(comment);
+    }
 }

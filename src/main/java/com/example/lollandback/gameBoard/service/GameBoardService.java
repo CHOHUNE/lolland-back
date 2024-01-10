@@ -51,4 +51,8 @@ public class GameBoardService {
 
     }
 
+    public void boardCount(Integer id) {
+        mapper.boardCount(id);
+
+    }
 }

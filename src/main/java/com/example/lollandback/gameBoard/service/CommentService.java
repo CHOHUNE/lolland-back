@@ -39,6 +39,10 @@ public class CommentService {
 
     @DeleteMapping
     public void remove(Integer boardId){
-         commentMapper.deleteByBoardId(boardId);
+          commentMapper.deleteByBoardId(boardId) ;
+    }
+
+    public boolean update(Comment comment) {
+        return commentMapper.update(comment);
     }
 }
