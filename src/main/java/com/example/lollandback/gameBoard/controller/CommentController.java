@@ -30,9 +30,11 @@ public class CommentController {
 
         }
     }
-    @GetMapping("list")
-    public List<Comment> list(@RequestParam("id")Integer boardId){
-        return commentService.list(boardId);
+    @GetMapping("list/{id}")
+    public List<Comment> list(@PathVariable Integer id){
+        return commentService.list(id);
     }
+
+
 
 }

@@ -20,10 +20,10 @@ public class CommentService {
         if(comment ==null){
             return false;
         }
-        if(comment.getBoardId()==null || comment.getBoardId() <1){
+        if(comment.getGame_board_id()==null || comment.getGame_board_id() <1){
             return false;
         }
-        if(comment.getCommentContent() ==null || comment.getCommentContent().isBlank()){
+        if(comment.getComment_content() ==null || comment.getComment_content().isBlank()){
             return false;
         }
         return true;

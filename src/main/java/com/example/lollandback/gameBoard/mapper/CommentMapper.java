@@ -13,19 +13,19 @@ import java.util.List;
 public interface CommentMapper {
 
     @Insert("""
-INSERT INTO gameboardcomment(comment_content, parent_id, game_board_id, member_id)
-VALUES (#{commentContent},#{partendCommentId},#{boardId},#{memberId})
+INSERT INTO gameboardcomment(comment_content, game_board_id)
+VALUES (#{comment_content},#{game_board_id})
 """)
     int insert(Comment comment);
 
 
     @Select("""
-SELECT * FROM gameboardcomment WHERE game_board_id=#{boardId}
+SELECT * FROM gameboardcomment WHERE game_board_id=#{game_board_id}
 """)
     List<Comment> selectByBoardId(Integer boardId);
 
     @Delete("""
-DELETE FROM gameboardcomment WHERE game_board_id=#{boardId}
+DELETE FROM gameboardcomment WHERE game_board_id=#{game_board_id}
 """)
     void deleteByBoardId(Integer boardId);
 }
