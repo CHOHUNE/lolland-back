@@ -35,12 +35,12 @@ public class GameBoardController {
         return gameboardService.list();
     }
 
-    @GetMapping("id/{id}")
+    @GetMapping("/id/{id}")
     public GameBoard get(@PathVariable Integer id) {
         return gameboardService.get(id);
     }
 
-    @DeleteMapping("remove/{id}")
+    @DeleteMapping("/remove/{id}")
     public ResponseEntity delete(@PathVariable Integer id) {
         if(gameboardService.delete(id)){
             return ResponseEntity.ok().build();
@@ -49,7 +49,7 @@ public class GameBoardController {
         }
     }
 
-    @PutMapping("edit")
+    @PutMapping("/edit")
     public ResponseEntity edit(@RequestBody GameBoard gameBoard) {
         if(gameboardService.validate(gameBoard)){
             if(gameboardService.update(gameBoard)){

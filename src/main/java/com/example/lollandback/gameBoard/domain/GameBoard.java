@@ -10,10 +10,11 @@ public class GameBoard {
 
     private String title;
     private String board_content;
-    private BigInteger id;
+    private Long id;
     private LocalDateTime reg_time;
     private String category;
-    private BigInteger board_count;
+    private Long board_count;
+
 
 
 }

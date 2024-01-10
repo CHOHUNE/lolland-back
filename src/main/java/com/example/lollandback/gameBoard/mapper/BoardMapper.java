@@ -27,7 +27,7 @@ SELECT id, title, board_content, reg_time,board_count
 FROM gameboard
 WHERE id=#{id}
 """)
-    GameBoard selectById(Integer bgId);
+    GameBoard selectById(Integer id);
 
     @Delete("""
          DELETE FROM gameboard
@@ -37,12 +37,10 @@ WHERE id=#{id}
 
     @Update("""
 UPDATE gameboard
-SET title= #{title},
-board_content=#{content}
+SET title= #{title},board_content=#{board_content},category=#{category}
 WHERE id= #{id}
 """)
     int update(GameBoard gameBoard);
-
 
 
 }
