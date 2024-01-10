@@ -28,7 +28,7 @@ public interface MemberMapper {
     void insertUser(Member member);
 
     @Select("""
-        SELECT member_login_id 
+        SELECT *
         FROM member 
         WHERE member_login_id = #{memberLoginId} 
     """)
