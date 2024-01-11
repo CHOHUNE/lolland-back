@@ -1,6 +1,10 @@
 package com.example.lollandback.member.service;
 
 import com.example.lollandback.member.domain.Member;
+import com.example.lollandback.member.domain.MemberAddress;
+import com.example.lollandback.member.domain.MemberAndAddress;
+import com.example.lollandback.member.dto.MemberDto;
+import com.example.lollandback.member.mapper.MemberAddressMapper;
 import com.example.lollandback.member.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +17,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberMapper mapper;
+    private final MemberAddressMapper memberAddressMapper;
 
     private final S3Client s3;
 
@@ -22,13 +27,18 @@ public class MemberService {
     @Value("${image.file.prefix}")
     private String urlPrefix;
 
-    public void addUser(Member member) {
+    public void addUser(MemberAndAddress memberAndAddress) {
+        Member member = memberAndAddress.getMember();
+        MemberAddress memberAddress = memberAndAddress.getMemberAddress();
+
+        // 회원 생성
         mapper.insertUser(member);
+        // 주소 생성
+        memberAddressMapper.insertAddress(member.getId(),memberAddress);
     }
 
     public boolean loginUser(Member member, WebRequest request) {
         Member dbMember = mapper.selectById(member.getMember_login_id());
-
         if (dbMember != null ) {
             if(dbMember.getMember_password().equals(member.getMember_password())){
                 // 비밀번호 숨기기
@@ -41,7 +51,19 @@ public class MemberService {
         return false;
     }
 
-    public boolean deleteMember(String memberLoginId) {
-        return mapper.deleteById(memberLoginId) == 1;
+    public boolean deleteMember(Long id) {
+        return mapper.deleteById(id) == 1;
+    }
+
+    public MemberDto getMember(Member login) {
+        return mapper.selectByLoginId(login.getMember_login_id());
+    }
+
+    public String getLoginIdAndPassword(String memberLoginId, String password) {
+        return mapper.selectByLoginIdAndPassword(memberLoginId, password);
+    }
+
+    public MemberDto getMemberInfo(Member login) {
+        return mapper.selectByMemberId(login.getMember_login_id());
     }
 }
