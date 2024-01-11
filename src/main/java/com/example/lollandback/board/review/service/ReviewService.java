@@ -6,6 +6,7 @@ import com.example.lollandback.board.review.dto.ReviewUpdateDto;
 import com.example.lollandback.board.review.mapper.ReviewMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -26,20 +27,23 @@ public class ReviewService {
         reviewMapper.addNewReview(review);
     }
 
+    @Transactional
     public void updateReview(ReviewUpdateDto updatedReview) {
         reviewMapper.updateReview(updatedReview);
     }
 
-    public void deleteReviewById(Long review_id) {
-        reviewMapper.deleteReviewById(review_id);
+    @Transactional
+    public void deleteReviewById(Long reviewId) {
+        reviewMapper.deleteReviewById(reviewId);
     }
 
-    public void deleteAllReviewsByMember(Long member_id) {
-        reviewMapper.deleteReviewByMember(member_id);
+    @Transactional
+    public void deleteSelectedReviews(List<Long> reviewIds) {
+        reviewMapper.deleteSelectedReviews(reviewIds);
     }
 
-    public void deleteSelectedReviews(List<Long> review_ids) {
-        reviewMapper.deleteSelectedReviews(review_ids);
-
+    @Transactional
+    public void deleteAllReviewsByMember(Long memberId) {
+        reviewMapper.deleteReviewByMember(memberId);
     }
 }

@@ -1,9 +1,8 @@
 package com.example.lollandback.board.product.mapper;
 
-import com.example.lollandback.board.product.domain.Category;
 import com.example.lollandback.board.product.domain.Product;
-import com.example.lollandback.board.product.domain.SubCategory;
 import com.example.lollandback.board.product.dto.CategoryDto;
+import com.example.lollandback.board.product.dto.ProductDto;
 import com.example.lollandback.board.product.dto.SubCategoryDto;
 import org.apache.ibatis.annotations.*;
 
@@ -62,4 +61,10 @@ public interface ProductMapper {
         WHERE subcategory_id = #{subcategory_id}
     """)
     String subCategoryById(Long subcategory_id);
+
+    @Delete("""
+            DELETE FROM product
+            WHERE product_id = #{product_id}
+            """)
+    void deleteByProduct(Long productId);
 }
