@@ -36,9 +36,9 @@ public interface MemberMapper {
 
     @Delete("""
         DELETE FROM member
-        WHERE member_login_id = #{memberLoginId}
+        WHERE id = #{id}
     """)
-    int deleteById(String memberLoginId);
+    int deleteById(Long id);
 
     @Select("""
         SELECT member_login_id

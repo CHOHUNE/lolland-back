@@ -21,6 +21,7 @@ import org.springframework.web.context.request.WebRequest;
 public class MemberController {
     private final MemberService service;
 
+    // 회원 가입
     @PostMapping("signUp")
     public void addUser(@RequestBody @Valid MemberAndAddress memberAndAddress) {
         service.addUser(memberAndAddress);
@@ -70,11 +71,17 @@ public class MemberController {
     @DeleteMapping
     public ResponseEntity delete(@SessionAttribute(value = "login", required = false) Member login) {
 
-        System.out.println("login = " + login);
-        if(service.deleteMember(login.getMember_login_id())) {
+        // 비 로그인 유저이면 401 에러 던지기
+        if(login == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 401
+        }
+
+        // 회원 탈퇴 성공시 ok 값 던지기
+        if(service.deleteMember(login.getId())) {
             return ResponseEntity.ok().build();
         }
 
+        // 실패시 서버 에러 던지기
         return ResponseEntity.internalServerError().build();
     }
 }

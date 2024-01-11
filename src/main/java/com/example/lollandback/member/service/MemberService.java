@@ -6,7 +6,6 @@ import com.example.lollandback.member.domain.MemberAndAddress;
 import com.example.lollandback.member.dto.MemberDto;
 import com.example.lollandback.member.mapper.MemberAddressMapper;
 import com.example.lollandback.member.mapper.MemberMapper;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -52,8 +51,8 @@ public class MemberService {
         return false;
     }
 
-    public boolean deleteMember(String memberLoginId) {
-        return mapper.deleteById(memberLoginId) == 1;
+    public boolean deleteMember(Long id) {
+        return mapper.deleteById(id) == 1;
     }
 
     public MemberDto getMember(Member login) {
