@@ -9,41 +9,39 @@ import java.util.List;
 @Mapper
 public interface BoardMapper {
     @Insert("""
-INSERT INTO board(title, content, writer)
-VALUES (#{title},#{content},#{writer})
+INSERT INTO gameboard(title,board_content,category)
+VALUES (#{title},#{board_content},#{category})
 """)
     int insert(GameBoard gameBoard);
 
     @Select("""
-            SELECT id,title,writer,inserted
-            FROM board 
-            ORDER BY bgId DESC
+            SELECT id, board_content, title, category, board_count, reg_time
+            FROM gameboard
+            ORDER BY reg_time ASC
             
             """)
     List<GameBoard> selectAll();
 
     @Select("""
-SELECT id, title, content, writer, inserted
-FROM board
-WHERE bgId=#{id}
+SELECT id, title, board_content, reg_time,board_count
+FROM gameboard
+WHERE id=#{id}
 """)
-    GameBoard selectById(Integer bgId);
+    GameBoard selectById(Integer id);
 
     @Delete("""
-         DELETE FROM board
-         WHERE bgid=#{id}   
+         DELETE FROM gameboard
+         WHERE id=#{id}
             """)
     int deleteById(Integer bgId);
 
     @Update("""
-UPDATE board
-SET title= #{title},
-content=#{content},
-writer=#{writer}
+UPDATE gameboard
+SET title= #{title},board_content=#{board_content},category=#{category}
 WHERE id= #{id}
 """)
     int update(GameBoard gameBoard);
 
-
-
+    @Update("UPDATE gameboard SET board_count = board_count + 0.5 WHERE id = #{id}")
+    void boardCount(Integer id);
 }
