@@ -1,7 +1,9 @@
 package com.example.lollandback.board.cart.mapper;
 
+import com.example.lollandback.board.cart.domain.Cart;
 import com.example.lollandback.board.cart.dto.CartDto;
-import lombok.RequiredArgsConstructor;
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -11,16 +13,42 @@ import java.util.List;
 public interface CartMapper {
 
     @Select("""
-    SELECT c.cart_id, c.member_id, c.product_id, m.member_login_id, cat.category_name, sub.subcategory_name, 
-    p.product_name, com.company_name, c.count 
-    FROM cart c 
-    INNER JOIN member m ON c.member_id = m.member_id
+    SELECT c.cart_id, c.product_id, cat.category_name, sub.subcategory_name, 
+    p.product_name, p.product_price, com.company_name, img.main_img_url, c.count 
+    FROM cart c
     INNER JOIN product p ON c.product_id = p.product_id
     INNER JOIN category cat ON p.category_id = cat.category_id
     INNER JOIN subcategory sub ON p.subcategory_id = sub.subcategory_id
     INNER JOIN company com ON p.company_id = com.company_id
-    INNER JOIN 
-    WHERE member_id = #{member_id}
+    INNER JOIN productimg img ON p.product_id = img.product_id
+    WHERE c.member_id = #{memberId}
     """)
-    List<CartDto> fetchCartByMemberId(Long member_id);
+    List<CartDto> fetchCartByMemberId(Long memberId);
+
+    @Insert("""
+        INSERT INTO cart (member_id, product_id, count)
+        VALUES (#{cart.member_id}, #{cart.product_id}, #{cart.count})
+    """)
+    void addProductToCart(Cart cart);
+
+    @Delete("""
+        DELETE FROM cart
+        WHERE cart_id = #{cartId}
+    """)
+    void deleteByCartId(Long cartId);
+
+    @Delete("""
+        DELETE FROM cart
+        WHERE cart_id IN
+        <foreach collection="cartIds" open="(" seperator="," close=")">
+            #{cart_id}
+        </foreach>
+    """)
+    void deleteSelected(List<Long> cartIds);
+
+    @Delete("""
+        DELETE FROM cart
+        WHERE member_id = #{memberId}
+    """)
+    void deleteAllByMember(Long memberId);
 }

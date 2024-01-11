@@ -31,6 +31,7 @@ public class ReviewController {
     @PostMapping("/submit")
     public ResponseEntity addNewReview(@RequestBody Review review) {
         try {
+            //TODO: 해당 회원이 구매 내역에 있는지 조회하는 메소드
             reviewService.addNewReview(review);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
