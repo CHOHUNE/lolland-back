@@ -1,14 +1,12 @@
 package com.example.lollandback.board.product.service;
 
-import com.example.lollandback.board.product.domain.Category;
-import com.example.lollandback.board.product.domain.Company;
-import com.example.lollandback.board.product.domain.Product;
-import com.example.lollandback.board.product.domain.ProductImg;
+import com.example.lollandback.board.product.domain.*;
 import com.example.lollandback.board.product.dto.CategoryDto;
 import com.example.lollandback.board.product.dto.ProductDto;
 import com.example.lollandback.board.product.mapper.ProductCompanyMapper;
 import com.example.lollandback.board.product.mapper.ProductMainImg;
 import com.example.lollandback.board.product.mapper.ProductMapper;
+import com.example.lollandback.board.product.mapper.ProductOptionMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -41,6 +39,7 @@ public class ProductService {
     private final ProductMapper productMapper;
     private final ProductCompanyMapper companyMapper;
     private final ProductMainImg mainImgMapper;
+    private final ProductOptionMapper productOptionMapper;
 
     // --------------------------- 상품 저장 시 대분류/소분류 보여주기 로직 ---------------------------
     public List<CategoryDto> getAllCategories() {
@@ -49,7 +48,7 @@ public class ProductService {
 
     // --------------------------- 상품 저장 로직 ---------------------------
     @Transactional
-    public boolean save(Product product, Company company, MultipartFile[] mainImg) throws IOException {
+    public boolean save(Product product, Company company, MultipartFile[] mainImg, List<String> optionNames) throws IOException {
         // 제조사 정보 저장
         if (companyMapper.insert(company) != 1) {
             return false;
@@ -59,6 +58,17 @@ public class ProductService {
         // 상품 정보 저장
         if (productMapper.insert(product) != 1) {
             return false;
+        }
+
+        // 옵션 저장 로직
+        if (optionNames != null) {
+            for (String optionName : optionNames) {
+                // ProductOption 객체 생성 및 초기화
+                ProductOptions productOption = new ProductOptions();
+                productOption.setProduct_id(product.getProduct_id());
+                productOption.setOption_name(optionName);
+                productOptionMapper.insert(productOption); // 옵션 저장
+            }
         }
 
         // 이미지 정보 저장
