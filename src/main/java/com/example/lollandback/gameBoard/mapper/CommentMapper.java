@@ -21,7 +21,7 @@ SELECT * FROM gameboardcomment WHERE game_board_id=#{game_board_id}
 """)
     List<Comment> selectByBoardId(Integer boardId);
 
-    @Delete("""
+    @Delete(""" 
 DELETE FROM gameboardcomment WHERE id=#{id}
 """)
     void deleteByBoardId(Integer id);
