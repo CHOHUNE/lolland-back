@@ -62,7 +62,7 @@ VALUES (#{comment_content},#{game_board_id},#{parent_id})
         WHERE
           game_board_id = #{game_board_id}
         ORDER BY
-          reg_time
+          parent_id,reg_time
         """)
         List<Comment> selectByBoardId(Integer game_board_id);
 
