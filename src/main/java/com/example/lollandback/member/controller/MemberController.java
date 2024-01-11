@@ -43,22 +43,25 @@ public class MemberController {
         }
     }
 
-    // 로그인한 맴버로 맴버 ID 가져오기
+    // 로그인 한 맴버로 맴버 ID만 가져오기
     @GetMapping("login")
     public MemberDto getMember(@SessionAttribute("login")Member login) {
-        System.out.println("login = " + login);
         return service.getMember(login);
     }
 
     // 회원정보 조회시 비밀번호 체크
     @GetMapping("checkPassword")
     public ResponseEntity checkPassword(@SessionAttribute("login") Member login, @RequestParam String password) {
-        System.out.println("login = " + login);
-        System.out.println("password = " + password);
         if(service.getLoginIdAndPassword(login.getMember_login_id(), password) != null){
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.badRequest().build();
+    }
+
+    //회원 정보 수정 전 비밀번호 제외 유저의 정보 전달
+    @GetMapping("memberInfo")
+    public MemberDto getMemberInfo(@SessionAttribute("login")Member login) {
+        return service.getMemberInfo(login);
     }
 
     // 회원 탈퇴

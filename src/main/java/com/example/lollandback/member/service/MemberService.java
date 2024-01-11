@@ -52,4 +52,8 @@ public class MemberService {
     public String getLoginIdAndPassword(String memberLoginId, String password) {
         return mapper.selectByLoginIdAndPassword(memberLoginId, password);
     }
+
+    public MemberDto getMemberInfo(Member login) {
+        return mapper.selectByMemberId(login.getMember_login_id());
+    }
 }
