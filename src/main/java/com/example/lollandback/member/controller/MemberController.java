@@ -1,6 +1,8 @@
 package com.example.lollandback.member.controller;
 
 import com.example.lollandback.member.domain.Member;
+import com.example.lollandback.member.domain.MemberAddress;
+import com.example.lollandback.member.domain.MemberAndAddress;
 import com.example.lollandback.member.dto.MemberDto;
 import com.example.lollandback.member.service.MemberService;
 import jakarta.servlet.http.HttpSession;
@@ -20,8 +22,8 @@ public class MemberController {
     private final MemberService service;
 
     @PostMapping("signUp")
-    public void addUser(@RequestBody @Valid Member member) {
-        service.addUser(member);
+    public void addUser(@RequestBody @Valid MemberAndAddress memberAndAddress) {
+        service.addUser(memberAndAddress);
     }
 
     // 회원 로그인

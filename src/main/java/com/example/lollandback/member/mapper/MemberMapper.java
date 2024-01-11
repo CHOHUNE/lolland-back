@@ -2,10 +2,7 @@ package com.example.lollandback.member.mapper;
 
 import com.example.lollandback.member.domain.Member;
 import com.example.lollandback.member.dto.MemberDto;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 @Mapper
 public interface MemberMapper {
@@ -27,6 +24,7 @@ public interface MemberMapper {
             #{member_type}
         )
         """)
+    @Options(useGeneratedKeys = true, keyProperty = "id")
     void insertUser(Member member);
 
     @Select("""
