@@ -30,6 +30,7 @@ public class CommentService {
     }
 
     public boolean add(Comment comment) {
+
         return commentMapper.insert(comment)==1;
     }
 
