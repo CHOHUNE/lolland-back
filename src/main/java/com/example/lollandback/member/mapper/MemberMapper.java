@@ -1,6 +1,7 @@
 package com.example.lollandback.member.mapper;
 
 import com.example.lollandback.member.domain.Member;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -33,4 +34,10 @@ public interface MemberMapper {
         WHERE member_login_id = #{memberLoginId} 
     """)
     Member selectById(String memberLoginId);
+
+    @Delete("""
+        DELETE FROM member
+        WHERE member_login_id = #{memberLoginId}
+    """)
+    int deleteById(String memberLoginId);
 }

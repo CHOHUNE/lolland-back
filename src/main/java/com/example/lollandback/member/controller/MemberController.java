@@ -9,10 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
 @RestController
@@ -43,5 +40,17 @@ public class MemberController {
         if(session != null) {
             session.invalidate();
         }
+    }
+
+    // 회원 탈퇴
+    @DeleteMapping
+    public ResponseEntity delete(@SessionAttribute(value = "login", required = false) Member login) {
+
+        System.out.println("login = " + login);
+        if(service.deleteMember(login.getMember_login_id())) {
+            return ResponseEntity.ok().build();
+        }
+
+        return ResponseEntity.internalServerError().build();
     }
 }

@@ -40,4 +40,8 @@ public class MemberService {
         }
         return false;
     }
+
+    public boolean deleteMember(String memberLoginId) {
+        return mapper.deleteById(memberLoginId) == 1;
+    }
 }
