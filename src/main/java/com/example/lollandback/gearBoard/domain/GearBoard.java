@@ -9,6 +9,11 @@ public class GearBoard {
     private Integer gear_id;
     private String  gear_title ;
     private String  gear_content;
-    private String  gear_writer ;
+    private String category;
     private LocalDateTime gear_inserted ;
+    private Integer gear_views;
+    private Integer gear_recommand;
+    private  String member_name;
+    private Integer member_id;
 }
+
