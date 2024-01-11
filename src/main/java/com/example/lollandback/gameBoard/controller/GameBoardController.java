@@ -11,38 +11,37 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/gameBoard")
+@RequestMapping("/api/gameboard")
 public class GameBoardController {
-
 
     private final GameBoardService gameboardService;
 
-    @PostMapping("add")
-    public ResponseEntity add(@RequestBody GameBoard gameboard
-                              ) {
+    @PostMapping("/write")
+    public ResponseEntity add(@RequestBody GameBoard gameboard){
 
         if (!gameboardService.validate(gameboard)) {
-
-            return ResponseEntity.ok().build();
+            return ResponseEntity.badRequest().body("Invaild request body");
         }
         if (gameboardService.save(gameboard)) {
             return ResponseEntity.ok().build();
         } else {
-            return ResponseEntity.ok().build();
+            return ResponseEntity.internalServerError().body("글 작성 실패");
         }
+
     }
 
-    @GetMapping("list")
+    @GetMapping
     public List<GameBoard> list() {
         return gameboardService.list();
     }
 
-    @GetMapping("id/{id}")
+    @GetMapping("/id/{id}")
     public GameBoard get(@PathVariable Integer id) {
+        gameboardService.boardCount(id);
         return gameboardService.get(id);
     }
 
-    @DeleteMapping("remove/{id}")
+    @DeleteMapping("/remove/{id}")
     public ResponseEntity delete(@PathVariable Integer id) {
         if(gameboardService.delete(id)){
             return ResponseEntity.ok().build();
@@ -51,7 +50,7 @@ public class GameBoardController {
         }
     }
 
-    @PutMapping("edit")
+    @PutMapping("/edit")
     public ResponseEntity edit(@RequestBody GameBoard gameBoard) {
         if(gameboardService.validate(gameBoard)){
             if(gameboardService.update(gameBoard)){

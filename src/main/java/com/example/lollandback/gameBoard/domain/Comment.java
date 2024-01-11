@@ -9,12 +9,12 @@ import java.time.LocalDateTime;
 
 @Data
 public class Comment {
-    private Integer memberId;
-    private  Integer boardId;
-    private  Integer parentCommentId;
-    private  Integer commentId;
-    private  LocalDateTime regTime;
-    private  String commentContent;
+    private Integer member_id;
+    private  Integer game_board_id;
+    private  Integer parent_id;
+    private  Integer id;
+    private  LocalDateTime reg_time;
+    private  String comment_content;
 
 
 
