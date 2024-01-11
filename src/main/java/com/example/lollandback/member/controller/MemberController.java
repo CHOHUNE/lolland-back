@@ -1,6 +1,7 @@
 package com.example.lollandback.member.controller;
 
 import com.example.lollandback.member.domain.Member;
+import com.example.lollandback.member.dto.MemberDto;
 import com.example.lollandback.member.service.MemberService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -14,7 +15,7 @@ import org.springframework.web.context.request.WebRequest;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/member/")
+@RequestMapping("/api/member")
 public class MemberController {
     private final MemberService service;
 
@@ -40,6 +41,24 @@ public class MemberController {
         if(session != null) {
             session.invalidate();
         }
+    }
+
+    // 로그인한 맴버로 맴버 ID 가져오기
+    @GetMapping("login")
+    public MemberDto getMember(@SessionAttribute("login")Member login) {
+        System.out.println("login = " + login);
+        return service.getMember(login);
+    }
+
+    // 회원정보 조회시 비밀번호 체크
+    @GetMapping("checkPassword")
+    public ResponseEntity checkPassword(@SessionAttribute("login") Member login, @RequestParam String password) {
+        System.out.println("login = " + login);
+        System.out.println("password = " + password);
+        if(service.getLoginIdAndPassword(login.getMember_login_id(), password) != null){
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.badRequest().build();
     }
 
     // 회원 탈퇴

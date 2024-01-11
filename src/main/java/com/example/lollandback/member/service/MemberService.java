@@ -1,6 +1,7 @@
 package com.example.lollandback.member.service;
 
 import com.example.lollandback.member.domain.Member;
+import com.example.lollandback.member.dto.MemberDto;
 import com.example.lollandback.member.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +29,6 @@ public class MemberService {
 
     public boolean loginUser(Member member, WebRequest request) {
         Member dbMember = mapper.selectById(member.getMember_login_id());
-
         if (dbMember != null ) {
             if(dbMember.getMember_password().equals(member.getMember_password())){
                 // 비밀번호 숨기기
@@ -43,5 +43,13 @@ public class MemberService {
 
     public boolean deleteMember(String memberLoginId) {
         return mapper.deleteById(memberLoginId) == 1;
+    }
+
+    public MemberDto getMember(Member login) {
+        return mapper.selectByLoginId(login.getMember_login_id());
+    }
+
+    public String getLoginIdAndPassword(String memberLoginId, String password) {
+        return mapper.selectByLoginIdAndPassword(memberLoginId, password);
     }
 }
