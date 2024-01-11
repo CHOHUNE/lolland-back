@@ -2,17 +2,19 @@ package com.example.lollandback.gameBoard.domain;
 
 import lombok.Data;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 @Data
 public class GameBoard {
 
     private String title;
-    private String content;
-    private String writer;
-    private Integer bgId;
-    private LocalDateTime regTime;
-    private String Category;
+    private String board_content;
+    private Long id;
+    private LocalDateTime reg_time;
+    private String category;
+    private Long board_count;
+
 
 
 }
