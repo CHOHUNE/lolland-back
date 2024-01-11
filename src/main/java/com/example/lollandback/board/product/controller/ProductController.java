@@ -2,11 +2,14 @@ package com.example.lollandback.board.product.controller;
 
 import com.example.lollandback.board.product.domain.Company;
 import com.example.lollandback.board.product.domain.Product;
+import com.example.lollandback.board.product.domain.ProductOptions;
 import com.example.lollandback.board.product.dto.CategoryDto;
 import com.example.lollandback.board.product.dto.ProductDto;
+import com.example.lollandback.board.product.dto.ProductOptionsDto;
 import com.example.lollandback.board.product.dto.SubCategoryDto;
 import com.example.lollandback.board.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.apache.ibatis.annotations.Delete;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,6 +56,27 @@ public class ProductController {
         return productDto;
     }
 
+    // --------------------------- 상품 상세옵션 보기 로직 ---------------------------
+    @GetMapping("option/{product_id}")
+    public ResponseEntity<List<ProductOptionsDto>> getOption(@PathVariable Integer product_id) {
+        List<ProductOptionsDto> options = productService.getOptionsByProductId(product_id);
+        return ResponseEntity.ok(options);
+    }
 
+    // --------------------------- 상품 삭제 로직 ---------------------------
+    @DeleteMapping("remove/{product_id}")
+    public void remove(@PathVariable Long product_id) {
+        productService.remove(product_id);
+    }
 
+    // --------------------------- 상품 수정 로직 ---------------------------
+    @PutMapping("edit")
+    public ResponseEntity update(ProductDto productDto,
+                                 @RequestParam(value = "removeMainImgs[]", required = false) List<String> removeMainImg,
+                                 @RequestParam(value = "newImgs[]", required = false) MultipartFile[] uploadMainImg) throws IOException {
+        System.out.println("productDto = " + productDto);
+        System.out.println("removeMainImg = " + removeMainImg);
+        System.out.println("uploadMainImg = " + uploadMainImg);
+        return null;
+    }
 }

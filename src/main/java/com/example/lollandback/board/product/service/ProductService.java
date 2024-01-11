@@ -3,24 +3,20 @@ package com.example.lollandback.board.product.service;
 import com.example.lollandback.board.product.domain.*;
 import com.example.lollandback.board.product.dto.CategoryDto;
 import com.example.lollandback.board.product.dto.ProductDto;
-import com.example.lollandback.board.product.mapper.ProductCompanyMapper;
-import com.example.lollandback.board.product.mapper.ProductMainImg;
-import com.example.lollandback.board.product.mapper.ProductMapper;
-import com.example.lollandback.board.product.mapper.ProductOptionMapper;
+import com.example.lollandback.board.product.dto.ProductOptionsDto;
+import com.example.lollandback.board.product.mapper.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,6 +36,8 @@ public class ProductService {
     private final ProductCompanyMapper companyMapper;
     private final ProductMainImg mainImgMapper;
     private final ProductOptionMapper productOptionMapper;
+    private final ProductCategory productCategory;
+    private final ProductSubCategory productSubCategory;
 
     // --------------------------- 상품 저장 시 대분류/소분류 보여주기 로직 ---------------------------
     public List<CategoryDto> getAllCategories() {
@@ -100,6 +98,11 @@ public class ProductService {
     // --------------------------- 상품 리스트 로직 ---------------------------
     public List<Product> list() {
         List<Product> product = productMapper.list();
+        product.forEach(productListImg -> {
+            List<ProductImg> productsImg = mainImgMapper.selectNamesByProductId(productListImg.getProduct_id());
+            productsImg.forEach(img -> img.setMain_img_uri(urlPrefix + "lolland/product/productMainImg/" + productListImg.getProduct_id() + "/" + img.getMain_img_uri()));
+            productListImg.setMainImgs(productsImg);
+        });
         return product;
     }
 
@@ -128,5 +131,36 @@ public class ProductService {
         productDto.setMainImgUrls(imgUrls);
 
         return productDto;
+    }
+
+    // --------------------------- 상품 상세 옵션 보기 로직 ---------------------------
+    public List<ProductOptionsDto> getOptionsByProductId(Integer producId) {
+        return productOptionMapper.getOptionByProductId(producId);
+
+    }
+
+    // --------------------------- 상품 삭제 로직 ---------------------------
+    public void remove(Long productId) {
+        // 1. 이미지삭제
+        deleteMainImg(productId);
+        // 2. 옵션삭제
+        productOptionMapper.deleteByOption(productId);
+        // 3. 상품삭제
+        productMapper.deleteByProduct(productId);
+        // 3. 제조사 삭제
+        companyMapper.deleteByCompany(productId);
+
+    }
+    private void deleteMainImg(Long product_id) {
+        List<ProductImg> productImgs = mainImgMapper.selectNamesByProductId(product_id);
+        for (ProductImg img : productImgs) {
+            String key = "lolland/product/productMainImg/" + product_id + "/" + img.getMain_img_uri();
+            DeleteObjectRequest objectRequest = DeleteObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(key)
+                    .build();
+            s3.deleteObject(objectRequest);
+        }
+        mainImgMapper.deleteByProductId(product_id);
     }
 }
