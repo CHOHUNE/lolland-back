@@ -41,25 +41,25 @@ public interface ReviewMapper {
 
     @Delete("""
         DELETE FROM review
-        WHERE review_id = #{review_id}
+        WHERE review_id = #{reviewId}
     """)
-    void deleteReviewById(Long review_id);
+    void deleteReviewById(Long reviewId);
 
     //선택된 리뷰 삭제
     @Delete("""
         DELETE FROM review
         WHERE review_id IN
-        <foreach collection="review_ids" open="(" seperator="," close=")">
+        <foreach collection="reviewIds" open="(" seperator="," close=")">
             #{review_id}
         </foreach>
     """)
-    void deleteSelectedReviews(List<Long> review_ids);
+    void deleteSelectedReviews(List<Long> reviewIds);
 
     //멤버 탈퇴 시 사용
     @Delete("""
         DELETE FROM review
-        WHERE member_id = #{member_id}
+        WHERE member_id = #{memberId}
     """)
-    void deleteReviewByMember(Long member_id);
+    void deleteReviewByMember(Long memberId);
 
 }
