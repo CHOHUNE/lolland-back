@@ -1,8 +1,13 @@
 package com.example.lollandback.board.cart.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Data
+@Builder
 public class CartDto {
     private Long cart_id;
     private Long member_id;
@@ -12,7 +17,7 @@ public class CartDto {
     private String subcategory_name;
     private String product_name;
     private String company_name;
-    private String main_img_url;
+    private List<String> main_img_uri;
     private Double product_price;
     private Integer count;
 }
