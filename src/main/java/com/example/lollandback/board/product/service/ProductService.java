@@ -42,10 +42,12 @@ public class ProductService {
     private final ProductCompanyMapper companyMapper;
     private final ProductMainImg mainImgMapper;
 
+    // --------------------------- 상품 저장 시 대분류/소분류 보여주기 로직 ---------------------------
     public List<CategoryDto> getAllCategories() {
         return productMapper.getAllCategoriesWithSub();
     }
 
+    // --------------------------- 상품 저장 로직 ---------------------------
     @Transactional
     public boolean save(Product product, Company company, MultipartFile[] mainImg) throws IOException {
         // 제조사 정보 저장
@@ -72,7 +74,7 @@ public class ProductService {
         return true;
     }
 
-    // 이미지 업로드 로직
+    // --------------------------- 이미지 업로드 로직 ---------------------------
     private void upload(Long product_id, MultipartFile mainImg) throws IOException {
         String key = "lolland/product/productMainImg/" + product_id + "/" + mainImg.getOriginalFilename();
 
@@ -85,26 +87,23 @@ public class ProductService {
         s3.putObject(objectRequest, RequestBody.fromInputStream(mainImg.getInputStream(), mainImg.getSize()));
     }
 
+    // --------------------------- 상품 리스트 로직 ---------------------------
     public List<Product> list() {
         List<Product> product = productMapper.list();
         return product;
     }
 
-
+    // --------------------------- 상품 보기 로직 ---------------------------
     public ProductDto get(Integer productId) {
         ProductDto productDto = new ProductDto();
         Product product = productMapper.selectById(productId);
-        System.out.println("product = " + product);
         productDto.setProduct(product);
 
         Company company = companyMapper.selectById(product.getCompany_id());
-        System.out.println("company = " + company);
         productDto.setCompany_name(company.getCompany_name());
 
         String category_name = productMapper.categoryById(product.getCategory_id());
-        System.out.println("category_name = " + category_name);
         String subCategory_name = productMapper.subCategoryById(product.getSubcategory_id());
-        System.out.println("subCategory_name = " + subCategory_name);
 
         productDto.setCategory_name(category_name);
         productDto.setSubcategory_name(subCategory_name);

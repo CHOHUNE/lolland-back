@@ -27,7 +27,7 @@ public class ProductController {
         return productService.getAllCategories();
     }
 
-    // --------------------------- 상품 등록 ---------------------------
+    // --------------------------- 상품 등록 로직 ---------------------------
     @PostMapping("add")
     public ResponseEntity add(Product product, Company company,
                               @RequestParam(value = "mainImg[]", required = false) MultipartFile[] mainImg) throws IOException {
@@ -38,11 +38,13 @@ public class ProductController {
         }
     }
 
+    // --------------------------- 상품 리스트 로직 ---------------------------
     @GetMapping("list")
     public List<Product> list() {
         return productService.list();
     }
 
+    // --------------------------- 상품 보기 로직 ---------------------------
     @GetMapping("product_id/{product_id}")
     public ProductDto get(@PathVariable Integer product_id) {
         ProductDto productDto = productService.get(product_id);
