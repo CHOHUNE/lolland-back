@@ -13,6 +13,8 @@ public class GameBoard {
     private Long id;
     private LocalDateTime reg_time;
     private String category;
+    private Long count_comment;
+    private Long count_like;
     private Long board_count;
 
 

@@ -15,10 +15,20 @@ VALUES (#{title},#{board_content},#{category})
     int insert(GameBoard gameBoard);
 
     @Select("""
-            SELECT id, board_content, title, category, board_count, reg_time
-            FROM gameboard
-            ORDER BY reg_time ASC
-            
+            SELECT gb.id,
+             gb.board_content,
+             gb.title,
+              gb.category,
+               gb.board_count,
+                gb.reg_time,
+                COUNT(DISTINCT gl.id)count_like,
+                COUNT(DISTINCT gc.id)count_comment 
+            FROM gameboard gb
+            LEFT JOIN lolland.gameboardlike gl on gb.id = gl.game_board_id
+            LEFT JOIN lolland.gameboardcomment gc on gb.id = gc.game_board_id
+            GROUP BY gb.id
+            ORDER BY gb.id DESC
+                        
             """)
     List<GameBoard> selectAll();
 

@@ -36,10 +36,11 @@ VALUES (#{comment_content},#{game_board_id},#{parent_id})
                    FROM
                        gameboardcomment
                    WHERE
-                       parent_id IS NULL -- 최상위 댓글은 parent_id가 NULL인 것으로 시작
+                   parent_id IS NULL
+                   AND game_board_id = #{game_board_id} -- 추가된 부분
                
                    UNION ALL
-               
+
                    SELECT
                        c.id,
                        c.comment_content,
@@ -53,6 +54,8 @@ VALUES (#{comment_content},#{game_board_id},#{parent_id})
                        gameboardcomment c
                    JOIN
                        CommentHierarchy ch ON c.parent_id = ch.id
+                         WHERE
+                       c.game_board_id = #{game_board_id} -- 추가된 부분
                )
                
                SELECT
@@ -65,8 +68,10 @@ VALUES (#{comment_content},#{game_board_id},#{parent_id})
                    depth
                FROM
                    CommentHierarchy
+            
                ORDER BY
                    path;
+            
 """)
     List<Comment> selectByBoardId(Integer game_board_id);
 
