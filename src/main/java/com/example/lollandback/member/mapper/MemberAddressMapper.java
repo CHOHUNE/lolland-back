@@ -1,8 +1,13 @@
 package com.example.lollandback.member.mapper;
 
 import com.example.lollandback.member.domain.MemberAddress;
+import com.example.lollandback.member.dto.MemberAddressDto;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 @Mapper
 public interface MemberAddressMapper {
@@ -26,4 +31,16 @@ public interface MemberAddressMapper {
         ) 
     """)
     void insertAddress(Long id, MemberAddress memberAddress);
+
+    @Select("""
+        SELECT * FROM memberaddress
+        WHERE member_id = #{memberId}
+        """)
+    List<MemberAddressDto> getAddressByLoginUser(Long memberId);
+
+    @Delete("""
+        DELETE FROM memberaddress
+        WHERE member_id = #{memberId} AND id = #{addressId}
+        """)
+    Integer deleteAddressByMemberAndAddressId(Long memberId, Long addressId);
 }
