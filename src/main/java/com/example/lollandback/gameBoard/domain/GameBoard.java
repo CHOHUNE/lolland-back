@@ -1,5 +1,6 @@
 package com.example.lollandback.gameBoard.domain;
 
+import com.example.lollandback.gameBoard.util.AppUtil;
 import lombok.Data;
 
 import java.math.BigInteger;
@@ -17,6 +18,8 @@ public class GameBoard {
     private Long count_like;
     private Long board_count;
 
-
+    public String getAgo() {
+        return AppUtil.getAgo(reg_time);
+    }
 
 }
