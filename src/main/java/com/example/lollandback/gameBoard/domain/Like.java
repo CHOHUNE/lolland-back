@@ -6,8 +6,8 @@ import lombok.Data;
 public class Like {
 
     private Integer id;
-    private Integer boardId;
-    private String memberId;
+    private Integer game_board_id;
+    private String member_id;
 
 
 }

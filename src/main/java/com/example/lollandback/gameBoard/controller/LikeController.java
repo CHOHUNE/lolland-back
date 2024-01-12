@@ -15,6 +15,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/like")
 public class LikeController {
+
     private final LikeService service;
 
     @PostMapping
@@ -22,9 +23,11 @@ public class LikeController {
         service.update(like);
     }
 
-    @GetMapping("gameboard/{gameboardId}")
-    public ResponseEntity<Map<String, Object>> get(@PathVariable Integer gameboardId) {
-        return ResponseEntity.ok(service.get(gameboardId));
-
+    @GetMapping("gameboard/{boardId}")
+    public ResponseEntity<Map<String, Object>> get(
+            @PathVariable Integer boardId
+    ) {
+        return ResponseEntity.ok(service.get(boardId));
     }
 }
+
