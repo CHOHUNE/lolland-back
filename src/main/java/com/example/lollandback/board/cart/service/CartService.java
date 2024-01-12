@@ -4,6 +4,7 @@ import com.example.lollandback.board.cart.domain.Cart;
 import com.example.lollandback.board.cart.dto.CartDto;
 import com.example.lollandback.board.cart.dto.CartDtoWithLoginId;
 import com.example.lollandback.board.cart.mapper.CartMapper;
+import com.example.lollandback.member.domain.Member;
 import com.example.lollandback.member.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,21 +24,22 @@ public class CartService {
     @Value("${image.file.prefix}")
     private String urlPrefix;
 
-    public CartDtoWithLoginId fetchCartByMember(Long memberId) {
-        List<CartDto> cartDtoList = cartMapper.fetchCartByMemberId(memberId);
+    public CartDtoWithLoginId fetchCartByMember(String memberLoginId) {
+        Member member = memberMapper.selectById(memberLoginId);
+        Long memberId = member.getId();
+        List<CartDto> cartDtoList = cartMapper.fetchCartByMemberLoginId(memberId);
 
-        cartDtoList.forEach(cartDto -> {
-            List<String> modifiedMainImgUri = cartDto.getMain_img_uri().stream()
-                    .map(uri -> urlPrefix + "lolland/product/productMainImg/" +  cartDto.getProduct_id() + "/" + uri)
-                    .collect(Collectors.toList());
-            cartDto.setMain_img_uri(modifiedMainImgUri);
-        });
+        if(cartDtoList != null) {
+            cartDtoList.forEach(cartDto -> {
+                List<String> modifiedMainImgUri = cartDto.getMain_img_uri().stream()
+                        .map(uri -> urlPrefix + "lolland/product/productMainImg/" +  cartDto.getProduct_id() + "/" + uri)
+                        .collect(Collectors.toList());
+                cartDto.setMain_img_uri(modifiedMainImgUri);
+            });
+        }
 
-//        memberMapper로 member_login_id 가져오기
-
-//        CartDtoWithLoginId cartDtoWithLoginId = new CartDtoWithLoginId(cartDtoList, member_login_id);
-//        return cartDtoWithLoginId;
-        return null;
+        CartDtoWithLoginId cartDtoWithLoginId = new CartDtoWithLoginId(cartDtoList, memberLoginId);
+        return cartDtoWithLoginId;
     }
 
     public void addProductToCart(Cart cart) {
@@ -55,7 +57,9 @@ public class CartService {
     }
 
     @Transactional
-    public void deleteAllByMember(Long memberId) {
+    public void deleteAllByMember(String memberLoginId) {
+        Member member = memberMapper.selectById(memberLoginId);
+        Long memberId = member.getId();
         cartMapper.deleteAllByMember(memberId);
     }
 
