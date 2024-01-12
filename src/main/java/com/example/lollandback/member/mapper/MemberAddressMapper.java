@@ -63,4 +63,14 @@ public interface MemberAddressMapper {
         """)
     Integer deleteAddressByMemberAndAddressId(Long memberId, Long addressId);
 
+    @Select("""
+        SELECT ma.id, ma.member_id, 
+                ma.member_address_name, ma.member_address, 
+                ma.member_detail_address, ma.member_post_code, 
+                ma.member_address_type, ma.reg_time
+         FROM memberaddress ma JOIN member m
+            ON ma.member_id = m.id
+         WHERE m.member_login_id = #{memberLoginId} AND ma.member_address_type = 'main'
+        """)
+    MemberAddressDto selectByMemberIdToMainAddress(String memberLoginId);
 }
