@@ -1,8 +1,10 @@
 package com.example.lollandback.member.controller;
 
 import com.example.lollandback.member.domain.Member;
+import com.example.lollandback.member.domain.MemberAddress;
 import com.example.lollandback.member.dto.MemberAddressDto;
 import com.example.lollandback.member.service.MemberAddressService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,12 +17,20 @@ import java.util.List;
 public class MemberAddressController {
     private final MemberAddressService service;
 
+    // 로그인 한 유저의 주소 등록 하기
+    @PostMapping
+    public void add(@RequestBody @Valid MemberAddress memberAddress,
+                    @SessionAttribute("login")Member login ) {
+        service.addAddress(memberAddress, login);
+    }
+
     // 로그인 한 해당 유저의 주소 목록 가져오기
     @GetMapping("loginUser")
     public List<MemberAddressDto> getAddress(@SessionAttribute("login")Member login) {
         return service.getAddressByLoginUser(login);
     }
 
+    // 로그인 한 해당 유저의 해당 주소 (한개) 삭제하기
     @DeleteMapping("deleteAddress/{addressId}")
     public ResponseEntity deleteAddress(@SessionAttribute("login")Member login, @PathVariable Long addressId) {
 
