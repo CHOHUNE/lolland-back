@@ -27,5 +27,14 @@ public interface ProductOptionMapper {
             WHERE product_id = #{product_id}
             """)
     void deleteByOption(Long productId);
+
+
+    @Update("""
+            UPDATE productoptions
+            SET
+                option_name = #{option_name}
+            WHERE product_id = #{product_id}
+            """)
+    int update(List<ProductOptionsDto> options);
 }
 

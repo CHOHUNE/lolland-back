@@ -72,10 +72,19 @@ public class ProductController {
     // --------------------------- 상품 수정 로직 ---------------------------
     @PutMapping("edit")
     public ResponseEntity update(ProductDto productDto,
-                                 @RequestParam(value = "removeMainImgs[]", required = false) List<String> removeMainImg,
+                                 @RequestParam(value = "options[]", required = false) List<ProductOptionsDto> options,
+                                 @RequestParam(value = "removeMainImgs[]", required = false) List<Integer> removeMainImg,
                                  @RequestParam(value = "newImgs[]", required = false) MultipartFile[] newImgs) throws IOException {
+
+        System.out.println("productDto = " + productDto);
+        System.out.println("options = " + options);
         System.out.println("removeMainImg = " + removeMainImg);
         System.out.println("newImgs = " + newImgs);
-        return null;
+
+        if (productService.update(productDto, options, removeMainImg, newImgs )) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

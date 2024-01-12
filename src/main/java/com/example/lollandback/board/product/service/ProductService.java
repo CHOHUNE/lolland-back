@@ -18,7 +18,6 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,8 +35,6 @@ public class ProductService {
     private final ProductCompanyMapper companyMapper;
     private final ProductMainImg mainImgMapper;
     private final ProductOptionMapper productOptionMapper;
-    private final ProductCategory productCategory;
-    private final ProductSubCategory productSubCategory;
 
     // --------------------------- 상품 저장 시 대분류/소분류 보여주기 로직 ---------------------------
     public List<CategoryDto> getAllCategories() {
@@ -125,10 +122,14 @@ public class ProductService {
         List<ProductImg> productImgs = mainImgMapper.selectByProductId(Long.valueOf(productId));
 
         // 이미지 URI 리스트를 URL로 변환하여 Product 객체에 설정
-        List<String> imgUrls = productImgs.stream()
-                .map(productImg -> urlPrefix + "lolland/product/productMainImg/" + productId + "/" + productImg.getMain_img_uri())
-                .collect(Collectors.toList());
-        productDto.setMainImgUrls(imgUrls);
+//        List<String> imgUrls = productImgs.stream()
+//                .map(productImg -> urlPrefix + "lolland/product/productMainImg/" + productId + "/" + productImg.getMain_img_uri())
+//                .collect(Collectors.toList());
+
+        productImgs.forEach((productImg -> productImg.setMain_img_uri(urlPrefix + "lolland/product/productMainImg/" + productId + "/" + productImg.getMain_img_uri())));
+//        productDto.setMainImgUrls(imgUrls);
+
+        productDto.setProductImgs(productImgs);
 
         return productDto;
     }
@@ -162,5 +163,43 @@ public class ProductService {
             s3.deleteObject(objectRequest);
         }
         mainImgMapper.deleteByProductId(product_id);
+    }
+
+    public boolean update(ProductDto productDto, List<ProductOptionsDto> options, List<Integer> removeMainImg, MultipartFile[] newImgs) throws IOException {
+
+        // 이미지 파일 지우기
+        if (removeMainImg != null) {
+            for (Integer main_img_id: removeMainImg) {
+                // s3삭제
+                ProductImg productImg = mainImgMapper.selectById(main_img_id);
+                String key = "lolland/product/productMainImg/" + main_img_id + "/" + productImg.getMain_img_uri();
+                DeleteObjectRequest objectRequest = DeleteObjectRequest.builder()
+                        .bucket(bucket)
+                        .key(key)
+                        .build();
+                s3.deleteObject(objectRequest);
+                // db삭제
+                mainImgMapper.deleteById(main_img_id);
+            }
+        }
+        // 새로운 이미지 파일 추가
+        if (newImgs != null) {
+            // s3에 추가
+            for (MultipartFile img : newImgs) {
+                upload(productDto.getProduct_id(), img);
+                mainImgMapper.insert(productDto.getProduct_id(), img.getOriginalFilename());
+            }
+        }
+
+        // 상세옵션 변경
+//        if (options != null) {
+//            for (List<ProductOptionsDto> option : options) {
+//
+//            }
+//        }
+
+        // 상품 정보 변경
+        return productMapper.updateById(productDto) == 1;
+
     }
 }
