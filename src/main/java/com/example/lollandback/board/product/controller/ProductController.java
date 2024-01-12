@@ -73,10 +73,9 @@ public class ProductController {
     @PutMapping("edit")
     public ResponseEntity update(ProductDto productDto,
                                  @RequestParam(value = "removeMainImgs[]", required = false) List<String> removeMainImg,
-                                 @RequestParam(value = "newImgs[]", required = false) MultipartFile[] uploadMainImg) throws IOException {
-        System.out.println("productDto = " + productDto);
+                                 @RequestParam(value = "newImgs[]", required = false) MultipartFile[] newImgs) throws IOException {
         System.out.println("removeMainImg = " + removeMainImg);
-        System.out.println("uploadMainImg = " + uploadMainImg);
+        System.out.println("newImgs = " + newImgs);
         return null;
     }
 }
