@@ -76,4 +76,15 @@ public class MemberService {
     }
 
 
+    public boolean editMember(Member login, MemberAndAddress memberAndAddress) {
+        Member member = memberAndAddress.getMember();
+        MemberAddress memberAddress = memberAndAddress.getMemberAddress();
+
+        // 회원 생성
+        mapper.insertUser(member);
+        // 주소 생성
+        memberAddressMapper.insertAddress(member.getId(),memberAddress);
+
+        return false;
+    }
 }

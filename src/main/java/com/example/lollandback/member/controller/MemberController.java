@@ -1,5 +1,6 @@
 package com.example.lollandback.member.controller;
 
+import com.example.lollandback.member.domain.EditMemberAndAddress;
 import com.example.lollandback.member.domain.Member;
 import com.example.lollandback.member.domain.MemberAddress;
 import com.example.lollandback.member.domain.MemberAndAddress;
@@ -65,6 +66,18 @@ public class MemberController {
     @GetMapping("memberInfo")
     public MemberDto getMemberInfo(@SessionAttribute("login")Member login) {
         return service.getMemberInfo(login);
+    }
+
+    // 회원 정보 수정
+    @PutMapping("edit")
+    public void editMember(@SessionAttribute("login")Member login, @RequestBody @Valid EditMemberAndAddress editMemberAndAddress) {
+        System.out.println("login = " + login);
+        System.out.println("editMemberAndAddress = " + editMemberAndAddress);
+        //        if (service.editMember(login, memberAndAddress)){
+//            return ResponseEntity.ok().build();
+//        } else {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//        }
     }
 
     // 회원 탈퇴

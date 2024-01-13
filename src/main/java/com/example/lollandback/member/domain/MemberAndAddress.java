@@ -7,5 +7,6 @@ import lombok.Data;
 public class MemberAndAddress {
     @Valid
     private Member member;
+    @Valid
     private MemberAddress memberAddress;
 }
