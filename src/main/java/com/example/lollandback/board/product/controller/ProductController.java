@@ -51,7 +51,6 @@ public class ProductController {
     @GetMapping("product_id/{product_id}")
     public ProductDto get(@PathVariable Integer product_id) {
         ProductDto productDto = productService.get(product_id);
-        System.out.println("productDto = " + productDto);
         return productDto;
     }
 
@@ -78,8 +77,6 @@ public class ProductController {
 
         ObjectMapper objectMapper = new ObjectMapper();
         List<ProductOptionsDto> details = objectMapper.readValue(options, new TypeReference<>() {});
-
-
 
         if (productService.update(productUpdateDto, details, removeMainImg, newImgs )) {
             return ResponseEntity.ok().build();

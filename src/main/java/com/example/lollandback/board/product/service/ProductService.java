@@ -172,8 +172,6 @@ public class ProductService {
     @Transactional
     public boolean update(ProductUpdateDto productUpdateDto, List<ProductOptionsDto> options, List<Integer> removeMainImg, MultipartFile[] newImgs) throws IOException {
         // ------------- 이미지 파일 지우기 -------------
-        System.out.println("removeMainImg = " + removeMainImg);
-        System.out.println("productDto = " + productUpdateDto);
         if (removeMainImg != null && !removeMainImg.isEmpty()) {
             for (Integer main_img_id : removeMainImg) {
                 // s3삭제
@@ -206,6 +204,8 @@ public class ProductService {
                 productOptionMapper.updateOptions(productOptionsDto);
             }
         }
+
+        companyMapper.updateCompany(productUpdateDto);
 
         // ------------- 상품 수정 로직 -------------
         try {

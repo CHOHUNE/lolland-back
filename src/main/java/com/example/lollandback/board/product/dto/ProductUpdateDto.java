@@ -10,6 +10,7 @@ public class ProductUpdateDto {
     private String product_content;
     private Long total_stock;
     private String company_name;
+    private Long company_id;
     private Long category_id;
     private Long subcategory_id;
 }
