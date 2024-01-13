@@ -64,6 +64,12 @@ public class MemberController {
         return service.getMember(login);
     }
 
+    // loginProvider에 제공 하는 기능
+    @GetMapping("homepageLogin")
+    public Member login(@SessionAttribute(value = "login", required = false) Member login){
+        return login;
+    }
+
     // 회원정보 조회시 비밀번호 체크
     @GetMapping("checkPassword")
     public ResponseEntity checkPassword(@SessionAttribute("login") Member login, @RequestParam String password) {
