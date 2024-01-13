@@ -11,7 +11,7 @@ import java.util.List;
 public interface ReviewMapper {
 
     @Select("""
-        SELECT r.review_id, r.product_id, r.member_id, r.review_content, r.rate, m.member_login_id
+        SELECT r.review_id, r.product_id, r.member_id, r.review_content, r.rate, r.review_reg_time, m.member_login_id
         FROM review r NATURAL JOIN member m
         WHERE r.product_id = #{product_id}
     """)
@@ -25,7 +25,7 @@ public interface ReviewMapper {
 
     @Insert("""
         INSERT INTO review (product_id, member_id, review_content, rate)
-        VALUES (#{review.product_id}, #{review.member_id}, #{review.review_content}, #{review.rate})
+        VALUES (#{product_id}, #{member_id}, #{review_content}, #{rate})
     """)
     void addNewReview(Review review);
 

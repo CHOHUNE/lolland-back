@@ -53,7 +53,7 @@ public class CartService {
 
     @Transactional
     public void deleteSelected(List<Long> cartIds) {
-        cartMapper.deleteSelected(cartIds);
+//        cartMapper.deleteSelected(cartIds);
     }
 
     @Transactional
