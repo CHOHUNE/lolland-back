@@ -37,14 +37,14 @@ public interface CartMapper {
     """)
     void deleteByCartId(Long cartId);
 
-    @Delete("""
-        DELETE FROM cart
-        WHERE cart_id IN
-        <foreach collection="cartIds" open="(" seperator="," close=")">
-            #{cart_id}
-        </foreach>
-    """)
-    void deleteSelected(List<Long> cartIds);
+//    @Delete("""
+//        DELETE FROM cart
+//        WHERE cart_id IN
+//        <foreach collection="cartIds" open="(" separator="," close=")">
+//            #{cartId}
+//        </foreach>
+//    """)
+//    void deleteSelected(List<Long> cartIds); //TODO: IN이 인식이 안된다
 
     @Delete("""
         DELETE FROM cart
