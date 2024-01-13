@@ -5,6 +5,8 @@ import com.example.lollandback.board.product.domain.Product;
 import com.example.lollandback.board.product.domain.ProductOptions;
 import com.example.lollandback.board.product.dto.*;
 import com.example.lollandback.board.product.service.ProductService;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.annotations.Delete;
 import org.springframework.http.ResponseEntity;
@@ -68,19 +70,21 @@ public class ProductController {
 
     // --------------------------- 상품 수정 로직 ---------------------------
     @PutMapping("edit")
-    public ResponseEntity update(ProductDto productDto,
-                                 @RequestParam(value = "options[]", required = false) List<OptionUpdateDto> options,
+    public ResponseEntity update(ProductUpdateDto productUpdateDto,
+                                 @RequestParam(value = "options", required = false) String options,
                                  @RequestParam(value = "removeMainImgs[]", required = false) List<Integer> removeMainImg,
                                  @RequestParam(value = "newImgs[]", required = false) MultipartFile[] newImgs) throws IOException {
 
-        System.out.println("productDto = " + productDto);
-        System.out.println("options = " + options);
 
-//        if (productService.update(productDto, options, removeMainImg, newImgs )) {
-//            return ResponseEntity.ok().build();
-//        } else {
-//            return ResponseEntity.internalServerError().build();
-//        }
-        return null;
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<ProductOptionsDto> details = objectMapper.readValue(options, new TypeReference<>() {});
+
+
+
+        if (productService.update(productUpdateDto, details, removeMainImg, newImgs )) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

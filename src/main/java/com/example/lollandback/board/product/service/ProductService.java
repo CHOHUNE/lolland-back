@@ -4,6 +4,7 @@ import com.example.lollandback.board.product.domain.*;
 import com.example.lollandback.board.product.dto.CategoryDto;
 import com.example.lollandback.board.product.dto.ProductDto;
 import com.example.lollandback.board.product.dto.ProductOptionsDto;
+import com.example.lollandback.board.product.dto.ProductUpdateDto;
 import com.example.lollandback.board.product.mapper.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -152,6 +153,8 @@ public class ProductService {
         companyMapper.deleteByCompany(productId);
 
     }
+
+    // ------------ 이미지 삭제 ------------
     private void deleteMainImg(Long product_id) {
         List<ProductImg> productImgs = mainImgMapper.selectNamesByProductId(product_id);
         for (ProductImg img : productImgs) {
@@ -165,11 +168,14 @@ public class ProductService {
         mainImgMapper.deleteByProductId(product_id);
     }
 
-    public boolean update(ProductDto productDto, List<ProductOptionsDto> options, List<Integer> removeMainImg, MultipartFile[] newImgs) throws IOException {
-
-        // 이미지 파일 지우기
-        if (removeMainImg != null) {
-            for (Integer main_img_id: removeMainImg) {
+    // --------------------------- 상품 수정 로직 ---------------------------
+    @Transactional
+    public boolean update(ProductUpdateDto productUpdateDto, List<ProductOptionsDto> options, List<Integer> removeMainImg, MultipartFile[] newImgs) throws IOException {
+        // ------------- 이미지 파일 지우기 -------------
+        System.out.println("removeMainImg = " + removeMainImg);
+        System.out.println("productDto = " + productUpdateDto);
+        if (removeMainImg != null && !removeMainImg.isEmpty()) {
+            for (Integer main_img_id : removeMainImg) {
                 // s3삭제
                 ProductImg productImg = mainImgMapper.selectById(main_img_id);
                 String key = "lolland/product/productMainImg/" + main_img_id + "/" + productImg.getMain_img_uri();
@@ -182,27 +188,32 @@ public class ProductService {
                 mainImgMapper.deleteById(main_img_id);
             }
         }
-        // 새로운 이미지 파일 추가
+        // ------------- 새로운 이미지 파일 추가 -------------
         if (newImgs != null) {
             // s3에 추가
             for (MultipartFile img : newImgs) {
-                upload(productDto.getProduct_id(), img);
-                mainImgMapper.insert(productDto.getProduct_id(), img.getOriginalFilename());
+                upload(productUpdateDto.getProduct_id(), img);
+                mainImgMapper.insert(productUpdateDto.getProduct_id(), img.getOriginalFilename());
             }
         }
 
+        // ------------- 상세옵션 관련 로직 -------------
         for (ProductOptionsDto productOptionsDto : options) {
             // 상세옵션 추가 로직
             if (productOptionsDto.getProduct_id() == null) {
-               return productOptionMapper.insertOptions(productOptionsDto);
+                productOptionMapper.insertOptions(productOptionsDto);
             } else {
-                return productOptionMapper.updateOptions(productOptionsDto);
+                productOptionMapper.updateOptions(productOptionsDto);
             }
         }
 
-
-        // 상품 정보 변경
-        return productMapper.updateById(productDto) == 1;
+        // ------------- 상품 수정 로직 -------------
+        try {
+            int updatedRows = productMapper.updateById(productUpdateDto);
+            return updatedRows == 1;
+        } catch (Exception e) {
+            throw e;
+        }
 
     }
 }

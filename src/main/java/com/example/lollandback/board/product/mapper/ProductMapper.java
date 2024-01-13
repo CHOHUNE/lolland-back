@@ -2,7 +2,7 @@ package com.example.lollandback.board.product.mapper;
 
 import com.example.lollandback.board.product.domain.Product;
 import com.example.lollandback.board.product.dto.CategoryDto;
-import com.example.lollandback.board.product.dto.ProductDto;
+import com.example.lollandback.board.product.dto.ProductUpdateDto;
 import com.example.lollandback.board.product.dto.SubCategoryDto;
 import org.apache.ibatis.annotations.*;
 
@@ -70,15 +70,15 @@ public interface ProductMapper {
 
 
     @Update("""
-            UPDATE product
-            SET
-                category_id = #{category_id},
-                subcategory_id = #{subcategory_id},
-                product_name = #{product_name},
-                product_price = #{product_price},
-                product_content = #{product_content},
-                total_stock = #{total_stock}
-            WHERE product_id = #{product_id}
-            """)
-    int updateById(ProductDto productDto);
+    UPDATE product
+    SET
+        category_id = #{category_id},
+        subcategory_id = #{subcategory_id},
+        product_name = #{product_name},
+        product_price = #{product_price},
+        product_content = #{product_content},
+        total_stock = #{total_stock}
+    WHERE product_id = #{product_id}
+    """)
+    int updateById(ProductUpdateDto productDto);
 }

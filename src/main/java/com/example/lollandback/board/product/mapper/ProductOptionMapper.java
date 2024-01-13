@@ -9,8 +9,8 @@ import java.util.List;
 @Mapper
 public interface ProductOptionMapper {
     @Insert("""
-            INSERT INTO productoptions (product_id, option_name)
-            VALUES (#{product_id}, #{option_name})
+            INSERT INTO productoptions (product_id, option_name, stock)
+            VALUES (#{product_id}, #{option_name}, #{stock})
             """)
     @Options(useGeneratedKeys = true, keyProperty = "option_id")
     int insert(ProductOptions productOptions);
