@@ -3,10 +3,7 @@ package com.example.lollandback.board.product.controller;
 import com.example.lollandback.board.product.domain.Company;
 import com.example.lollandback.board.product.domain.Product;
 import com.example.lollandback.board.product.domain.ProductOptions;
-import com.example.lollandback.board.product.dto.CategoryDto;
-import com.example.lollandback.board.product.dto.ProductDto;
-import com.example.lollandback.board.product.dto.ProductOptionsDto;
-import com.example.lollandback.board.product.dto.SubCategoryDto;
+import com.example.lollandback.board.product.dto.*;
 import com.example.lollandback.board.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.annotations.Delete;
@@ -72,19 +69,18 @@ public class ProductController {
     // --------------------------- 상품 수정 로직 ---------------------------
     @PutMapping("edit")
     public ResponseEntity update(ProductDto productDto,
-                                 @RequestParam(value = "options[]", required = false) List<ProductOptionsDto> options,
+                                 @RequestParam(value = "options[]", required = false) List<OptionUpdateDto> options,
                                  @RequestParam(value = "removeMainImgs[]", required = false) List<Integer> removeMainImg,
                                  @RequestParam(value = "newImgs[]", required = false) MultipartFile[] newImgs) throws IOException {
 
         System.out.println("productDto = " + productDto);
         System.out.println("options = " + options);
-        System.out.println("removeMainImg = " + removeMainImg);
-        System.out.println("newImgs = " + newImgs);
 
-        if (productService.update(productDto, options, removeMainImg, newImgs )) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.internalServerError().build();
-        }
+//        if (productService.update(productDto, options, removeMainImg, newImgs )) {
+//            return ResponseEntity.ok().build();
+//        } else {
+//            return ResponseEntity.internalServerError().build();
+//        }
+        return null;
     }
 }

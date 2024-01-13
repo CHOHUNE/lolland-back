@@ -191,12 +191,15 @@ public class ProductService {
             }
         }
 
-        // 상세옵션 변경
-//        if (options != null) {
-//            for (List<ProductOptionsDto> option : options) {
-//
-//            }
-//        }
+        for (ProductOptionsDto productOptionsDto : options) {
+            // 상세옵션 추가 로직
+            if (productOptionsDto.getProduct_id() == null) {
+               return productOptionMapper.insertOptions(productOptionsDto);
+            } else {
+                return productOptionMapper.updateOptions(productOptionsDto);
+            }
+        }
+
 
         // 상품 정보 변경
         return productMapper.updateById(productDto) == 1;

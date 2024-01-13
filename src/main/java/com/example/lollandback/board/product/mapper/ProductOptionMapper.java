@@ -29,12 +29,19 @@ public interface ProductOptionMapper {
     void deleteByOption(Long productId);
 
 
+    @Insert("""
+            INSERT INTO productoptions (option_name)
+            VALUES (#{optoon_name})
+            """)
+    boolean insertOptions(ProductOptionsDto productOptionsDto);
+
+
     @Update("""
             UPDATE productoptions
             SET
                 option_name = #{option_name}
             WHERE product_id = #{product_id}
             """)
-    int update(List<ProductOptionsDto> options);
+    boolean updateOptions(ProductOptionsDto productOptionsDto);
 }
 
