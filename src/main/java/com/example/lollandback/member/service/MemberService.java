@@ -87,4 +87,8 @@ public class MemberService {
 
         return false;
     }
+
+    public String checkUserId(String memberLoginId) {
+        return mapper.checkUserId(memberLoginId);
+    }
 }

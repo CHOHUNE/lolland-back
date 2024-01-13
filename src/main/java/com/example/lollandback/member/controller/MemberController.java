@@ -28,6 +28,17 @@ public class MemberController {
         service.addUser(memberAndAddress);
     }
 
+    // 회원 가입시 아이디 중복 체크
+    @GetMapping("checkId")
+    public ResponseEntity checkUserId(@RequestParam String member_login_id) {
+        System.out.println("member_login_id = " + member_login_id);
+        if(service.checkUserId(member_login_id) != null){
+            return ResponseEntity.badRequest().build();
+        } else {
+            return ResponseEntity.ok().build();
+        }
+    }
+
     // 회원 로그인
     @PostMapping("login")
     public ResponseEntity login(@RequestBody Member member, WebRequest request){

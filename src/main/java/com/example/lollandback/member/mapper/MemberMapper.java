@@ -58,4 +58,10 @@ public interface MemberMapper {
         WHERE member_login_id = #{memberLoginId}
     """)
     MemberDto selectByMemberId(String memberLoginId);
+
+    @Select("""
+        SELECT member_login_id FROM member
+        WHERE member_login_id = #{memberLoginId}
+    """)
+    String checkUserId(String memberLoginId);
 }
