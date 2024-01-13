@@ -32,9 +32,12 @@ public class ProductController {
     // --------------------------- 상품 등록 로직 ---------------------------
     @PostMapping("add")
     public ResponseEntity add(Product product, Company company,
-                              @RequestParam(value = "option_name[]", required = false) List<String> optionNames,
+                              @RequestParam(value = "options", required = false) String options,
                               @RequestParam(value = "mainImg[]", required = false) MultipartFile[] mainImg) throws IOException {
-        if (productService.save(product, company, mainImg, optionNames)) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<ProductOptionsDto> optionsList = objectMapper.readValue(options, new TypeReference<>() {});
+        System.out.println("options = " + optionsList);
+        if (productService.save(product, company, mainImg, optionsList)) {
             return ResponseEntity.ok(product.getProduct_id());
         } else {
             return ResponseEntity.internalServerError().build();

@@ -13,7 +13,7 @@ public interface ProductOptionMapper {
             VALUES (#{product_id}, #{option_name}, #{stock})
             """)
     @Options(useGeneratedKeys = true, keyProperty = "option_id")
-    int insert(ProductOptions productOptions);
+    int insert(ProductOptionsDto productOptions);
 
     @Select("""
             SELECT *

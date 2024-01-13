@@ -44,28 +44,39 @@ public class ProductService {
 
     // --------------------------- 상품 저장 로직 ---------------------------
     @Transactional
-    public boolean save(Product product, Company company, MultipartFile[] mainImg, List<String> optionNames) throws IOException {
+    public boolean save(Product product, Company company, MultipartFile[] mainImg, List<ProductOptionsDto> optionList) throws IOException {
+        Long total_stock = 0L;
         // 제조사 정보 저장
         if (companyMapper.insert(company) != 1) {
             return false;
         }
         product.setCompany_id(company.getCompany_id());
 
+        if (optionList != null) {
+            for (ProductOptionsDto productOptionsDto : optionList) {
+                total_stock += productOptionsDto.getStock();
+            }
+            product.setTotal_stock(total_stock);
+        }
+
         // 상품 정보 저장
         if (productMapper.insert(product) != 1) {
             return false;
         }
 
+
+
+
         // 옵션 저장 로직
-        if (optionNames != null) {
-            for (String optionName : optionNames) {
+        if (optionList != null) {
+            for (ProductOptionsDto productOptionsDto : optionList) {
                 // ProductOption 객체 생성 및 초기화
-                ProductOptions productOption = new ProductOptions();
-                productOption.setProduct_id(product.getProduct_id());
-                productOption.setOption_name(optionName);
-                productOptionMapper.insert(productOption); // 옵션 저장
+                productOptionsDto.setProduct_id(product.getProduct_id());
+                productOptionMapper.insert(productOptionsDto); // 옵션 저장
             }
         }
+
+
 
         // 이미지 정보 저장
         if (mainImg != null && mainImg.length > 0) {
@@ -171,6 +182,7 @@ public class ProductService {
     // --------------------------- 상품 수정 로직 ---------------------------
     @Transactional
     public boolean update(ProductUpdateDto productUpdateDto, List<ProductOptionsDto> options, List<Integer> removeMainImg, MultipartFile[] newImgs) throws IOException {
+        Long total_stock = 0L;
         // ------------- 이미지 파일 지우기 -------------
         if (removeMainImg != null && !removeMainImg.isEmpty()) {
             for (Integer main_img_id : removeMainImg) {
@@ -203,12 +215,14 @@ public class ProductService {
             } else {
                 productOptionMapper.updateOptions(productOptionsDto);
             }
+            total_stock += productOptionsDto.getStock();
         }
 
         companyMapper.updateCompany(productUpdateDto);
 
         // ------------- 상품 수정 로직 -------------
         try {
+            productUpdateDto.setTotal_stock(total_stock);
             int updatedRows = productMapper.updateById(productUpdateDto);
             return updatedRows == 1;
         } catch (Exception e) {
