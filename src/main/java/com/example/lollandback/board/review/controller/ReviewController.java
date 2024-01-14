@@ -21,7 +21,6 @@ public class ReviewController {
 
     @GetMapping("/fetch")
     public List<ReviewDto> fetchReviews(@RequestParam Long product_id) {
-        System.out.println("ReviewController.fetchReviews");
         return reviewService.getAllReviewsByProduct(product_id);
     }
 
