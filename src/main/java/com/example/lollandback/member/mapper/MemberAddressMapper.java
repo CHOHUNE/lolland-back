@@ -79,4 +79,23 @@ public interface MemberAddressMapper {
         WHERE m.id = #{userId} AND ma.member_address_type = 'main'
     """)
     void changeMainAddressType(Long userId);
+
+
+    @Select("""
+        SELECT COUNT(*) FROM memberaddress 
+        WHERE id = #{addressId} AND member_id = #{memberId} AND member_address_type = 'main'
+    """)
+    int getMainAddressByMemberIdAndAddressId(Long memberId, Long addressId);
+
+    @Update("""
+        UPDATE memberaddress 
+        SET 
+        member_address_name = #{member_address_name},
+        member_address = #{member_address},
+        member_detail_address = #{member_detail_address},
+        member_post_code = #{member_post_code},
+        member_address_type = #{member_address_type}
+        WHERE id = #{id}
+    """)
+    void editAddress(MemberAddress memberAddress);
 }

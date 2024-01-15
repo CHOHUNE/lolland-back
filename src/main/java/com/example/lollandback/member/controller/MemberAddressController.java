@@ -42,5 +42,12 @@ public class MemberAddressController {
         }
     }
 
+    // 로그인 한 유저가 수정 요청한 주소 (한개) 수정하기
+    @PutMapping("editAddress")
+    public ResponseEntity editAddress(@SessionAttribute("login")Member login, @RequestBody @Valid MemberAddress memberAddress) {
+        System.out.println("memberAddress = " + memberAddress);
+        return service.editAddressByMemberAndAddressId(login.getId(), memberAddress);
+    }
+
 
 }
