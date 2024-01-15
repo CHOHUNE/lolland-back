@@ -2,10 +2,7 @@ package com.example.lollandback.member.mapper;
 
 import com.example.lollandback.member.domain.MemberAddress;
 import com.example.lollandback.member.dto.MemberAddressDto;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -73,4 +70,13 @@ public interface MemberAddressMapper {
          WHERE m.member_login_id = #{memberLoginId} AND ma.member_address_type = 'main'
         """)
     MemberAddressDto selectByMemberIdToMainAddress(String memberLoginId);
+
+    // main 주소 sub로 강등 시키기
+    @Update("""
+        UPDATE memberaddress ma
+        JOIN member m ON ma.member_id = m.id
+        SET ma.member_address_type = 'sub'
+        WHERE m.id = #{userId}
+    """)
+    void changeMainAddressType(Long userId);
 }
