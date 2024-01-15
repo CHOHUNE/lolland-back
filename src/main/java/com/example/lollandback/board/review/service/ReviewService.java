@@ -15,7 +15,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReviewService {
     private final ReviewMapper reviewMapper;
-    private final ProductMapper productMapper;
 
     public List<ReviewDto> getAllReviewsByProduct(Long product_id) {
         return reviewMapper.getAllReviewsByProduct(product_id);
