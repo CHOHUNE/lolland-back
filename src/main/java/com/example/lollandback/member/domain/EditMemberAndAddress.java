@@ -4,9 +4,9 @@ import jakarta.validation.Valid;
 import lombok.Data;
 
 @Data
-public class MemberAndAddress {
+public class EditMemberAndAddress {
     @Valid
-    private Member member;
+    private EditMember member;
     @Valid
     private MemberAddress memberAddress;
 }

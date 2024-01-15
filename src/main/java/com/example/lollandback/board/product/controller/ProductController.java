@@ -76,11 +76,8 @@ public class ProductController {
                                  @RequestParam(value = "options", required = false) String options,
                                  @RequestParam(value = "removeMainImgs[]", required = false) List<Integer> removeMainImg,
                                  @RequestParam(value = "newImgs[]", required = false) MultipartFile[] newImgs) throws IOException {
-
-
         ObjectMapper objectMapper = new ObjectMapper();
         List<ProductOptionsDto> details = objectMapper.readValue(options, new TypeReference<>() {});
-
         if (productService.update(productUpdateDto, details, removeMainImg, newImgs )) {
             return ResponseEntity.ok().build();
         } else {

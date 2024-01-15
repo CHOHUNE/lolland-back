@@ -3,6 +3,7 @@ package com.example.lollandback.member.service;
 import com.example.lollandback.member.domain.Member;
 import com.example.lollandback.member.domain.MemberAddress;
 import com.example.lollandback.member.domain.MemberAndAddress;
+import com.example.lollandback.member.dto.MemberAddressDto;
 import com.example.lollandback.member.dto.MemberDto;
 import com.example.lollandback.member.mapper.MemberAddressMapper;
 import com.example.lollandback.member.mapper.MemberMapper;
@@ -12,6 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.WebRequest;
 import software.amazon.awssdk.services.s3.S3Client;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -64,6 +68,27 @@ public class MemberService {
     }
 
     public MemberDto getMemberInfo(Member login) {
-        return mapper.selectByMemberId(login.getMember_login_id());
+        MemberAddressDto memberAddress = memberAddressMapper.selectByMemberIdToMainAddress(login.getMember_login_id());
+
+        MemberDto member = mapper.selectByMemberId(login.getMember_login_id());
+        member.setMemberAddressDto(memberAddress);
+        return member;
+    }
+
+
+    public boolean editMember(Member login, MemberAndAddress memberAndAddress) {
+        Member member = memberAndAddress.getMember();
+        MemberAddress memberAddress = memberAndAddress.getMemberAddress();
+
+        // 회원 생성
+        mapper.insertUser(member);
+        // 주소 생성
+        memberAddressMapper.insertAddress(member.getId(),memberAddress);
+
+        return false;
+    }
+
+    public String checkUserId(String memberLoginId) {
+        return mapper.checkUserId(memberLoginId);
     }
 }

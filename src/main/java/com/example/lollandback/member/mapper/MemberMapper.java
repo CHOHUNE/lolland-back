@@ -54,8 +54,14 @@ public interface MemberMapper {
     String selectByLoginIdAndPassword(String memberLoginId, String password);
 
     @Select("""
-        SELECT member_login_id, member_name, member_phone_number, member_email, reg_time FROM member
+        SELECT id, member_login_id, member_name, member_phone_number, member_email, member_type,reg_time FROM member
         WHERE member_login_id = #{memberLoginId}
     """)
     MemberDto selectByMemberId(String memberLoginId);
+
+    @Select("""
+        SELECT member_login_id FROM member
+        WHERE member_login_id = #{memberLoginId}
+    """)
+    String checkUserId(String memberLoginId);
 }
