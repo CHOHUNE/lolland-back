@@ -22,12 +22,18 @@ public class ProductLikeController {
     @PostMapping
     public ResponseEntity<Map<String, Object>> like(@RequestBody ProductLike productLike,
                                                     @SessionAttribute(value = "login", required = false) com.example.lollandback.member.domain.Member login) {
-
         if (login == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
         return ResponseEntity.ok(productLikeService.update(productLike, login));
     }
 
+    @GetMapping("/{productId}")
+    public ResponseEntity<Map<String, Object>> get(@PathVariable Long productId,
+                                                   @SessionAttribute(value = "login", required = false) com.example.lollandback.member.domain.Member login) {
+        if (login == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(productLikeService.get(productId, login));
+    }
 }

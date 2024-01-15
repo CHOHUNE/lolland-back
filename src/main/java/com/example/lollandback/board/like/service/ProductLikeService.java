@@ -31,4 +31,13 @@ public class ProductLikeService {
         return Map.of("productLike", count == 1);
     }
 
+    public Map<String, Object> get(Long productId, Member login) {
+
+        ProductLike productLike = null;
+        if (login != null) {
+            productLike = productLikeMapper.selectByProductIdAndMemberId(productId, login.getId());
+        }
+        return Map.of("productLike", productLike != null);
+
+    }
 }
