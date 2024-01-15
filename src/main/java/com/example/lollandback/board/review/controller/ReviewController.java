@@ -4,6 +4,7 @@ import com.example.lollandback.board.review.domain.Review;
 import com.example.lollandback.board.review.dto.ReviewDto;
 import com.example.lollandback.board.review.dto.ReviewUpdateDto;
 import com.example.lollandback.board.review.service.ReviewService;
+import com.example.lollandback.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,14 +24,17 @@ public class ReviewController {
         return reviewService.getAllReviewsByProduct(product_id);
     }
 
-    @GetMapping("/fetch/{member_id}")
-    public List<ReviewDto> fetchMemberReviews(@PathVariable Long member_id) {
+    @GetMapping("/fetch/")
+    public List<ReviewDto> fetchMemberReviews(@SessionAttribute("login") Member login) {
+        Long member_id = login.getId();
         return reviewService.getAllReviewsByMember(member_id);
     }
 
     @PostMapping("/submit")
-    public ResponseEntity addNewReview(@RequestBody Review review) {
+    public ResponseEntity addNewReview(@SessionAttribute("login") Member login, @RequestBody Review review) {
         try {
+            Long member_id = login.getId();
+            review.setMember_id(member_id);
             //TODO: 해당 회원이 구매 내역에 있는지 조회하는 메소드
             reviewService.addNewReview(review);
             return ResponseEntity.ok().build();
