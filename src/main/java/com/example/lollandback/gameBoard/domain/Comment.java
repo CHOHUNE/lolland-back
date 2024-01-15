@@ -1,5 +1,6 @@
 package com.example.lollandback.gameBoard.domain;
 
+import com.example.lollandback.gameBoard.util.AppUtil;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,10 @@ public class Comment {
     private  LocalDateTime reg_time;
     private  String comment_content;
     private Integer depth;
+
+    public String getAgo(){
+        return AppUtil.getAgo(reg_time);
+    }
 
 
 

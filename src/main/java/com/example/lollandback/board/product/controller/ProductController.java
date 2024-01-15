@@ -3,11 +3,10 @@ package com.example.lollandback.board.product.controller;
 import com.example.lollandback.board.product.domain.Company;
 import com.example.lollandback.board.product.domain.Product;
 import com.example.lollandback.board.product.domain.ProductOptions;
-import com.example.lollandback.board.product.dto.CategoryDto;
-import com.example.lollandback.board.product.dto.ProductDto;
-import com.example.lollandback.board.product.dto.ProductOptionsDto;
-import com.example.lollandback.board.product.dto.SubCategoryDto;
+import com.example.lollandback.board.product.dto.*;
 import com.example.lollandback.board.product.service.ProductService;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.annotations.Delete;
 import org.springframework.http.ResponseEntity;
@@ -33,9 +32,12 @@ public class ProductController {
     // --------------------------- 상품 등록 로직 ---------------------------
     @PostMapping("add")
     public ResponseEntity add(Product product, Company company,
-                              @RequestParam(value = "option_name[]", required = false) List<String> optionNames,
+                              @RequestParam(value = "options", required = false) String options,
                               @RequestParam(value = "mainImg[]", required = false) MultipartFile[] mainImg) throws IOException {
-        if (productService.save(product, company, mainImg, optionNames)) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<ProductOptionsDto> optionsList = objectMapper.readValue(options, new TypeReference<>() {});
+        System.out.println("options = " + optionsList);
+        if (productService.save(product, company, mainImg, optionsList)) {
             return ResponseEntity.ok(product.getProduct_id());
         } else {
             return ResponseEntity.internalServerError().build();
@@ -52,7 +54,6 @@ public class ProductController {
     @GetMapping("product_id/{product_id}")
     public ProductDto get(@PathVariable Integer product_id) {
         ProductDto productDto = productService.get(product_id);
-        System.out.println("productDto = " + productDto);
         return productDto;
     }
 
@@ -71,12 +72,16 @@ public class ProductController {
 
     // --------------------------- 상품 수정 로직 ---------------------------
     @PutMapping("edit")
-    public ResponseEntity update(ProductDto productDto,
-                                 @RequestParam(value = "removeMainImgs[]", required = false) List<String> removeMainImg,
-                                 @RequestParam(value = "newImgs[]", required = false) MultipartFile[] uploadMainImg) throws IOException {
-        System.out.println("productDto = " + productDto);
-        System.out.println("removeMainImg = " + removeMainImg);
-        System.out.println("uploadMainImg = " + uploadMainImg);
-        return null;
+    public ResponseEntity update(ProductUpdateDto productUpdateDto,
+                                 @RequestParam(value = "options", required = false) String options,
+                                 @RequestParam(value = "removeMainImgs[]", required = false) List<Integer> removeMainImg,
+                                 @RequestParam(value = "newImgs[]", required = false) MultipartFile[] newImgs) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<ProductOptionsDto> details = objectMapper.readValue(options, new TypeReference<>() {});
+        if (productService.update(productUpdateDto, details, removeMainImg, newImgs )) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

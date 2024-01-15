@@ -1,6 +1,7 @@
 package com.example.lollandback.board.product.mapper;
 
 import com.example.lollandback.board.product.domain.Company;
+import com.example.lollandback.board.product.dto.ProductUpdateDto;
 import org.apache.ibatis.annotations.*;
 
 @Mapper
@@ -24,4 +25,14 @@ public interface ProductCompanyMapper {
             WHERE company_id = #{company_id}
             """)
     void deleteByCompany(Long productId);
+
+    @Update("""
+        UPDATE company
+        JOIN product ON company.company_id = product.company_id
+        SET 
+            company.company_name = #{company_name}
+        WHERE product.product_id = #{product_id}
+        """)
+    void updateCompany(ProductUpdateDto productUpdateDto);
+
 }
