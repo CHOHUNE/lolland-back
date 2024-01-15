@@ -32,10 +32,10 @@ public interface ReviewMapper {
     @Update("""
         UPDATE review
             SET
-                review_content = #{updatedReview.review_content},
-                rate = #{updatedReview.rate}
+                review_content = #{review_content},
+                rate = #{rate}
             WHERE
-                review_id = #{updatedReview.review_id}
+                review_id = #{review_id}
     """)
     void updateReview(ReviewUpdateDto updatedReview);
 
@@ -54,6 +54,13 @@ public interface ReviewMapper {
         </foreach>
     """)
     void deleteSelectedReviews(List<Long> reviewIds);
+
+    //상품 삭제 시 사용, productId로 넘겨주거나 이름 맞춰서 수정하기
+    @Delete("""
+        DELETE FROM review
+        WHERE product_id = #{productId}
+    """)
+    void deleteReviewByProductId(Long productId);
 
     //멤버 탈퇴 시 사용
     @Delete("""

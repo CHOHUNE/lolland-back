@@ -46,6 +46,8 @@ public class ReviewController {
 
     @PutMapping("/update")
     public ResponseEntity updateReview(@RequestBody ReviewUpdateDto updatedReview) {
+        System.out.println("ReviewController.updateReview");
+        System.out.println("updatedReview = " + updatedReview.toString());
         try {
             reviewService.updateReview(updatedReview);
             return ResponseEntity.ok().build();
