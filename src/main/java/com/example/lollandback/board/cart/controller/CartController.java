@@ -4,6 +4,7 @@ import com.example.lollandback.board.cart.domain.Cart;
 import com.example.lollandback.board.cart.dto.CartDto;
 import com.example.lollandback.board.cart.dto.CartDtoWithLoginId;
 import com.example.lollandback.board.cart.service.CartService;
+import com.example.lollandback.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +20,20 @@ public class CartController {
     private final CartService cartService;
 
     @GetMapping("/fetch")
-    CartDtoWithLoginId fetchCart(@RequestParam Long member_id) {
-        return cartService.fetchCartByMember(member_id);
+    public ResponseEntity<CartDtoWithLoginId> fetchCart(@SessionAttribute("login") Member login) {
+        try {
+            String member_login_id = login.getMember_login_id();
+            if(member_login_id != null) {
+                CartDtoWithLoginId dto = cartService.fetchCartByMember(member_login_id);
+                return ResponseEntity.ok().body(dto);
+            } else {
+                System.out.println("member_login_id가 존재하지 않음 ");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+        } catch (Exception e) {
+            System.out.println("카트 가져오는 도중 에러 발생: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping("/add")
@@ -60,13 +73,14 @@ public class CartController {
     }
 
     //해당 멤버의 모든 카트 삭제
-    @DeleteMapping("/delete/{member_id}")
-    public ResponseEntity deleteAllCart(@PathVariable Long member_id) {
+    @DeleteMapping("/delete/all")
+    public ResponseEntity deleteAllCart(@SessionAttribute("login") Member login) {
+        String member_login_id = login.getMember_login_id();
         try {
-            cartService.deleteAllByMember(member_id);
+            cartService.deleteAllByMember(member_login_id);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            System.out.println("멤버 "+ member_id + "의 카트 비우기 도중 에러 발생" + e.getMessage());
+            System.out.println("멤버 "+ member_login_id + "의 카트 비우기 도중 에러 발생" + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

@@ -14,7 +14,7 @@ public interface CartMapper {
 
     @Select("""
     SELECT c.cart_id, c.product_id, cat.category_name, sub.subcategory_name, 
-    p.product_name, p.product_price, com.company_name, img.main_img_url, c.count 
+    p.product_name, p.product_price, com.company_name, img.main_img_uri, c.count 
     FROM cart c
     INNER JOIN product p ON c.product_id = p.product_id
     INNER JOIN category cat ON p.category_id = cat.category_id
@@ -23,7 +23,7 @@ public interface CartMapper {
     INNER JOIN productimg img ON p.product_id = img.product_id
     WHERE c.member_id = #{memberId}
     """)
-    List<CartDto> fetchCartByMemberId(Long memberId);
+    List<CartDto> fetchCartByMemberLoginId(Long memberId);
 
     @Insert("""
         INSERT INTO cart (member_id, product_id, count)
@@ -37,14 +37,14 @@ public interface CartMapper {
     """)
     void deleteByCartId(Long cartId);
 
-    @Delete("""
-        DELETE FROM cart
-        WHERE cart_id IN
-        <foreach collection="cartIds" open="(" seperator="," close=")">
-            #{cart_id}
-        </foreach>
-    """)
-    void deleteSelected(List<Long> cartIds);
+//    @Delete("""
+//        DELETE FROM cart
+//        WHERE cart_id IN
+//        <foreach collection="cartIds" open="(" separator="," close=")">
+//            #{cartId}
+//        </foreach>
+//    """)
+//    void deleteSelected(List<Long> cartIds); //TODO: IN이 인식이 안된다
 
     @Delete("""
         DELETE FROM cart

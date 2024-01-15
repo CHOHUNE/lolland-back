@@ -9,11 +9,11 @@ import java.util.List;
 @Mapper
 public interface ProductOptionMapper {
     @Insert("""
-            INSERT INTO productoptions (product_id, option_name)
-            VALUES (#{product_id}, #{option_name})
+            INSERT INTO productoptions (product_id, option_name, stock)
+            VALUES (#{product_id}, #{option_name}, #{stock})
             """)
     @Options(useGeneratedKeys = true, keyProperty = "option_id")
-    int insert(ProductOptions productOptions);
+    int insert(ProductOptionsDto productOptions);
 
     @Select("""
             SELECT *
@@ -27,5 +27,21 @@ public interface ProductOptionMapper {
             WHERE product_id = #{product_id}
             """)
     void deleteByOption(Long productId);
+
+
+    @Insert("""
+            INSERT INTO productoptions (option_name)
+            VALUES (#{optoon_name})
+            """)
+    boolean insertOptions(ProductOptionsDto productOptionsDto);
+
+
+    @Update("""
+            UPDATE productoptions
+            SET
+                option_name = #{option_name}
+            WHERE product_id = #{product_id}
+            """)
+    boolean updateOptions(ProductOptionsDto productOptionsDto);
 }
 

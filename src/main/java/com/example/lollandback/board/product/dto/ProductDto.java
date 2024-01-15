@@ -2,6 +2,7 @@ package com.example.lollandback.board.product.dto;
 
 import com.example.lollandback.board.product.domain.Company;
 import com.example.lollandback.board.product.domain.Product;
+import com.example.lollandback.board.product.domain.ProductImg;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -25,4 +26,5 @@ public class ProductDto {
     private Double average_rate;
     private LocalDateTime product_reg_time;
     private List<String> mainImgUrls;
+    private List<ProductImg> productImgs;
 }
