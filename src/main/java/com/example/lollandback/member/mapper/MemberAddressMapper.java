@@ -76,7 +76,7 @@ public interface MemberAddressMapper {
         UPDATE memberaddress ma
         JOIN member m ON ma.member_id = m.id
         SET ma.member_address_type = 'sub'
-        WHERE m.id = #{userId}
+        WHERE m.id = #{userId} AND ma.member_address_type = 'main'
     """)
     void changeMainAddressType(Long userId);
 }

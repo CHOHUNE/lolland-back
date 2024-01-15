@@ -22,6 +22,7 @@ public class MemberAddressController {
     public void add(@RequestBody @Valid MemberAddress memberAddress,
                     @SessionAttribute("login")Member login ) {
         service.addAddress(memberAddress, login);
+        System.out.println("memberAddress = " + memberAddress);
     }
 
     // 로그인 한 해당 유저의 주소 목록 가져오기
