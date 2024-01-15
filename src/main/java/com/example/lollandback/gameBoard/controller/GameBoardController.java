@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.lollandback.gameBoard.domain.GameBoard;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -18,15 +20,16 @@ public class GameBoardController {
     private final GameBoardService gameboardService;
 
     @PostMapping("/write")
-    public ResponseEntity add(@RequestBody GameBoard gameboard) {
+    public ResponseEntity add(GameBoard gameboard, @RequestParam(value = "uploadFiles[]", required = false) MultipartFile[] files) throws IOException {
 
         if (!gameboardService.validate(gameboard)) {
             return ResponseEntity.badRequest().body("Invaild request body");
         }
-        if (gameboardService.save(gameboard)) {
+
+        if (gameboardService.save(gameboard, files)) {
             return ResponseEntity.ok().build();
         } else {
-            return ResponseEntity.internalServerError().body("글 작성 실패");
+            return ResponseEntity.internalServerError().build();
         }
 
     }
@@ -57,9 +60,15 @@ public class GameBoardController {
     }
 
     @PutMapping("/edit")
-    public ResponseEntity edit(@RequestBody GameBoard gameBoard) {
+    public ResponseEntity edit(GameBoard gameBoard,
+                               @RequestParam(value = "removeFileIds[]", required = false) List<Integer> removeFileIds,
+                               @RequestParam(value = "uploadFiles[]", required = false) MultipartFile[] uploadFiles
+
+    ) throws IOException {
+
+
         if (gameboardService.validate(gameBoard)) {
-            if (gameboardService.update(gameBoard)) {
+            if (gameboardService.update(gameBoard ,removeFileIds,uploadFiles)) {
                 return ResponseEntity.ok().build();
             } else {
                 return ResponseEntity.internalServerError().build();

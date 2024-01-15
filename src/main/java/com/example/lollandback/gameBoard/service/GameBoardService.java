@@ -2,11 +2,24 @@ package com.example.lollandback.gameBoard.service;
 
 
 import com.example.lollandback.gameBoard.domain.GameBoard;
+import com.example.lollandback.gameBoard.domain.GameBoardFile;
 import com.example.lollandback.gameBoard.mapper.BoardMapper;
+import com.example.lollandback.gameBoard.mapper.CommentMapper;
+import com.example.lollandback.gameBoard.mapper.FileMapper;
+import com.example.lollandback.gameBoard.mapper.LikeMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -14,9 +27,46 @@ import java.util.Map;
 public class GameBoardService {
 
     private final BoardMapper mapper;
+    private final FileMapper fileMapper;
+    private final LikeMapper likeMapper;
+    private final CommentMapper commentMapper;
 
-    public boolean save(GameBoard gameBoard) {
-        return mapper.insert(gameBoard) == 1;
+    private final S3Client s3;
+
+    @Value("${aws.s3.bucket.name}")
+    private String bucket;
+
+    @Value("${image.file.prefix}")
+    private String urlPrefix;
+
+
+    public boolean save(GameBoard gameBoard, MultipartFile[] files) throws IOException {
+
+        int cnt = mapper.insert(gameBoard);
+
+        if (files != null) {
+            for (int i = 0; i < files.length; i++) {
+                String file_url = urlPrefix + upload(gameBoard.getId(), files[i]);
+                fileMapper.insert(gameBoard.getId(), files[i].getOriginalFilename(),file_url);
+
+            }
+        }
+        return cnt == 1;
+    }
+
+    private String upload(Long gameboardId, MultipartFile file) throws IOException {
+
+        String key = "lolland/gameboard/" + gameboardId + "/" + file.getOriginalFilename();
+
+        PutObjectRequest objectRequest = PutObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .acl(ObjectCannedACL.PUBLIC_READ)
+                .build();
+
+        s3.putObject(objectRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+
+        return key;
     }
 
     public boolean validate(GameBoard gameBoard) {
@@ -66,16 +116,69 @@ public class GameBoardService {
     }
 
     public GameBoard get(Integer id) {
-        return mapper.selectById(id);
+        GameBoard gameBoard = mapper.selectById(id);
+
+        List<GameBoardFile> boardFiles = fileMapper.selectNamesBygameboardId(id);
+        gameBoard.setFiles(boardFiles);
+
+//        for (GameBoardFile gameBoardFile:boardFiles) {
+//            String url = urlPrefix + "lolland/gameboard/" + id + "/" + gameBoardFile.getFile_name();
+//            gameBoardFile.setFile_url(url);
+//        }
+
+        return gameBoard;
     }
 
-    public boolean update(GameBoard gameBoard) {
+    public boolean update(GameBoard gameBoard, List<Integer> removeFileIds, MultipartFile[] uploadFiles) throws IOException{
+        if (removeFileIds != null) {
+            for (Integer id : removeFileIds) {
+                GameBoardFile file = fileMapper.selectById(id);
+                String key = "lolland/gameboard/" + id + "/" + file.getFile_name();
+                DeleteObjectRequest objectRequest = DeleteObjectRequest.builder()
+                        .bucket(bucket).key(key).build();
+
+                s3.deleteObject(objectRequest);
+                fileMapper.deleteById(id);
+            }
+        }
+        if (uploadFiles != null) {
+            for (MultipartFile file : uploadFiles) {
+                upload(gameBoard.getId(), file);
+                String file_url = urlPrefix + upload(gameBoard.getId(), file);
+                fileMapper.insert(gameBoard.getId(), file.getOriginalFilename(),file_url);
+
+            }
+        }
         return mapper.update(gameBoard) == 1;
     }
 
     public boolean delete(Integer id) {
+
+        commentMapper.deleteByBoardId(id);
+
+        likeMapper.deleteByBoardId(id);
+
+        deleteFile(id);
+
+
         return mapper.deleteById(id) == 1;
 
+    }
+
+    private void deleteFile(Integer id) {
+        List<GameBoardFile> boardFiles = fileMapper.selectNamesBygameboardId(id);
+
+        for (GameBoardFile file : boardFiles) {
+
+            String key = "lolland/gameboard/" + id + "/" + file.getFile_name();
+
+            DeleteObjectRequest objectRequest = DeleteObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(key)
+                    .build();
+            s3.deleteObject(objectRequest);
+        }
+        fileMapper.deleteByBoard(id);
     }
 
     public void boardCount(Integer id) {

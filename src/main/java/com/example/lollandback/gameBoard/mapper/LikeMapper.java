@@ -33,4 +33,9 @@ SELECT COUNT(id) FROM gameboardlike WHERE game_board_id=#{game_board_id}
 SELECT * FROM gameboardlike WHERE game_board_id=#{game_board_id}
 """)
     Like selectByBoardId(Integer boardId);
+
+    @Delete("""
+DELETE FROM gameboardlike WHERE game_board_id=#{id}
+""")
+    int deleteByBoardId(Integer id);
 }

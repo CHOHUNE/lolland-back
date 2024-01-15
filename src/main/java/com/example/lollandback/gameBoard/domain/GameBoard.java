@@ -5,9 +5,11 @@ import lombok.Data;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class GameBoard {
+
 
     private String title;
     private String board_content;
@@ -17,6 +19,9 @@ public class GameBoard {
     private Long count_comment;
     private Long count_like;
     private Long board_count;
+    private Long countFile;
+
+    private List<GameBoardFile> files;
 
     public String getAgo() {
         return AppUtil.getAgo(reg_time);

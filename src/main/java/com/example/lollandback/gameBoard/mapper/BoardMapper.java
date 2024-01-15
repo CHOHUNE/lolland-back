@@ -7,10 +7,12 @@ import java.util.List;
 
 @Mapper
 public interface BoardMapper {
+
     @Insert("""
 INSERT INTO gameboard(title,board_content,category)
 VALUES (#{title},#{board_content},#{category})
 """)
+    @Options(useGeneratedKeys = true,keyProperty = "id")
     int insert(GameBoard gameBoard);
 
     @Select("""
@@ -21,10 +23,12 @@ VALUES (#{title},#{board_content},#{category})
                   gb.board_count,
                    gb.reg_time,
                    COUNT(DISTINCT gl.id)count_like,
-                   COUNT(DISTINCT gc.id)count_comment 
+                   COUNT(DISTINCT gc.id)count_comment,
+                   COUNT(DISTINCT gf.id)countFile
                FROM gameboard gb
                LEFT JOIN lolland.gameboardlike gl on gb.id = gl.game_board_id
                LEFT JOIN lolland.gameboardcomment gc on gb.id = gc.game_board_id
+               LEFT JOIN lolland.gameboardfile gf on gb.id = gf.gameboard_id
                  WHERE 
                      title LIKE #{keyword}
                     OR board_content LIKE #{keyword}

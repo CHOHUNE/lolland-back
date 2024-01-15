@@ -1,7 +1,6 @@
 package com.example.lollandback.gameBoard.mapper;
 
 import com.example.lollandback.gameBoard.domain.Comment;
-import lombok.Data;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -83,6 +82,11 @@ VALUES (#{comment_content},#{game_board_id},#{parent_id})
     @Delete(""" 
 DELETE FROM gameboardcomment WHERE id=#{id}
 """)
+    void deleteById(Integer id);
+
+    @Delete("""
+            DELETE FROM gameboardcomment WHERE game_board_id=#{id}
+            """)
     void deleteByBoardId(Integer id);
 
 
