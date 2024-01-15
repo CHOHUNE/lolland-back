@@ -40,7 +40,7 @@ VALUES (#{title},#{board_content},#{category})
     List<GameBoard> selectAll(int from, String keyword);
 
     @Select("""
-SELECT id, title, board_content, reg_time,board_count
+SELECT *
 FROM gameboard
 WHERE id=#{id}
 """)

@@ -66,7 +66,6 @@ public class GameBoardController {
 
     ) throws IOException {
 
-
         if (gameboardService.validate(gameBoard)) {
             if (gameboardService.update(gameBoard ,removeFileIds,uploadFiles)) {
                 return ResponseEntity.ok().build();
