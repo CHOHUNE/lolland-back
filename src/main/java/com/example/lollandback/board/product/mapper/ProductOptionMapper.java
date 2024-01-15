@@ -39,8 +39,9 @@ public interface ProductOptionMapper {
     @Update("""
             UPDATE productoptions
             SET
-                option_name = #{option_name}
-            WHERE product_id = #{product_id}
+                option_name = #{option_name},
+                stock = #{stock}
+            WHERE option_id = #{option_id}
             """)
     boolean updateOptions(ProductOptionsDto productOptionsDto);
 }

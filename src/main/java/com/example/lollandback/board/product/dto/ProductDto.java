@@ -2,6 +2,7 @@ package com.example.lollandback.board.product.dto;
 
 import com.example.lollandback.board.product.domain.Company;
 import com.example.lollandback.board.product.domain.Product;
+import com.example.lollandback.board.product.domain.ProductDetailsImg;
 import com.example.lollandback.board.product.domain.ProductImg;
 import lombok.Data;
 
@@ -27,4 +28,5 @@ public class ProductDto {
     private LocalDateTime product_reg_time;
     private List<String> mainImgUrls;
     private List<ProductImg> productImgs;
+    private List<ProductDetailsImg> productDetailsImgs;
 }
