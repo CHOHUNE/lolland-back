@@ -217,7 +217,6 @@ public class ProductService {
             }
             total_stock += productOptionsDto.getStock();
         }
-
         companyMapper.updateCompany(productUpdateDto);
 
         // ------------- 상품 수정 로직 -------------
@@ -228,6 +227,5 @@ public class ProductService {
         } catch (Exception e) {
             throw e;
         }
-
     }
 }
