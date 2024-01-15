@@ -32,6 +32,7 @@ VALUES (#{title},#{board_content},#{category})
                  WHERE 
                      title LIKE #{keyword}
                     OR board_content LIKE #{keyword}
+                    OR category LIKE #{keyword}
                GROUP BY gb.id
                ORDER BY gb.id DESC
                LIMIT #{from},10
