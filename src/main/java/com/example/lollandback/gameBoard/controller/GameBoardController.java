@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import com.example.lollandback.gameBoard.domain.GameBoard;
 
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
@@ -17,7 +18,7 @@ public class GameBoardController {
     private final GameBoardService gameboardService;
 
     @PostMapping("/write")
-    public ResponseEntity add(@RequestBody GameBoard gameboard){
+    public ResponseEntity add(@RequestBody GameBoard gameboard) {
 
         if (!gameboardService.validate(gameboard)) {
             return ResponseEntity.badRequest().body("Invaild request body");
@@ -30,9 +31,14 @@ public class GameBoardController {
 
     }
 
-    @GetMapping
-    public List<GameBoard> list() {
-        return gameboardService.list();
+
+    @GetMapping("list")
+    public Map<String, Object> list(
+            @RequestParam(value = "p", defaultValue = "1") Integer page,
+            @RequestParam(value = "k", defaultValue = "") String keyword) {
+
+
+        return gameboardService.list(page, keyword);
     }
 
     @GetMapping("/id/{id}")
@@ -43,22 +49,22 @@ public class GameBoardController {
 
     @DeleteMapping("/remove/{id}")
     public ResponseEntity delete(@PathVariable Integer id) {
-        if(gameboardService.delete(id)){
+        if (gameboardService.delete(id)) {
             return ResponseEntity.ok().build();
-        }else{
+        } else {
             return ResponseEntity.internalServerError().build();
         }
     }
 
     @PutMapping("/edit")
     public ResponseEntity edit(@RequestBody GameBoard gameBoard) {
-        if(gameboardService.validate(gameBoard)){
-            if(gameboardService.update(gameBoard)){
+        if (gameboardService.validate(gameBoard)) {
+            if (gameboardService.update(gameBoard)) {
                 return ResponseEntity.ok().build();
-            }else{
+            } else {
                 return ResponseEntity.internalServerError().build();
             }
-        }else{
+        } else {
             return ResponseEntity.badRequest().build();
         }
     }
