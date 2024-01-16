@@ -37,8 +37,9 @@ public class MemberController {
     // 회원 가입시 인증번호 발송 로직
     @PostMapping("sendCodeMail")
     public void sendCodeMail(@RequestBody EmailSendCodeDto emailSendCodeDto) {
+        System.out.println("emailSendCodeDto = " + emailSendCodeDto);
         // Gmail보내기
-        memberEmailService.sendEmail(emailSendCodeDto);
+//        memberEmailService.sendEmail(emailSendCodeDto);
     }
 
     // 회원 가입시 아이디 중복 체크
