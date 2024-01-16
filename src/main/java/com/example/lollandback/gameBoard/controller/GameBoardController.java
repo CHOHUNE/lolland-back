@@ -41,9 +41,20 @@ public class GameBoardController {
             @RequestParam(value = "p", defaultValue = "1") Integer page,
             @RequestParam(value = "k", defaultValue = "") String keyword) {
 
-
         return gameboardService.list(page, keyword);
     }
+
+    @GetMapping("list/notice")
+    public List<GameBoard> notice(){
+         return gameboardService.notice();
+    }
+
+    @GetMapping("list/top")
+    public List<GameBoard> top(){
+        return gameboardService.top();
+    }
+
+
 
     @GetMapping("/id/{id}")
     public GameBoard get(@PathVariable Integer id) {

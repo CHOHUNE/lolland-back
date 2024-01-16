@@ -41,6 +41,35 @@ VALUES (#{title},#{board_content},#{category},#{member_id})
     List<GameBoard> selectAll(int from, String keyword);
 
     @Select("""
+SELECT *,COUNT(DISTINCT gl.id)count_like,
+ COUNT(DISTINCT gc.id)count_comment,
+                   COUNT(DISTINCT gf.id)countFile
+               
+ from gameboard gb
+ LEFT JOIN lolland.gameboardlike gl on gb.id = gl.game_board_id
+ LEFT JOIN lolland.gameboardcomment gc on gb.id = gc.game_board_id
+               LEFT JOIN lolland.gameboardfile gf on gb.id = gf.gameboard_id
+               
+ GROUP BY gb.id
+ ORDER BY count_like DESC
+ LIMIT 10
+""")
+    List<GameBoard> selectTop();
+
+    @Select("""
+       SELECT *,
+            COUNT(DISTINCT gl.id)count_like,
+            COUNT(DISTINCT gc.id)count_comment,
+            COUNT(DISTINCT gf.id)countFile
+              from gameboard gb
+             LEFT JOIN lolland.gameboardlike gl on gb.id = gl.game_board_id
+             LEFT JOIN lolland.gameboardcomment gc on gb.id = gc.game_board_id
+             LEFT JOIN lolland.gameboardfile gf on gb.id = gf.gameboard_id
+                       WHERE category = '공지'
+                       """)
+    List<GameBoard> selectNotice();
+
+    @Select("""
 SELECT *
 FROM gameboard
 WHERE id=#{id}

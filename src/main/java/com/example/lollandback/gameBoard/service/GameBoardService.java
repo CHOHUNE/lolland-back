@@ -115,6 +115,7 @@ public class GameBoardService {
         int from = (page - 1) * 10;
         map.put("gameBoardList", mapper.selectAll(from, "%" + keyword + "%"));
         map.put("pageInfo", pageInfo);
+
         return map;
     }
 
@@ -189,4 +190,11 @@ public class GameBoardService {
 
     }
 
+    public List<GameBoard> notice() {
+        return mapper.selectNotice();
+    }
+
+    public List<GameBoard> top() {
+        return mapper.selectTop();
+    }
 }

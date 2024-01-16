@@ -23,10 +23,7 @@ CommentController {
 
         if (login == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-
         }
-
-
         if (commentService.validate(comment)) {
             if (commentService.add(comment,login)) {
                 return ResponseEntity.ok().build();
