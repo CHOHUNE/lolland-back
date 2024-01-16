@@ -54,10 +54,10 @@ public interface ReviewMapper {
     void addNewReview(Review review);
 
     @Update("""
-        UPDATE products
+        UPDATE product
         SET average_rate = (
             SELECT AVG(CAST(rate AS DOUBLE))
-            FROM reviews
+            FROM review
             WHERE product_id = #{product_id}
         )
         WHERE product_id = #{product_id};
@@ -77,10 +77,10 @@ public interface ReviewMapper {
     @Update("""
         <script>
             <foreach collection="productIds" item="productId" separator=";">
-                UPDATE products
+                UPDATE product
                 SET average_rate = (
                     SELECT AVG(CAST(rate AS DOUBLE))
-                    FROM reviews
+                    FROM review
                     WHERE product_id = #{productId}
                 )
                 WHERE product_id = #{productId}

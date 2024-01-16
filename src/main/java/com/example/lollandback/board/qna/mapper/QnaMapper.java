@@ -16,7 +16,7 @@ public interface QnaMapper {
         a.answer_content, a.answer_reg_time
         FROM question q 
         JOIN member m ON q.member_id = m.id
-        JOIN answer a ON q.question_id = a.question_id
+        LEFT JOIN answer a ON q.question_id = a.question_id
         JOIN product p ON q.product_id = p.product_id
         WHERE p.product_id = #{productId}
     """)

@@ -20,6 +20,7 @@ public class QnaController {
 
     @GetMapping("/list")
     public List<QnaDto> fetchList(@RequestParam Long product_id) {
+        System.out.println("product_id = " + product_id);
         return qnaService.getQnaByProduct(product_id);
     }
 
