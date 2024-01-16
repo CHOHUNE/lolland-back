@@ -7,9 +7,11 @@ import com.example.lollandback.gameBoard.mapper.BoardMapper;
 import com.example.lollandback.gameBoard.mapper.CommentMapper;
 import com.example.lollandback.gameBoard.mapper.FileMapper;
 import com.example.lollandback.gameBoard.mapper.LikeMapper;
+import com.example.lollandback.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -40,8 +42,9 @@ public class GameBoardService {
     private String urlPrefix;
 
 
-    public boolean save(GameBoard gameBoard, MultipartFile[] files) throws IOException {
+    public boolean save(GameBoard gameBoard, MultipartFile[] files, @SessionAttribute(value="login",required = false)Member login) throws IOException {
 
+        gameBoard.setMember_id(login.getId());
         int cnt = mapper.insert(gameBoard);
 
         if (files != null) {

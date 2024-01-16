@@ -9,8 +9,8 @@ import java.util.List;
 public interface BoardMapper {
 
     @Insert("""
-INSERT INTO gameboard(title,board_content,category)
-VALUES (#{title},#{board_content},#{category})
+INSERT INTO gameboard(title,board_content,category,member_id)
+VALUES (#{title},#{board_content},#{category},#{member_id})
 """)
     @Options(useGeneratedKeys = true,keyProperty = "id")
     int insert(GameBoard gameBoard);

@@ -2,6 +2,7 @@ package com.example.lollandback.gameBoard.controller;
 
 
 import com.example.lollandback.gameBoard.service.GameBoardService;
+import com.example.lollandback.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,13 +21,13 @@ public class GameBoardController {
     private final GameBoardService gameboardService;
 
     @PostMapping("/write")
-    public ResponseEntity add(GameBoard gameboard, @RequestParam(value = "uploadFiles[]", required = false) MultipartFile[] files) throws IOException {
+    public ResponseEntity add(GameBoard gameboard, @RequestParam(value = "uploadFiles[]", required = false) MultipartFile[] files,@SessionAttribute(value="login",required = false) Member login) throws IOException {
 
         if (!gameboardService.validate(gameboard)) {
             return ResponseEntity.badRequest().body("Invaild request body");
         }
 
-        if (gameboardService.save(gameboard, files)) {
+        if (gameboardService.save(gameboard, files,login)) {
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.internalServerError().build();
