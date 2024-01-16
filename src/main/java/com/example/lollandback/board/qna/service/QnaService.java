@@ -25,7 +25,7 @@ public class QnaService {
         qnaMapper.addQuestion(question);
     }
 
-    public QnaDto getQnaByMemberAndProduct(Long memberId, Long productId) {
+    public List<QnaDto> getQnaByMemberAndProduct(Long memberId, Long productId) {
         return qnaMapper.getQnaByMemberAndProductId(memberId, productId);
     }
 

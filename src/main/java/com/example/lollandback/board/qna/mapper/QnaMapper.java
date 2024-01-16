@@ -30,7 +30,7 @@ public interface QnaMapper {
         JOIN product p ON q.product_id = p.product_id
         WHERE p.product_id = #{productId} AND m.id=#{memberId}
     """)
-    QnaDto getQnaByMemberAndProductId(Long memberId, Long productId);
+    List<QnaDto> getQnaByMemberAndProductId(Long memberId, Long productId);
 
     @Insert("""
         INSERT INTO question (member_id, question_content, product_id, question_title)
@@ -53,7 +53,7 @@ public interface QnaMapper {
     @Update("""
         UPDATE question
             SET
-                question_title = #{question_title}
+                question_title = #{question_title},
                 question_content = #{question_content}
             WHERE
                 question_id = #{question_id}

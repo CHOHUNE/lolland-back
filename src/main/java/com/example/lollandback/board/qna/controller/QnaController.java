@@ -25,7 +25,7 @@ public class QnaController {
     }
 
     @GetMapping("/fetchMine")
-    public QnaDto fetchMine(@SessionAttribute("login") Member login, @RequestParam Long product_id) {
+    public List<QnaDto> fetchMine(@SessionAttribute("login") Member login, @RequestParam Long product_id) {
         return qnaService.getQnaByMemberAndProduct(login.getId(), product_id);
     }
 
