@@ -4,6 +4,7 @@ import com.example.lollandback.member.domain.EditMemberAndAddress;
 import com.example.lollandback.member.domain.Member;
 import com.example.lollandback.member.domain.MemberAddress;
 import com.example.lollandback.member.domain.MemberAndAddress;
+import com.example.lollandback.member.dto.EmailSendCodeDto;
 import com.example.lollandback.member.dto.MemberDto;
 import com.example.lollandback.member.service.MemberService;
 import jakarta.servlet.http.HttpSession;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/member")
@@ -26,6 +29,12 @@ public class MemberController {
     @PostMapping("signUp")
     public void addUser(@RequestBody @Valid MemberAndAddress memberAndAddress) {
         service.addUser(memberAndAddress);
+    }
+
+    // 회원 가입시 인증번호 발송 로직
+    @PostMapping("sendCodeMail")
+    public void sendCodeMail(@RequestBody EmailSendCodeDto emailSendCodeDto) {
+        System.out.println("emailSendCodeDto = " + emailSendCodeDto);
     }
 
     // 회원 가입시 아이디 중복 체크
