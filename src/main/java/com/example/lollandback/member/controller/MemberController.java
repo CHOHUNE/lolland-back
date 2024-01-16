@@ -26,20 +26,16 @@ import java.util.List;
 public class MemberController {
     private final MemberService service;
 
-    private final MemberEmailService memberEmailService;
-
     // 회원 가입
     @PostMapping("signUp")
     public void addUser(@RequestBody @Valid MemberAndAddress memberAndAddress) {
         service.addUser(memberAndAddress);
     }
 
-    // 회원 가입시 인증번호 발송 로직
-    @PostMapping("sendCodeMail")
-    public void sendCodeMail(@RequestBody EmailSendCodeDto emailSendCodeDto) {
-        System.out.println("emailSendCodeDto = " + emailSendCodeDto);
-        // Gmail보내기
-//        memberEmailService.sendEmail(emailSendCodeDto);
+    // 아이디 찾기
+    @GetMapping("findId")
+    public ResponseEntity findId(MemberDto memberDto) {
+            return service.findIdByNameAndEmail(memberDto.getMember_name(), memberDto.getMember_email());
     }
 
     // 회원 가입시 아이디 중복 체크

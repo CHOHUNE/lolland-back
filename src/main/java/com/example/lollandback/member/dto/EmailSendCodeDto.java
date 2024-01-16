@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class EmailSendCodeDto {
     private String member_email;
-    private String randomNumber;
+    private String message;
 }
