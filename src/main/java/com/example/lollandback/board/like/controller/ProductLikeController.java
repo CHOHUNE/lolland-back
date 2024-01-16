@@ -42,7 +42,7 @@ public class ProductLikeController {
     }
 
     // ---------------------------- 상품 좋아요 목록을 프론트로 내보내는 로직 ----------------------------
-    @GetMapping("detilas")
+    @GetMapping("details")
     public ResponseEntity<List<ProductLikeDto>> getAllLikes(@SessionAttribute(value = "login", required = false) Member login) {
         if (login == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -50,5 +50,21 @@ public class ProductLikeController {
 
         List<ProductLikeDto> likes = productLikeService.getAllLikes(login);
         return ResponseEntity.ok(likes);
+    }
+
+    // ---------------------------- 찜목록에서 좋아요 삭제 로직 ----------------------------
+    @DeleteMapping("/like/{productLikeId}")
+    public ResponseEntity<?> remove(@PathVariable Long productLikeId) {
+        productLikeService.remove(productLikeId);
+        return ResponseEntity.ok().build(); // 삭제 후 응답 반환
+    }
+
+    // ---------------------------- 찜목록에서 선택상품삭제 로직 ----------------------------
+    @PostMapping("/deleteSelected")
+    public ResponseEntity<?> removeSelected(@RequestBody List<Long> productIds) {
+        for (Long productId : productIds) {
+            productLikeService.removeList(productId);
+        }
+        return ResponseEntity.ok().build(); // 삭제 후 응답 반환
     }
 }

@@ -49,4 +49,15 @@ public interface ProductLikeMapper {
     List<ProductLikeDto> selectById(Long member_id, String urlPrefix);
 
 
+    @Delete("""
+            DELETE FROM productlike
+            WHERE like_id = #{like_id}
+            """)
+    void deleteById(Long productLikeId);
+
+    @Delete("""
+            DELETE FROM productlike
+            WHERE product_id = #{product_id}
+            """)
+    void deleteByProductId(Long product_id);
 }

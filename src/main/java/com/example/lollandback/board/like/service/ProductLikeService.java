@@ -53,4 +53,12 @@ public class ProductLikeService {
         List<ProductLikeDto> productLikeDtos = productLikeMapper.selectById(login.getId(), urlPrefix);
         return productLikeDtos;
     }
+
+    public void remove(Long productLikeId) {
+        productLikeMapper.deleteById(productLikeId);
+    }
+
+    public void removeList(Long productId) {
+        productLikeMapper.deleteByProductId(productId);
+    }
 }
