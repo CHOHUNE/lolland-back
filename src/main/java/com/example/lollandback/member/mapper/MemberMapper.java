@@ -72,4 +72,12 @@ public interface MemberMapper {
         AND member_email = #{memberEmail}
     """)
     String findIdByNameAndEmail(String memberName, String memberEmail);
+
+    @Select("""
+        SELECT COUNT(*) 
+        FROM member
+        WHERE member_login_id = #{memberLoginId}
+        AND member_email = #{memberEmail}
+    """)
+    Integer findUserByIdAndEmail(String memberLoginId, String memberEmail);
 }

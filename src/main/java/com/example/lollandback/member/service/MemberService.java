@@ -102,4 +102,13 @@ public class MemberService {
         }
     }
 
+    public ResponseEntity findUserByIdAndEmail(String memberLoginId, String memberEmail) {
+        Integer existUser = mapper.findUserByIdAndEmail(memberLoginId, memberEmail);
+        if(existUser == 1) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+
+    }
 }
