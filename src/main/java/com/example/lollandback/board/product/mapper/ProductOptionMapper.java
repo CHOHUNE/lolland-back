@@ -30,8 +30,8 @@ public interface ProductOptionMapper {
 
 
     @Insert("""
-            INSERT INTO productoptions (option_name)
-            VALUES (#{optoon_name})
+            INSERT INTO productoptions (product_id, option_name)
+            VALUES (#{product_id} ,#{option_name})
             """)
     boolean insertOptions(ProductOptionsDto productOptionsDto);
 
