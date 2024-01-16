@@ -1,5 +1,6 @@
 package com.example.lollandback.board.qna.service;
 
+import com.example.lollandback.board.qna.domain.Question;
 import com.example.lollandback.board.qna.dto.QnaDto;
 import com.example.lollandback.board.qna.mapper.QnaMapper;
 import lombok.RequiredArgsConstructor;
@@ -16,5 +17,9 @@ public class QnaService {
 
     public List<QnaDto> getQnaByProduct(Long productId) {
         return qnaMapper.getQnaByProduct(productId);
+    }
+
+    public void addQuestion(Question question) {
+        qnaMapper.addQuestion(question);
     }
 }

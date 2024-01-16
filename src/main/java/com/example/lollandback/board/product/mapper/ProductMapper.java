@@ -76,7 +76,7 @@ public interface ProductMapper {
         subcategory_id = #{subcategory_id},
         product_name = #{product_name},
         product_price = #{product_price},
-        product_content = #{product_content},
+        product_content = #{product_content} 
     WHERE product_id = #{product_id}
     """)
     int updateById(ProductUpdateDto productDto);

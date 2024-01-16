@@ -1,6 +1,8 @@
 package com.example.lollandback.board.qna.mapper;
 
+import com.example.lollandback.board.qna.domain.Question;
 import com.example.lollandback.board.qna.dto.QnaDto;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -21,5 +23,9 @@ public interface QnaMapper {
     List<QnaDto> getQnaByProduct(Long productId);
 
 
-
+    @Insert("""
+        INSERT INTO question (member_id, question_content, product_id, question_title)
+        VALUES (#{member_id}, #{question_content}, #{product_id}, #{question_title})
+    """)
+    void addQuestion(Question question);
 }
