@@ -6,6 +6,7 @@ import com.example.lollandback.member.domain.MemberAddress;
 import com.example.lollandback.member.domain.MemberAndAddress;
 import com.example.lollandback.member.dto.EmailSendCodeDto;
 import com.example.lollandback.member.dto.MemberDto;
+import com.example.lollandback.member.service.MemberEmailService;
 import com.example.lollandback.member.service.MemberService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -25,6 +26,8 @@ import java.util.List;
 public class MemberController {
     private final MemberService service;
 
+    private final MemberEmailService memberEmailService;
+
     // 회원 가입
     @PostMapping("signUp")
     public void addUser(@RequestBody @Valid MemberAndAddress memberAndAddress) {
@@ -35,6 +38,8 @@ public class MemberController {
     @PostMapping("sendCodeMail")
     public void sendCodeMail(@RequestBody EmailSendCodeDto emailSendCodeDto) {
         System.out.println("emailSendCodeDto = " + emailSendCodeDto);
+        // Gmail보내기
+        memberEmailService.sendEmail(emailSendCodeDto);
     }
 
     // 회원 가입시 아이디 중복 체크
