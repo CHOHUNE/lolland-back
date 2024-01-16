@@ -21,16 +21,22 @@ VALUES (#{game_board_id},#{member_id})
 
 DELETE FROM gameboardlike 
 WHERE game_board_id=#{game_board_id}
+AND member_id=#{member_id}
 """) int delete(Like like);
 
 
     @Select("""
 SELECT COUNT(id) FROM gameboardlike WHERE game_board_id=#{game_board_id}
 """)
-    int countByBoardId(Integer boardId);
+    int countByBoardId(Integer game_board_id);
 
     @Select("""
-SELECT * FROM gameboardlike WHERE game_board_id=#{game_board_id}
+SELECT * FROM gameboardlike WHERE game_board_id=#{game_board_id} AND member_id=#{member_id}
 """)
-    Like selectByBoardId(Integer boardId);
+    Like selectByBoardId(Integer game_board_id,String member_id);
+
+    @Delete("""
+DELETE FROM gameboardlike WHERE game_board_id=#{id}
+""")
+    int deleteByBoardId(Integer id);
 }
