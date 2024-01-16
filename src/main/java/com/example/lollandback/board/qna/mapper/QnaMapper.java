@@ -11,15 +11,53 @@ import java.util.List;
 public interface QnaMapper {
 
     @Select("""
-        SELECT m.member_login_id, q.question_id, q.question_title, q.question_reg_time, q.question_content, 
-        a.answer_content, a.answer_reg_time
-        FROM question q 
-        JOIN member m ON q.member_id = m.id
-        LEFT JOIN answer a ON q.question_id = a.question_id
-        JOIN product p ON q.product_id = p.product_id
-        WHERE p.product_id = #{productId}
+        <script>
+            SELECT COUNT(*) 
+            FROM question q 
+            JOIN member m ON q.member_id = m.id
+            JOIN product p ON q.product_id = p.product_id
+            WHERE
+                 p.product_id = #{productId} AND
+                <trim prefixOverrides="OR">
+                    <if test="category == 'all' or category == 'title'">
+                        OR q.question_title LIKE #{keyword}
+                    </if>
+                    <if test="category == 'all' or category == 'content'">
+                        OR q.question_content LIKE #{keyword}
+                    </if>
+                    <if test="category == 'all' or category == 'id'">
+                        OR m.member_login_id LIKE #{keyword}
+                    </if>
+                </trim>
+        </script>
     """)
-    List<QnaDto> getQnaByProduct(Long productId);
+    int countAll(String keyword, String category, Long productId);
+
+
+    @Select("""
+        <script>
+            SELECT m.member_login_id, q.question_id, q.question_title, q.question_reg_time, q.question_content, 
+            a.answer_content, a.answer_reg_time
+            FROM question q 
+            JOIN member m ON q.member_id = m.id
+            LEFT JOIN answer a ON q.question_id = a.question_id
+            JOIN product p ON q.product_id = p.product_id
+            WHERE 
+                p.product_id = #{productId} AND
+                <trim prefixOverrides="OR">
+                    <if test="category == 'all' or category == 'title'">
+                        OR q.question_title LIKE #{keyword}
+                    </if>
+                    <if test="category == 'all' or category == 'content'">
+                        OR q.question_content LIKE #{keyword}
+                    </if>
+                    <if test="category == 'all' or category == 'id'">
+                        OR m.member_login_id LIKE #{keyword}
+                    </if>
+                </trim>
+        </script>
+    """)
+    List<QnaDto> getQnaByProduct(Integer from, String keyword, String category, Long productId);
 
     @Select("""
         SELECT m.member_login_id, q.question_id, q.question_title, q.question_reg_time, q.question_content, 
@@ -59,4 +97,5 @@ public interface QnaMapper {
                 question_id = #{question_id}
     """)
     void updateQuestionById(QuestionUpdateDto questionUpdateDto);
+
 }
