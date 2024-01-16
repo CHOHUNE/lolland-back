@@ -1,7 +1,6 @@
 package com.example.lollandback.gearBoard.mapper;
 
 import com.example.lollandback.gearBoard.domain.GearBoard;
-import com.example.lollandback.member.dto.Member;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -12,14 +11,12 @@ public interface GearMapper {
     @Insert("""
                 insert into gearboard (gear_title, gear_content, category) values (#{gear_title},#{gear_content},#{category});
         """)
-
     int save(GearBoard gearBoard);
 
     @Select("""
-    select gear_id, gear_title, gear_content, category, gear_inserted, gear_views, gear_recommand, member_name
-    from gearboard join lolland.member m on gearboard.member_id = m.id;
+                    select * from gearboard where category=#{category};
     """)
-    List<GearBoard> list( );
+    List<GearBoard> list(String category);
 
 
 
@@ -42,9 +39,5 @@ public interface GearMapper {
         """)
     int saveup(GearBoard gearBoard);
 
-    @Select("""
-                    select * from member ;
-    """)
-    Member getm();
 }
 

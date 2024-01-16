@@ -13,7 +13,5 @@ public class GearBoard {
     private LocalDateTime gear_inserted ;
     private Integer gear_views;
     private Integer gear_recommand;
-    private  String member_name;
-    private Integer member_id;
 }
 

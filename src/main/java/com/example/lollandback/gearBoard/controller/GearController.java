@@ -2,7 +2,6 @@ package com.example.lollandback.gearBoard.controller;
 
 import com.example.lollandback.gearBoard.domain.GearBoard;
 import com.example.lollandback.gearBoard.service.GearService;
-import com.example.lollandback.member.dto.Member;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.annotations.Delete;
 import org.springframework.web.bind.annotation.*;
@@ -17,10 +16,6 @@ public class GearController {
 
     private final GearService service;
 
-    @GetMapping("getm")
-    public Member getm(){
-        return service.getm();
-    }
 
 
 
@@ -30,9 +25,11 @@ public class GearController {
     }
 
 
+
+//      .get("/api/gearboard/list?category=" + category)
     @GetMapping("list")
-    public List<GearBoard> list(){
-        return service.list();
+    public List<GearBoard> list(@RequestParam String category){
+        return service.list(category);
     }
 
 

@@ -3,7 +3,6 @@ package com.example.lollandback.gearBoard.service;
 
 import com.example.lollandback.gearBoard.domain.GearBoard;
 import com.example.lollandback.gearBoard.mapper.GearMapper;
-import com.example.lollandback.member.dto.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +18,8 @@ public class GearService {
         mapper.save(gearBoard);
     }
 
-    public List<GearBoard> list( ) {
-        return mapper.list();
+    public List<GearBoard> list(String category) {
+        return mapper.list(category);
     }
 
 
@@ -35,7 +34,4 @@ public class GearService {
         mapper.saveup(gearBoard);
     }
 
-    public Member getm() {
-        return  mapper.getm();
-    }
 }
