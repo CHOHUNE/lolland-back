@@ -33,4 +33,17 @@ public interface ProductMainImg {
             WHERE product_id = #{product_id}
             """)
     void deleteByProductId(Long product_id);
+
+    @Select("""
+            SELECT *
+            FROM productimg
+            WHERE main_img_id = #{main_img_id}
+            """)
+    ProductImg selectById(Integer main_img_id);
+
+    @Delete("""
+            DELETE FROM productimg
+            WHERE main_img_id = #{main_img_id}
+            """)
+    void deleteById(Integer main_img_id);
 }
