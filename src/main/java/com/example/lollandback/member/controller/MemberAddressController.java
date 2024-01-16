@@ -22,6 +22,7 @@ public class MemberAddressController {
     public void add(@RequestBody @Valid MemberAddress memberAddress,
                     @SessionAttribute("login")Member login ) {
         service.addAddress(memberAddress, login);
+        System.out.println("memberAddress = " + memberAddress);
     }
 
     // 로그인 한 해당 유저의 주소 목록 가져오기
@@ -39,6 +40,13 @@ public class MemberAddressController {
         } else {
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    // 로그인 한 유저가 수정 요청한 주소 (한개) 수정하기
+    @PutMapping("editAddress")
+    public ResponseEntity editAddress(@SessionAttribute("login")Member login, @RequestBody @Valid MemberAddress memberAddress) {
+        System.out.println("memberAddress = " + memberAddress);
+        return service.editAddressByMemberAndAddressId(login.getId(), memberAddress);
     }
 
 

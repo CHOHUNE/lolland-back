@@ -3,14 +3,17 @@ package com.example.lollandback.gameBoard.service;
 
 import com.example.lollandback.gameBoard.domain.Comment;
 import com.example.lollandback.gameBoard.mapper.CommentMapper;
+import com.example.lollandback.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(rollbackFor = Exception.class)
 public class CommentService {
 
     private final CommentMapper commentMapper;
@@ -29,8 +32,9 @@ public class CommentService {
         return true;
     }
 
-    public boolean add(Comment comment) {
+    public boolean add(Comment comment, Member login) {
 
+        comment.setMember_id(login.getMember_login_id());
         return commentMapper.insert(comment)==1;
     }
 
@@ -40,7 +44,7 @@ public class CommentService {
 
     @DeleteMapping
     public void remove(Integer boardId){
-          commentMapper.deleteByBoardId(boardId) ;
+          commentMapper.deleteById(boardId) ;
     }
 
     public boolean update(Comment comment) {

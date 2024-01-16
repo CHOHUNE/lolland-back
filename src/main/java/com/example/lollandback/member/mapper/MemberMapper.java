@@ -64,4 +64,12 @@ public interface MemberMapper {
         WHERE member_login_id = #{memberLoginId}
     """)
     String checkUserId(String memberLoginId);
+
+    @Select("""
+        SELECT member_login_id 
+        FROM member 
+        WHERE member_name = #{memberName} 
+        AND member_email = #{memberEmail}
+    """)
+    String findIdByNameAndEmail(String memberName, String memberEmail);
 }

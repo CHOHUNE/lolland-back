@@ -9,6 +9,7 @@ import com.example.lollandback.member.mapper.MemberAddressMapper;
 import com.example.lollandback.member.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.WebRequest;
@@ -91,4 +92,14 @@ public class MemberService {
     public String checkUserId(String memberLoginId) {
         return mapper.checkUserId(memberLoginId);
     }
+
+    public ResponseEntity findIdByNameAndEmail(String memberName, String memberEmail) {
+        String member_login_id = mapper.findIdByNameAndEmail(memberName,memberEmail);
+        if ( member_login_id == null) {
+            return ResponseEntity.badRequest().body("일치하는 정보가 없습니다.");
+        } else {
+            return ResponseEntity.ok().body(member_login_id);
+        }
+    }
+
 }

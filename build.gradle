@@ -35,6 +35,10 @@ dependencies {
 
     // @NotBlank 어노테이션을 달기 위해 추가
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // gmail smtp 기능 추가
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
 }
 
 tasks.named('test') {
