@@ -20,7 +20,7 @@ public class GameBoard {
     private Long count_like;
     private Long board_count;
     private Long countFile;
-    private Long member_id;
+    private String member_id;
 
     private List<GameBoardFile> files;
 

@@ -44,7 +44,7 @@ public class GameBoardService {
 
     public boolean save(GameBoard gameBoard, MultipartFile[] files, @SessionAttribute(value="login",required = false)Member login) throws IOException {
 
-        gameBoard.setMember_id(login.getId());
+        gameBoard.setMember_id(login.getMember_login_id());
         int cnt = mapper.insert(gameBoard);
 
         if (files != null) {
