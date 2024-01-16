@@ -30,6 +30,7 @@ VALUES (#{title},#{board_content},#{category},#{member_id})
                LEFT JOIN lolland.gameboardcomment gc on gb.id = gc.game_board_id
                LEFT JOIN lolland.gameboardfile gf on gb.id = gf.gameboard_id
                  WHERE 
+                 gb.category !='공지' AND
                      title LIKE #{keyword}
                     OR board_content LIKE #{keyword}
                     OR category LIKE #{keyword}
@@ -49,6 +50,7 @@ SELECT *,COUNT(DISTINCT gl.id)count_like,
  LEFT JOIN lolland.gameboardlike gl on gb.id = gl.game_board_id
  LEFT JOIN lolland.gameboardcomment gc on gb.id = gc.game_board_id
                LEFT JOIN lolland.gameboardfile gf on gb.id = gf.gameboard_id
+               WHERE gb.category !='공지'
                
  GROUP BY gb.id
  ORDER BY count_like DESC
