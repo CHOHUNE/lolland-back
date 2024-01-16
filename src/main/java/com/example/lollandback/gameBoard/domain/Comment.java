@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class Comment {
-    private Integer member_id;
+    private String member_id;
     private  Integer game_board_id;
     private  Integer parent_id;
     private  Integer id;

@@ -9,8 +9,8 @@ import java.util.List;
 public interface CommentMapper {
 
     @Insert("""
-INSERT INTO gameboardcomment(comment_content, game_board_id,parent_id)
-VALUES (#{comment_content},#{game_board_id},#{parent_id})
+INSERT INTO gameboardcomment(comment_content, game_board_id,parent_id,member_id)
+VALUES (#{comment_content},#{game_board_id},#{parent_id},#{member_id})
 """)
     int insert(Comment comment);
 
