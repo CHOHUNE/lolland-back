@@ -24,7 +24,7 @@ public class ReviewController {
         return reviewService.getAllReviewsByProduct(product_id);
     }
 
-    @GetMapping("/fetch/")
+    @GetMapping("/fetchAll")
     public List<ReviewDto> fetchMemberReviews(@SessionAttribute("login") Member login) {
         Long member_id = login.getId();
         return reviewService.getAllReviewsByMember(member_id);
@@ -46,6 +46,8 @@ public class ReviewController {
 
     @PutMapping("/update")
     public ResponseEntity updateReview(@RequestBody ReviewUpdateDto updatedReview) {
+        System.out.println("ReviewController.updateReview");
+        System.out.println("updatedReview = " + updatedReview.toString());
         try {
             reviewService.updateReview(updatedReview);
             return ResponseEntity.ok().build();
