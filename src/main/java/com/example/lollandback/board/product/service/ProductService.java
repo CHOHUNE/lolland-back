@@ -36,6 +36,7 @@ public class ProductService {
     private final ProductCompanyMapper companyMapper;
     private final ProductMainImg mainImgMapper;
     private final ProductOptionMapper productOptionMapper;
+    private final ProductContentImg contentImgMapper;
 
     // --------------------------- 상품 저장 시 대분류/소분류 보여주기 로직 ---------------------------
     public List<CategoryDto> getAllCategories() {
@@ -44,29 +45,23 @@ public class ProductService {
 
     // --------------------------- 상품 저장 로직 ---------------------------
     @Transactional
-    public boolean save(Product product, Company company, MultipartFile[] mainImg, List<ProductOptionsDto> optionList) throws IOException {
+    public boolean save(Product product, Company company, MultipartFile[] mainImg, MultipartFile[] contentImg, List<ProductOptionsDto> optionList) throws IOException {
         Long total_stock = 0L;
         // 제조사 정보 저장
         if (companyMapper.insert(company) != 1) {
             return false;
         }
         product.setCompany_id(company.getCompany_id());
-
         if (optionList != null) {
             for (ProductOptionsDto productOptionsDto : optionList) {
                 total_stock += productOptionsDto.getStock();
             }
             product.setTotal_stock(total_stock);
         }
-
         // 상품 정보 저장
         if (productMapper.insert(product) != 1) {
             return false;
         }
-
-
-
-
         // 옵션 저장 로직
         if (optionList != null) {
             for (ProductOptionsDto productOptionsDto : optionList) {
@@ -75,16 +70,24 @@ public class ProductService {
                 productOptionMapper.insert(productOptionsDto); // 옵션 저장
             }
         }
-
-
-
-        // 이미지 정보 저장
+        // 메인 이미지 정보 저장
         if (mainImg != null && mainImg.length > 0) {
             for (MultipartFile img : mainImg) {
                 String imgFileName = img.getOriginalFilename();
                 if (imgFileName != null && !imgFileName.isEmpty()) {
                     mainImgMapper.insert(product.getProduct_id(), imgFileName);
                     upload(product.getProduct_id(), img);
+                }
+            }
+        }
+
+        // 설명 이미지 정보 저장
+        if (contentImg != null && contentImg.length > 0) {
+            for (MultipartFile contImg : contentImg) {
+                String contImgFileName = contImg.getOriginalFilename();
+                if (contImgFileName != null && !contImgFileName.isBlank()) {
+                    contentImgMapper.insert(product.getProduct_id(), contImgFileName);
+                    upload(product.getProduct_id(), contImg);
                 }
             }
         }
@@ -130,18 +133,16 @@ public class ProductService {
         productDto.setCategory_name(category_name);
         productDto.setSubcategory_name(subCategory_name);
 
-        // 해당 상품 ID에 대한 이미지 URI 리스트 조회
+
+        // 메인이미지
         List<ProductImg> productImgs = mainImgMapper.selectByProductId(Long.valueOf(productId));
-
-        // 이미지 URI 리스트를 URL로 변환하여 Product 객체에 설정
-//        List<String> imgUrls = productImgs.stream()
-//                .map(productImg -> urlPrefix + "lolland/product/productMainImg/" + productId + "/" + productImg.getMain_img_uri())
-//                .collect(Collectors.toList());
-
         productImgs.forEach((productImg -> productImg.setMain_img_uri(urlPrefix + "lolland/product/productMainImg/" + productId + "/" + productImg.getMain_img_uri())));
-//        productDto.setMainImgUrls(imgUrls);
-
         productDto.setProductImgs(productImgs);
+
+        // 설명이미지
+        List<ProductDetailsImg> detailsImgs = contentImgMapper.selectDetailsByProductId(Long.valueOf(productId));
+        detailsImgs.forEach(detailsImg -> detailsImg.setSub_img_uri(urlPrefix + "lolland/product/productMainImg/" + productId + "/" + detailsImg.getSub_img_uri()));
+        productDto.setProductDetailsImgs(detailsImgs);
 
         return productDto;
     }
@@ -154,18 +155,19 @@ public class ProductService {
 
     // --------------------------- 상품 삭제 로직 ---------------------------
     public void remove(Long productId) {
-        // 1. 이미지삭제
+        // 1. 메인 이미지삭제
         deleteMainImg(productId);
-        // 2. 옵션삭제
+        // 2. 설명 이미지삭제
+        deleteDetailsImg(productId);
+        // 3. 옵션삭제
         productOptionMapper.deleteByOption(productId);
-        // 3. 상품삭제
+        // 4. 상품삭제
         productMapper.deleteByProduct(productId);
-        // 3. 제조사 삭제
+        // 5. 제조사 삭제
         companyMapper.deleteByCompany(productId);
-
     }
 
-    // ------------ 이미지 삭제 ------------
+    // ------------ 메인 이미지 삭제 ------------
     private void deleteMainImg(Long product_id) {
         List<ProductImg> productImgs = mainImgMapper.selectNamesByProductId(product_id);
         for (ProductImg img : productImgs) {
@@ -179,11 +181,29 @@ public class ProductService {
         mainImgMapper.deleteByProductId(product_id);
     }
 
+    // ------------ 설명 이미지 삭제 ------------
+    private void deleteDetailsImg(Long product_id) {
+        List<ProductDetailsImg> productDetailsImgs = contentImgMapper.selectNamesByProductId(product_id);
+        for (ProductDetailsImg contentImg : productDetailsImgs) {
+            String key = "lolland/product/productMainImg/" + product_id + "/" + contentImg.getSub_img_uri();
+            DeleteObjectRequest objectRequest = DeleteObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(key)
+                    .build();
+            s3.deleteObject(objectRequest);
+        }
+        contentImgMapper.deleteByProductId(product_id);
+    }
+
     // --------------------------- 상품 수정 로직 ---------------------------
     @Transactional
-    public boolean update(ProductUpdateDto productUpdateDto, List<ProductOptionsDto> options, List<Integer> removeMainImg, MultipartFile[] newImgs) throws IOException {
-        Long total_stock = 0L;
-        // ------------- 이미지 파일 지우기 -------------
+    public boolean update(ProductUpdateDto productUpdateDto,
+                          List<ProductOptionsDto> options,
+                          List<Integer> removeMainImg,
+                          MultipartFile[] newImgs,
+                          List<Integer> removeContentImg,
+                          MultipartFile[] newContentImg) throws IOException {
+        // ------------- 메인 이미지 파일 지우기 -------------
         if (removeMainImg != null && !removeMainImg.isEmpty()) {
             for (Integer main_img_id : removeMainImg) {
                 // s3삭제
@@ -198,25 +218,53 @@ public class ProductService {
                 mainImgMapper.deleteById(main_img_id);
             }
         }
-        // ------------- 새로운 이미지 파일 추가 -------------
+        // ------------- 새로운 메인 이미지 파일 추가 -------------
         if (newImgs != null) {
-            // s3에 추가
+            // s3 추가
             for (MultipartFile img : newImgs) {
                 upload(productUpdateDto.getProduct_id(), img);
                 mainImgMapper.insert(productUpdateDto.getProduct_id(), img.getOriginalFilename());
             }
         }
 
+        // ------------- 설명 이미지 파일 지우기 -------------
+        if (removeContentImg != null && !removeContentImg.isEmpty()) {
+            for (Integer details_img_id : removeContentImg) {
+                // s3삭제
+                ProductDetailsImg productDetailsImg = contentImgMapper.selectById(details_img_id);
+                String key = "lolland/product/productMainImg/" + details_img_id + "/" + productDetailsImg.getDetails_img_id();
+                DeleteObjectRequest objectRequest = DeleteObjectRequest.builder()
+                        .bucket(bucket)
+                        .key(key)
+                        .build();
+                s3.deleteObject(objectRequest);
+                // db삭제
+                contentImgMapper.deleteById(details_img_id);
+            }
+        }
+        // ------------- 새로운 설명 이미지 파일 추가 -------------
+        if (newContentImg != null) {
+            // s3 추가
+            for (MultipartFile contentImg : newContentImg) {
+                upload(productUpdateDto.getProduct_id(), contentImg);
+                contentImgMapper.insert(productUpdateDto.getProduct_id(), contentImg.getOriginalFilename());
+            }
+        }
+
         // ------------- 상세옵션 관련 로직 -------------
+        Long total_stock = 0L;
         for (ProductOptionsDto productOptionsDto : options) {
             // 상세옵션 추가 로직
             if (productOptionsDto.getProduct_id() == null) {
+                productOptionsDto.setProduct_id(productUpdateDto.getProduct_id());
                 productOptionMapper.insertOptions(productOptionsDto);
             } else {
                 productOptionMapper.updateOptions(productOptionsDto);
             }
             total_stock += productOptionsDto.getStock();
         }
+
+        // ------------- 제조사 관련 로직 -------------
         companyMapper.updateCompany(productUpdateDto);
 
         // ------------- 상품 수정 로직 -------------

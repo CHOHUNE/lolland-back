@@ -33,11 +33,12 @@ public class ProductController {
     @PostMapping("add")
     public ResponseEntity add(Product product, Company company,
                               @RequestParam(value = "options", required = false) String options,
-                              @RequestParam(value = "mainImg[]", required = false) MultipartFile[] mainImg) throws IOException {
+                              @RequestParam(value = "mainImg[]", required = false) MultipartFile[] mainImg,
+                              @RequestParam(value = "contentImg[]", required = false) MultipartFile[] contentImg) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        List<ProductOptionsDto> optionsList = objectMapper.readValue(options, new TypeReference<>() {});
-        System.out.println("options = " + optionsList);
-        if (productService.save(product, company, mainImg, optionsList)) {
+        List<ProductOptionsDto> optionsList = objectMapper.readValue(options, new TypeReference<>() {
+        });
+        if (productService.save(product, company, mainImg, contentImg, optionsList)) {
             return ResponseEntity.ok(product.getProduct_id());
         } else {
             return ResponseEntity.internalServerError().build();
@@ -75,13 +76,18 @@ public class ProductController {
     public ResponseEntity update(ProductUpdateDto productUpdateDto,
                                  @RequestParam(value = "options", required = false) String options,
                                  @RequestParam(value = "removeMainImgs[]", required = false) List<Integer> removeMainImg,
-                                 @RequestParam(value = "newImgs[]", required = false) MultipartFile[] newImgs) throws IOException {
+                                 @RequestParam(value = "newImgs[]", required = false) MultipartFile[] newImgs,
+                                 @RequestParam(value = "removeContentImgs[]", required = false) List<Integer> removeContentImg,
+                                 @RequestParam(value = "newContentImgs[]", required = false) MultipartFile[] newContentImgs) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        List<ProductOptionsDto> details = objectMapper.readValue(options, new TypeReference<>() {});
-        if (productService.update(productUpdateDto, details, removeMainImg, newImgs )) {
+        List<ProductOptionsDto> details = objectMapper.readValue(options, new TypeReference<>() {
+        });
+        if (productService.update(productUpdateDto, details, removeMainImg, newImgs, removeContentImg, newContentImgs)) {
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+
 }
