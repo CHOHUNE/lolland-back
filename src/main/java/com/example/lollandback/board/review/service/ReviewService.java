@@ -18,8 +18,7 @@ public class ReviewService {
 
     public List<ReviewDto> getAllReviewsByProduct(Long product_id, Integer page, Integer pageSize) {
         Integer offset = page * pageSize;
-//        Integer pageSize = page * 10;
-        return reviewMapper.getAllReviewsByProduct(product_id, 0,  (page+1) * 10);
+        return reviewMapper.getAllReviewsByProduct(product_id, offset,  pageSize);
     }
 
     public List<ReviewDto> getAllReviewsByMember(Long member_id) {
