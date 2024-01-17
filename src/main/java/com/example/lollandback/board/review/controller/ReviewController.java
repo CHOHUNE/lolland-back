@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,6 +34,11 @@ public class ReviewController {
     public List<ReviewDto> fetchMemberReviews(@SessionAttribute("login") Member login) {
         Long member_id = login.getId();
         return reviewService.getAllReviewsByMember(member_id);
+    }
+
+    @GetMapping("/rating-distribution")
+    public Map<Integer, Long> getRatingDistribution(@RequestParam Long product_id) {
+        return reviewService.getRatingDistribution(product_id);
     }
 
     @PostMapping("/submit")

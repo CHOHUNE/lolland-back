@@ -10,6 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -70,5 +74,12 @@ public class ReviewService {
 
     public Long countTotalReview(Long productId) {
         return reviewMapper.countTotalReview(productId);
+    }
+
+    public Map<Integer, Long> getRatingDistribution(Long product_id) {
+        List<Integer> rates = reviewMapper.getAllRatesByProduct(product_id);
+
+        return rates.stream()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
     }
 }

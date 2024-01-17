@@ -20,6 +20,13 @@ public interface ReviewMapper {
     List<ReviewDto> getAllReviewsByProduct(Long product_id, Integer offset, Integer pageSize);
 
     @Select("""
+        SELECT rate
+        FROM review
+        WHERE product_id = #{product_id}
+    """)
+    List<Integer> getAllRatesByProduct(Long product_id);
+
+    @Select("""
         SELECT * FROM review
         WHERE member_id = #{member_id}
     """)
