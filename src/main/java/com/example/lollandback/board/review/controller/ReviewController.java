@@ -20,8 +20,12 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @GetMapping("/fetch")
-    public List<ReviewDto> fetchReviews(@RequestParam Long product_id) {
-        return reviewService.getAllReviewsByProduct(product_id);
+    public List<ReviewDto> fetchReviews(@RequestParam Long product_id,
+                                        @RequestParam(defaultValue = "0") Integer page,
+                                        @RequestParam(defaultValue = "10") Integer pageSize) {
+        List<ReviewDto> allReviewsByProduct = reviewService.getAllReviewsByProduct(product_id, page, pageSize);
+        System.out.println("allReviewsByProduct.size() = " + allReviewsByProduct.size());
+        return allReviewsByProduct;
     }
 
     @GetMapping("/fetchAll")

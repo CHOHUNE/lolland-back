@@ -16,8 +16,10 @@ import java.util.List;
 public class ReviewService {
     private final ReviewMapper reviewMapper;
 
-    public List<ReviewDto> getAllReviewsByProduct(Long product_id) {
-        return reviewMapper.getAllReviewsByProduct(product_id);
+    public List<ReviewDto> getAllReviewsByProduct(Long product_id, Integer page, Integer pageSize) {
+        Integer offset = page * pageSize;
+//        Integer pageSize = page * 10;
+        return reviewMapper.getAllReviewsByProduct(product_id, 0,  (page+1) * 10);
     }
 
     public List<ReviewDto> getAllReviewsByMember(Long member_id) {

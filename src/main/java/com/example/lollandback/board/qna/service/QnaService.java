@@ -44,10 +44,8 @@ public class QnaService {
         }
 
         int from = (page - 1) * 10;
-        System.out.println("from = " + from);
         map.put("qnaList", qnaMapper.getQnaByProduct(from, "%" + keyword + "%", category, productId));
         map.put("pageInfo", pageInfo);
-        System.out.println("pageInfo = " + pageInfo);
         return map;
     }
 

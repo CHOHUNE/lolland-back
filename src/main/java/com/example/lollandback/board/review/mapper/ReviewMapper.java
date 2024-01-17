@@ -12,10 +12,12 @@ public interface ReviewMapper {
 
     @Select("""
         SELECT r.review_id, r.product_id, r.member_id, r.review_content, r.rate, r.review_reg_time, m.member_login_id
-        FROM review r JOIN member m ON r.member_id = m.id
-        WHERE r.product_id = #{product_id}
+            FROM review r JOIN member m ON r.member_id = m.id
+            WHERE r.product_id = #{product_id}
+            ORDER BY r.review_id DESC
+            LIMIT #{pageSize} OFFSET #{offset}
     """)
-    List<ReviewDto> getAllReviewsByProduct(Long product_id);
+    List<ReviewDto> getAllReviewsByProduct(Long product_id, Integer offset, Integer pageSize);
 
     @Select("""
         SELECT * FROM review
