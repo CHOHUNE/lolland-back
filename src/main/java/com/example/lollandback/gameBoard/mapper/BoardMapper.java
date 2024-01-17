@@ -16,30 +16,30 @@ VALUES (#{title},#{board_content},#{category},#{member_id})
     int insert(GameBoard gameBoard);
 
     @Select("""
-               SELECT gb.id,
-                gb.board_content,
-                gb.title,
-                 gb.category,
-                  gb.board_count,
-                   gb.reg_time,
-                   COUNT(DISTINCT gl.id)count_like,
-                   COUNT(DISTINCT gc.id)count_comment,
-                   COUNT(DISTINCT gf.id)countFile
-               FROM gameboard gb
-               LEFT JOIN lolland.gameboardlike gl on gb.id = gl.game_board_id
-               LEFT JOIN lolland.gameboardcomment gc on gb.id = gc.game_board_id
-               LEFT JOIN lolland.gameboardfile gf on gb.id = gf.gameboard_id
-                 WHERE 
-                 gb.category !='공지' AND
-                     title LIKE #{keyword}
-                    OR board_content LIKE #{keyword}
-                    OR category LIKE #{keyword}
-               GROUP BY gb.id
-               ORDER BY gb.id DESC
-               LIMIT #{from},10
-                           
-               """)
+    SELECT 
+        gb.id,
+        gb.board_content,
+        gb.title,
+        gb.category,
+        gb.board_count,
+        gb.reg_time,
+        gb.member_id,
+        COUNT(DISTINCT gl.id) as count_like,
+        COUNT(DISTINCT gc.id) as count_comment,
+        COUNT(DISTINCT gf.id) as countFile
+    FROM gameboard gb
+    LEFT JOIN lolland.gameboardlike gl ON gb.id = gl.game_board_id
+    LEFT JOIN lolland.gameboardcomment gc ON gb.id = gc.game_board_id
+    LEFT JOIN lolland.gameboardfile gf ON gb.id = gf.gameboard_id
+    WHERE 
+        gb.category != '공지' AND
+        (title LIKE #{keyword} OR board_content LIKE #{keyword} OR category LIKE #{keyword})
+    GROUP BY gb.id
+    ORDER BY gb.id DESC
+    LIMIT #{from}, 10
+""")
     List<GameBoard> selectAll(int from, String keyword);
+
 
     @Select("""
 SELECT *,COUNT(DISTINCT gl.id)count_like,
@@ -52,8 +52,8 @@ SELECT *,COUNT(DISTINCT gl.id)count_like,
                LEFT JOIN lolland.gameboardfile gf on gb.id = gf.gameboard_id
                WHERE gb.category !='공지'
                
- GROUP BY gb.id
- ORDER BY count_like DESC
+ GROUP BY gb.id,gb.board_count
+ ORDER BY count_like DESC,count_comment DESC,gb.board_count DESC
  LIMIT 10
 """)
     List<GameBoard> selectTop();
@@ -68,13 +68,16 @@ SELECT *,COUNT(DISTINCT gl.id)count_like,
              LEFT JOIN lolland.gameboardcomment gc on gb.id = gc.game_board_id
              LEFT JOIN lolland.gameboardfile gf on gb.id = gf.gameboard_id
                        WHERE category = '공지'
+                       ORDER BY gb.id
                        """)
     List<GameBoard> selectNotice();
 
     @Select("""
-SELECT *
-FROM gameboard
-WHERE id=#{id}
+SELECT *,
+            COUNT(DISTINCT gc.id)count_comment
+            FROM gameboard gb
+             LEFT JOIN lolland.gameboardcomment gc on gb.id = gc.game_board_id
+WHERE gb.id=#{id}
 """)
     GameBoard selectById(Integer id);
 
