@@ -55,6 +55,8 @@ public interface QnaMapper {
                         OR m.member_login_id LIKE #{keyword}
                     </if>
                 </trim>
+                ORDER BY q.question_id DESC
+                LIMIT #{from}, 10
         </script>
     """)
     List<QnaDto> getQnaByProduct(Integer from, String keyword, String category, Long productId);

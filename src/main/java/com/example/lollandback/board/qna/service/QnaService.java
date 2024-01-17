@@ -27,7 +27,6 @@ public class QnaService {
 
         int lastPageNumber = (countAll - 1) / 10 + 1;
         int startPageNumber = ((page - 1) / 10) * 10 + 1;
-        startPageNumber = Math.max(1, startPageNumber);
         int endPageNumber = startPageNumber + 9;
         endPageNumber = Math.min(endPageNumber, lastPageNumber);
         int prevPageNumber = startPageNumber - 10;
@@ -45,8 +44,10 @@ public class QnaService {
         }
 
         int from = (page - 1) * 10;
+        System.out.println("from = " + from);
         map.put("qnaList", qnaMapper.getQnaByProduct(from, "%" + keyword + "%", category, productId));
         map.put("pageInfo", pageInfo);
+        System.out.println("pageInfo = " + pageInfo);
         return map;
     }
 

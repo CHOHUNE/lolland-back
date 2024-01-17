@@ -26,6 +26,7 @@ public class QnaController {
                                          @RequestParam(value = "k", defaultValue = "") String keyword,
                                          @RequestParam(value="c", defaultValue = "all") String category) {
         try {
+            System.out.println("page = " + page);
             return qnaService.getQnaByProduct(product_id, page, keyword, category);
         } catch (Exception e) {
             System.out.println("문의 사항 페이지 가져오는 도중에 에러 발생 = " + e);
