@@ -1,6 +1,7 @@
 package com.example.lollandback.board.review.controller;
 
 import com.example.lollandback.board.review.domain.Review;
+import com.example.lollandback.board.review.dto.GetReviewDto;
 import com.example.lollandback.board.review.dto.ReviewDto;
 import com.example.lollandback.board.review.dto.ReviewUpdateDto;
 import com.example.lollandback.board.review.service.ReviewService;
@@ -20,10 +21,12 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @GetMapping("/fetch")
-    public List<ReviewDto> fetchReviews(@RequestParam Long product_id,
-                                        @RequestParam(defaultValue = "0") Integer page,
-                                        @RequestParam(defaultValue = "10") Integer pageSize) {
-        return reviewService.getAllReviewsByProduct(product_id, page, pageSize);
+    public GetReviewDto fetchReviews(@RequestParam Long product_id,
+                                     @RequestParam(defaultValue = "0") Integer page,
+                                     @RequestParam(defaultValue = "10") Integer pageSize) {
+        Long totalReview = reviewService.countTotalReview(product_id);
+        List<ReviewDto> reviewList = reviewService.getAllReviewsByProduct(product_id, page, pageSize);
+        return new GetReviewDto(reviewList, totalReview);
     }
 
     @GetMapping("/fetchAll")

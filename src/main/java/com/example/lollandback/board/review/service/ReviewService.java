@@ -67,4 +67,8 @@ public class ReviewService {
             System.out.println("updatedRows = " + updatedRows + "productIds.size()" + productIds.size());
         }
     }
+
+    public Long countTotalReview(Long productId) {
+        return reviewMapper.countTotalReview(productId);
+    }
 }

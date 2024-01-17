@@ -49,6 +49,13 @@ public interface ReviewMapper {
     """)
     List<Long> getProductIdsByMember(Long memberId);
 
+    @Select("""
+        SELECT COUNT(*)
+        FROM review
+        WHERE product_id = #{productId}
+    """)
+    Long countTotalReview(Long productId);
+
     @Insert("""
         INSERT INTO review (product_id, member_id, review_content, rate)
         VALUES (#{product_id}, #{member_id}, #{review_content}, #{rate})
