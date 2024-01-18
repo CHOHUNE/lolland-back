@@ -29,4 +29,12 @@ public class MemberEmailService {
         message.setText("회원님의 ID : " + emailSendCodeDto.getMessage() + " 입니다.");
         javaMailSender.send(message);
     }
+
+    public void sendPasswordMail(EmailSendCodeDto emailSendCodeDto) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(emailSendCodeDto.getMember_email());
+        message.setSubject("[lolland] 임시 비밀번호가 발급 되었습니다.");
+        message.setText("회원님의 비밀 번호는 : " + emailSendCodeDto.getMessage() + " 입니다.");
+        javaMailSender.send(message);
+    }
 }
