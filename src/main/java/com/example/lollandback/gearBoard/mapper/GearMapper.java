@@ -8,8 +8,8 @@ import java.util.List;
 @Mapper
 public interface GearMapper {
     @Insert("""
-                            insert into gearboard (gear_title, gear_content, category, gear_uploadFiles,member_id)
-                            values (#{gear_title},#{gear_content},#{category},#{gear_uploadFiles},#{member_id});
+                            insert into gearboard (gear_title, gear_content, category,member_id)
+                            values (#{gear_title},#{gear_content},#{category},#{member_id});
     """)
     int insert(GearBoard gearBoard);
 

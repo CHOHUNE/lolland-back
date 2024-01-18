@@ -4,7 +4,6 @@ import com.example.lollandback.gearBoard.domain.GearBoard;
 import com.example.lollandback.gearBoard.service.GearService;
 import com.example.lollandback.member.domain.Member;
 import lombok.RequiredArgsConstructor;
-import org.apache.ibatis.annotations.Delete;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,23 +19,30 @@ public class GearController {
     private final GearService service;
 
 
+@PostMapping("saves")
+public ResponseEntity saves(  GearBoard gearBoard,
+                              @RequestParam(value = "files[]", required = false) MultipartFile[] files,
+                              @SessionAttribute(value = "login", required = false) Member login) {
 
-
-    @PostMapping("save")
-    public ResponseEntity save(@RequestBody GearBoard gearBoard,
-                               @RequestParam(value = "gear_uploadFiles[]", required = false)MultipartFile[] files,
-                               @SessionAttribute(value = "login",required = false) Member login)throws  Exception{
-      if (!service.validate(gearBoard)){
-          return  ResponseEntity.badRequest().build();
-      }
-
-      if (service.save(gearBoard,files,login)){
-          return ResponseEntity.ok().build();
-      }else {
-          return  ResponseEntity.internalServerError().build();
-      }
-
+    if (files != null) {
+        for (int i = 0; i < files.length; i++) {
+            System.out.println("file = " + files[i].getOriginalFilename());
+            System.out.println("file.getSize() = " + files[i].getSize());
+        }
     }
+
+    if (!service.validate(gearBoard)){
+        return  ResponseEntity.badRequest().build();
+    }
+    if (service.saves(gearBoard,login)){
+    return ResponseEntity.ok().build();
+    }else{
+        return  ResponseEntity.internalServerError().build();
+    }
+}
+
+
+
 
 
 

@@ -2,7 +2,7 @@ package com.example.lollandback.gearBoard.service;
 
 
 import com.example.lollandback.gearBoard.domain.GearBoard;
-import com.example.lollandback.gearBoard.domain.GearBoardFile;
+//import com.example.lollandback.gearBoard.domain.GearBoardFile;
 import com.example.lollandback.gearBoard.mapper.GearFileMapper;
 import com.example.lollandback.gearBoard.mapper.GearMapper;
 import com.example.lollandback.member.domain.Member;
@@ -34,7 +34,7 @@ public class GearService {
 
     private final GearFileMapper gearFileMapper;
 
-
+/*
     public boolean save(GearBoard gearBoard,
                         MultipartFile[] files,
                         @SessionAttribute (value = "login",required = false) Member login)
@@ -68,6 +68,7 @@ public class GearService {
         return key;
     }
 
+*/
     public List<GearBoard> list(String category) {
         return mapper.list(category);
     }
@@ -98,17 +99,18 @@ public class GearService {
     }
 
 
-    public GearBoard get(Integer gear_id) {
-        GearBoard gearBoard = mapper.selectById(gear_id);
+//    public GearBoard get(Integer gear_id) {
+//        GearBoard gearBoard = mapper.selectById(gear_id);
+//
+//        List<GearBoardFile> boardFiles = gearFileMapper.selectNamesBygearboardId(gear_id);
+//        gearBoard.setFiles(boardFiles);
+//
+//        return gearBoard;
+//    }
 
-        List<GearBoardFile> boardFiles = gearFileMapper.selectNamesBygearboardId(gear_id);
-        gearBoard.setFiles(boardFiles);
 
-        return gearBoard;
+    public boolean saves(GearBoard gearBoard, Member login) {
+            gearBoard.setMember_id(login.getMember_login_id());
+            return mapper.insert(gearBoard)==1;
     }
-
-
-
-
-
 }

@@ -19,7 +19,7 @@ public class GearBoard {
 
     private String member_id;
 
-    private List<GearBoardFile> files;
+//    private List<GearBoardFile> files;
 
 
 
