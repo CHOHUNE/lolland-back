@@ -100,4 +100,12 @@ public interface MemberMapper {
         WHERE id = #{id}
     """)
     boolean editMember(EditMember member);
+
+    @Update("""
+        UPDATE member
+        SET
+        member_password = #{memberPassword}
+        WHERE id = #{id} 
+    """)
+    boolean editPasswordById(Long id, String memberPassword);
 }

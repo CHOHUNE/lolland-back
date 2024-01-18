@@ -114,4 +114,12 @@ public class MemberService {
     public void setRandomPassword(SetRandomPasswordDto setRandomPasswordDto) {
         mapper.setPasswordByLoginId(setRandomPasswordDto);
     }
+
+    public boolean editPassword(Member login, Member member) {
+
+        if (mapper.editPasswordById(login.getId(), member.getMember_password())) {
+            return true;
+        }
+        return false;
+    }
 }

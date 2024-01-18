@@ -105,6 +105,19 @@ public class MemberController {
         }
     }
 
+    // 회원 비밀번호 수정
+    @PutMapping("editPassword")
+    public void editPassword(@SessionAttribute("login")Member login,
+                                @RequestBody String member_password) {
+        System.out.println("login = " + login);
+        System.out.println("member_password = " + member_password);
+//        if(service.editPassword(login, member)){
+//           return ResponseEntity.ok().build();
+//        } else {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//        }
+    }
+
     // 회원 비밀 번호를 임시 비밀 번호로 셋팅 ---------------------------------------------------------
     @PutMapping("setRandomPassword")
     public void setRandomPassword (@RequestBody SetRandomPasswordDto setRandomPasswordDto) {
