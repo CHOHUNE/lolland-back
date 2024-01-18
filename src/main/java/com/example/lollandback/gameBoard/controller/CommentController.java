@@ -38,9 +38,21 @@ CommentController {
 
     @GetMapping("list/{id}")
     public List<Comment> list(@PathVariable Integer id) {
-
         return commentService.list(id);
     }
+
+    @GetMapping("list/written/comment/{id}")
+    public List<Comment> writtenList(@PathVariable String id) {
+        return commentService.writtenList(id);
+
+    }
+
+
+
+
+
+//    @GetMapping("list/written/comment/{id}")
+
 
     @DeleteMapping("{id}")
     public void remove(@PathVariable Integer id) {

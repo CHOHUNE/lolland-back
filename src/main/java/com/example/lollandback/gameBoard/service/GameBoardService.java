@@ -197,4 +197,14 @@ public class GameBoardService {
     public List<GameBoard> top() {
         return mapper.selectTop();
     }
+
+    public List<GameBoard> writtenPost(String writer) {
+
+        return mapper.selectByMemberId(writer);
+    }
+
+    public Member postMemberInfo(String writer) {
+        return mapper.selectMemberById(writer);
+
+    }
 }

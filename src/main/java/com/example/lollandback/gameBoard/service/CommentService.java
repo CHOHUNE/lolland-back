@@ -38,6 +38,9 @@ public class CommentService {
         return commentMapper.insert(comment)==1;
     }
 
+    public List<Comment> writtenList(String memberId){
+        return commentMapper.selectByMemberId(memberId);}
+
     public List<Comment> list(Integer boardId) {
         return commentMapper.selectByBoardId(boardId);
     }
