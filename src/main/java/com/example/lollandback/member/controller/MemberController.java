@@ -41,14 +41,12 @@ public class MemberController {
     // 비밀번호 찾기
     @GetMapping("findPassword")
     public ResponseEntity findPassword(MemberDto memberDto) {
-        System.out.println("memberDto = " + memberDto);
         return service.findUserByIdAndEmail(memberDto.getMember_login_id(), memberDto.getMember_email());
     }
 
     // 회원 가입시 아이디 중복 체크
     @GetMapping("checkId")
     public ResponseEntity checkUserId(@RequestParam String member_login_id) {
-        System.out.println("member_login_id = " + member_login_id);
         if(service.checkUserId(member_login_id) != null){
             return ResponseEntity.badRequest().build();
         } else {
