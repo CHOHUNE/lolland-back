@@ -1,5 +1,6 @@
 package com.example.lollandback.member.mapper;
 
+import com.example.lollandback.member.domain.EditMember;
 import com.example.lollandback.member.domain.Member;
 import com.example.lollandback.member.dto.MemberDto;
 import com.example.lollandback.member.dto.SetRandomPasswordDto;
@@ -88,4 +89,15 @@ public interface MemberMapper {
         WHERE member_login_id = #{member_login_id}
     """)
     void setPasswordByLoginId(SetRandomPasswordDto setRandomPasswordDto);
+
+    @Update("""
+        UPDATE member 
+        SET 
+        member_login_id = #{member_login_id},
+        member_name = #{member_name},
+        member_phone_number = #{member_phone_number},
+        member_email = #{member_email}
+        WHERE id = #{id}
+    """)
+    boolean editMember(EditMember member);
 }

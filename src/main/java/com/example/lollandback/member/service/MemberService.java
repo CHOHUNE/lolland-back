@@ -1,5 +1,6 @@
 package com.example.lollandback.member.service;
 
+import com.example.lollandback.member.domain.EditMemberAndAddress;
 import com.example.lollandback.member.domain.Member;
 import com.example.lollandback.member.domain.MemberAddress;
 import com.example.lollandback.member.domain.MemberAndAddress;
@@ -8,6 +9,7 @@ import com.example.lollandback.member.dto.MemberDto;
 import com.example.lollandback.member.dto.SetRandomPasswordDto;
 import com.example.lollandback.member.mapper.MemberAddressMapper;
 import com.example.lollandback.member.mapper.MemberMapper;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.WebRequest;
 import software.amazon.awssdk.services.s3.S3Client;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -78,15 +77,14 @@ public class MemberService {
     }
 
 
-    public boolean editMember(Member login, MemberAndAddress memberAndAddress) {
-        Member member = memberAndAddress.getMember();
-        MemberAddress memberAddress = memberAndAddress.getMemberAddress();
-
-        // 회원 생성
-        mapper.insertUser(member);
-        // 주소 생성
-        memberAddressMapper.insertAddress(member.getId(),memberAddress);
-
+    public boolean editMember(@Valid EditMemberAndAddress editMemberAndAddress) {
+        // 회원 업데이트
+        if(mapper.editMember(editMemberAndAddress.getMember())){
+            // 메인 주소 업데이트
+            if(memberAddressMapper.editMainAddress(editMemberAndAddress.getMember().getId(), editMemberAndAddress.getMemberAddress())){
+                return true;
+            }
+        }
         return false;
     }
 

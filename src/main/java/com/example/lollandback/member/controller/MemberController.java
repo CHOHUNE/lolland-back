@@ -96,14 +96,13 @@ public class MemberController {
 
     // 회원 정보 수정
     @PutMapping("edit")
-    public void editMember(@SessionAttribute("login")Member login, @RequestBody @Valid EditMemberAndAddress editMemberAndAddress) {
-        System.out.println("login = " + login);
-        System.out.println("editMemberAndAddress = " + editMemberAndAddress);
-        //        if (service.editMember(login, memberAndAddress)){
-//            return ResponseEntity.ok().build();
-//        } else {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-//        }
+    public ResponseEntity editMember(@RequestBody @Valid EditMemberAndAddress editMemberAndAddress) {
+
+        if (service.editMember(editMemberAndAddress)){
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
     // 회원 비밀 번호를 임시 비밀 번호로 셋팅 ---------------------------------------------------------
