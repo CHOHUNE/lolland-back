@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,8 +21,17 @@ public class QnaController {
     private final QnaService qnaService;
 
     @GetMapping("/list")
-    public List<QnaDto> fetchList(@RequestParam Long product_id) {
-        return qnaService.getQnaByProduct(product_id);
+    public Map<String, Object> fetchList(@RequestParam Long product_id,
+                                         @RequestParam(value="p", defaultValue = "1") Integer page,
+                                         @RequestParam(value = "k", defaultValue = "") String keyword,
+                                         @RequestParam(value="c", defaultValue = "all") String category) {
+        try {
+            return qnaService.getQnaByProduct(product_id, page, keyword, category);
+        } catch (Exception e) {
+            System.out.println("문의 사항 페이지 가져오는 도중에 에러 발생 = " + e);
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @GetMapping("/fetchMine")

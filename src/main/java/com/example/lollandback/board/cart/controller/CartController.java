@@ -3,13 +3,16 @@ package com.example.lollandback.board.cart.controller;
 import com.example.lollandback.board.cart.domain.Cart;
 import com.example.lollandback.board.cart.dto.CartDto;
 import com.example.lollandback.board.cart.dto.CartDtoWithLoginId;
+import com.example.lollandback.board.cart.dto.ReceiveCartDto;
 import com.example.lollandback.board.cart.service.CartService;
+import com.example.lollandback.board.product.dto.OptionPurchaseDto;
 import com.example.lollandback.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -23,8 +26,9 @@ public class CartController {
     public ResponseEntity<CartDtoWithLoginId> fetchCart(@SessionAttribute("login") Member login) {
         try {
             String member_login_id = login.getMember_login_id();
+            Long memberId = login.getId();
             if(member_login_id != null) {
-                CartDtoWithLoginId dto = cartService.fetchCartByMember(member_login_id);
+                CartDtoWithLoginId dto = cartService.fetchCartByMember(memberId, member_login_id);
                 return ResponseEntity.ok().body(dto);
             } else {
                 System.out.println("member_login_id가 존재하지 않음 ");
@@ -37,10 +41,21 @@ public class CartController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity addProductToCart(@RequestBody Cart cart) {
-        //member_id, product_id, count(fe에서 *Long*으로 넘겨주기)
+    public ResponseEntity addProductToCart(@SessionAttribute("login") Member login, @RequestBody ReceiveCartDto cartDto) {
+        Long memberId = login.getId();
+        Long productId = cartDto.getProduct_id();
+
+        List<OptionPurchaseDto> selectedOptionList = cartDto.getSelectedOptionList();
+
+        List<Cart> cartList = new ArrayList<>();
+
+        for (OptionPurchaseDto optionDto : selectedOptionList) {
+            Cart cart = new Cart(memberId, productId, optionDto);
+            cartList.add(cart);
+        }
+
         try {
-            cartService.addProductToCart(cart);
+            cartService.addProductToCart(cartList);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             System.out.println("상품 카트에 추가 중 에러 발생: " + e.getMessage());

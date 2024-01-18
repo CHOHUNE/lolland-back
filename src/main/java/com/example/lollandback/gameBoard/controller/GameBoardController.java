@@ -35,7 +35,6 @@ public class GameBoardController {
 
     }
 
-
     @GetMapping("list")
     public Map<String, Object> list(
             @RequestParam(value = "p", defaultValue = "1") Integer page,
@@ -53,6 +52,16 @@ public class GameBoardController {
     public List<GameBoard> top(){
         return gameboardService.top();
     }
+
+    @GetMapping("list/written/post/{memberId}")
+    public List<GameBoard> writtenPost(@PathVariable String memberId){
+        return gameboardService.writtenPost(memberId);}
+
+    @GetMapping("list/info/{memberId}")
+    public Member memberInfo(@PathVariable String memberId) {
+        return gameboardService.postMemberInfo(memberId);
+    }
+
 
 
 

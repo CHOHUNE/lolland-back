@@ -1,6 +1,7 @@
 package com.example.lollandback.board.review.controller;
 
 import com.example.lollandback.board.review.domain.Review;
+import com.example.lollandback.board.review.dto.GetReviewDto;
 import com.example.lollandback.board.review.dto.ReviewDto;
 import com.example.lollandback.board.review.dto.ReviewUpdateDto;
 import com.example.lollandback.board.review.service.ReviewService;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,14 +22,23 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @GetMapping("/fetch")
-    public List<ReviewDto> fetchReviews(@RequestParam Long product_id) {
-        return reviewService.getAllReviewsByProduct(product_id);
+    public GetReviewDto fetchReviews(@RequestParam Long product_id,
+                                     @RequestParam(defaultValue = "0") Integer page,
+                                     @RequestParam(defaultValue = "10") Integer pageSize) {
+        Long totalReview = reviewService.countTotalReview(product_id);
+        List<ReviewDto> reviewList = reviewService.getAllReviewsByProduct(product_id, page, pageSize);
+        return new GetReviewDto(reviewList, totalReview);
     }
 
     @GetMapping("/fetchAll")
     public List<ReviewDto> fetchMemberReviews(@SessionAttribute("login") Member login) {
         Long member_id = login.getId();
         return reviewService.getAllReviewsByMember(member_id);
+    }
+
+    @GetMapping("/rating-distribution")
+    public Map<Integer, Long> getRatingDistribution(@RequestParam Long product_id) {
+        return reviewService.getRatingDistribution(product_id);
     }
 
     @PostMapping("/submit")
