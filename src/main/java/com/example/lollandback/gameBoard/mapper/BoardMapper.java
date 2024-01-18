@@ -59,16 +59,18 @@ SELECT *,COUNT(DISTINCT gl.id)count_like,
     List<GameBoard> selectTop();
 
     @Select("""
-       SELECT *,
-            COUNT(DISTINCT gl.id)count_like,
-            COUNT(DISTINCT gc.id)count_comment,
-            COUNT(DISTINCT gf.id)countFile
-              from gameboard gb
-             LEFT JOIN lolland.gameboardlike gl on gb.id = gl.game_board_id
-             LEFT JOIN lolland.gameboardcomment gc on gb.id = gc.game_board_id
-             LEFT JOIN lolland.gameboardfile gf on gb.id = gf.gameboard_id
-                       WHERE category = '공지'
-                       ORDER BY gb.id
+       
+            SELECT gb.*,
+                (SELECT COUNT(DISTINCT gl.id) FROM lolland.gameboardlike gl WHERE gl.game_board_id = gb.id) AS count_like,
+                (SELECT COUNT(DISTINCT gc.id) FROM lolland.gameboardcomment gc WHERE gc.game_board_id = gb.id) AS count_comment,
+                (SELECT COUNT(DISTINCT gf.id) FROM lolland.gameboardfile gf WHERE gf.gameboard_id = gb.id) AS countFile
+         FROM gameboard gb
+         LEFT JOIN lolland.gameboardlike gl ON gb.id = gl.game_board_id
+         LEFT JOIN lolland.gameboardcomment gc ON gb.id = gc.game_board_id
+         LEFT JOIN lolland.gameboardfile gf ON gb.id = gf.gameboard_id
+         WHERE gb.category = '공지'
+         ORDER BY gb.id;
+         
                        """)
     List<GameBoard> selectNotice();
 
