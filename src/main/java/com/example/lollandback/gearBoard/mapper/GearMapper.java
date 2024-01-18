@@ -7,11 +7,16 @@ import java.util.List;
 
 @Mapper
 public interface GearMapper {
-
     @Insert("""
-                insert into gearboard (gear_title, gear_content, category) values (#{gear_title},#{gear_content},#{category});
-        """)
-    int save(GearBoard gearBoard);
+                            insert into gearboard (gear_title, gear_content, category, gear_uploadFiles,member_id)
+                            values (#{gear_title},#{gear_content},#{category},#{gear_uploadFiles},#{member_id});
+    """)
+    int insert(GearBoard gearBoard);
+
+
+
+
+
 
     @Select("""
                     select * from gearboard where category=#{category};
@@ -39,5 +44,11 @@ public interface GearMapper {
         """)
     int saveup(GearBoard gearBoard);
 
+
+    @Select("""
+                select * from gearboard where gear_id=#{gear_id};
+        """)
+
+    GearBoard selectById(Integer gear_id);
 }
 
