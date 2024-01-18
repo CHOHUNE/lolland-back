@@ -17,7 +17,6 @@ public class MemberEmailController {
     // 회원 가입시 인증번호 발송 로직
     @PostMapping("sendCodeMail")
     public void sendCodeMail(@RequestBody EmailSendCodeDto emailSendCodeDto) {
-
         // Gmail보내기
         service.emailSendCode(emailSendCodeDto);
     }
@@ -27,6 +26,12 @@ public class MemberEmailController {
     public void sendIdMail(@RequestBody EmailSendCodeDto emailSendCodeDto) {
 
         service.emailFindId(emailSendCodeDto);
+    }
+
+    @PostMapping("findPassword")
+    public void sendPasswordMail(@RequestBody EmailSendCodeDto emailSendCodeDto) {
+        System.out.println("비밀번호 찾기 : " + emailSendCodeDto);
+        service.sendPasswordMail(emailSendCodeDto);
     }
 
 }
