@@ -5,6 +5,7 @@ import com.example.lollandback.board.product.domain.Product;
 import com.example.lollandback.board.product.domain.ProductOptions;
 import com.example.lollandback.board.product.dto.*;
 import com.example.lollandback.board.product.service.ProductService;
+import com.example.lollandback.member.domain.Member;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -32,13 +33,14 @@ public class ProductController {
     // --------------------------- 상품 등록 로직 ---------------------------
     @PostMapping("add")
     public ResponseEntity add(Product product, Company company,
+                              @SessionAttribute(value = "login", required = false) Member login,
                               @RequestParam(value = "options", required = false) String options,
                               @RequestParam(value = "mainImg[]", required = false) MultipartFile[] mainImg,
                               @RequestParam(value = "contentImg[]", required = false) MultipartFile[] contentImg) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         List<ProductOptionsDto> optionsList = objectMapper.readValue(options, new TypeReference<>() {
         });
-        if (productService.save(product, company, mainImg, contentImg, optionsList)) {
+        if (productService.save(product, login, company, mainImg, contentImg, optionsList)) {
             return ResponseEntity.ok(product.getProduct_id());
         } else {
             return ResponseEntity.internalServerError().build();
