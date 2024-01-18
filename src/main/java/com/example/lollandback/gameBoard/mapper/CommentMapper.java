@@ -77,7 +77,7 @@ VALUES (#{comment_content},#{game_board_id},#{parent_id},#{member_id})
 
 
 @Select("""
-SELECT id,comment_content from gameboardcomment
+SELECT id,comment_content,game_board_id from gameboardcomment
 WHERE member_id=#{member_id}
 ORDER BY id DESC
 LIMIT 5
