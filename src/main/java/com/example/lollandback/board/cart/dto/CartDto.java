@@ -16,5 +16,6 @@ public class CartDto {
     private Double product_price;
     private List<String> main_img_uri;
     private String company_name;
-    private Integer count;
+    private Integer quantity;
+    private String option_name;
 }
