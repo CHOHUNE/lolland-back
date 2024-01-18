@@ -10,14 +10,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
     private final ReviewMapper reviewMapper;
 
-    public List<ReviewDto> getAllReviewsByProduct(Long product_id) {
-        return reviewMapper.getAllReviewsByProduct(product_id);
+    public List<ReviewDto> getAllReviewsByProduct(Long product_id, Integer page, Integer pageSize) {
+        Integer offset = page * pageSize;
+        return reviewMapper.getAllReviewsByProduct(product_id, offset,  pageSize);
     }
 
     public List<ReviewDto> getAllReviewsByMember(Long member_id) {
@@ -65,5 +70,16 @@ public class ReviewService {
         } else {
             System.out.println("updatedRows = " + updatedRows + "productIds.size()" + productIds.size());
         }
+    }
+
+    public Long countTotalReview(Long productId) {
+        return reviewMapper.countTotalReview(productId);
+    }
+
+    public Map<Integer, Long> getRatingDistribution(Long product_id) {
+        List<Integer> rates = reviewMapper.getAllRatesByProduct(product_id);
+
+        return rates.stream()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
     }
 }
