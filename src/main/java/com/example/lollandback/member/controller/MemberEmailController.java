@@ -28,9 +28,10 @@ public class MemberEmailController {
         service.emailFindId(emailSendCodeDto);
     }
 
+    // 비밀번호 찾기 메일 보내기
     @PostMapping("findPassword")
     public void sendPasswordMail(@RequestBody EmailSendCodeDto emailSendCodeDto) {
-        System.out.println("비밀번호 찾기 : " + emailSendCodeDto);
+
         service.sendPasswordMail(emailSendCodeDto);
     }
 

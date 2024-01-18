@@ -109,7 +109,7 @@ public class MemberController {
     // 회원 비밀 번호를 임시 비밀 번호로 셋팅 ---------------------------------------------------------
     @PutMapping("setRandomPassword")
     public void setRandomPassword (@RequestBody SetRandomPasswordDto setRandomPasswordDto) {
-        System.out.println("setRandomPasswordDto = " + setRandomPasswordDto);
+
         service.setRandomPassword(setRandomPasswordDto);
     }
 
