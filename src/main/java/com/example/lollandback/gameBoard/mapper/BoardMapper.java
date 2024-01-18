@@ -1,6 +1,7 @@
 package com.example.lollandback.gameBoard.mapper;
 
 import com.example.lollandback.gameBoard.domain.GameBoard;
+import com.example.lollandback.member.domain.Member;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -16,30 +17,30 @@ VALUES (#{title},#{board_content},#{category},#{member_id})
     int insert(GameBoard gameBoard);
 
     @Select("""
-               SELECT gb.id,
-                gb.board_content,
-                gb.title,
-                 gb.category,
-                  gb.board_count,
-                   gb.reg_time,
-                   COUNT(DISTINCT gl.id)count_like,
-                   COUNT(DISTINCT gc.id)count_comment,
-                   COUNT(DISTINCT gf.id)countFile
-               FROM gameboard gb
-               LEFT JOIN lolland.gameboardlike gl on gb.id = gl.game_board_id
-               LEFT JOIN lolland.gameboardcomment gc on gb.id = gc.game_board_id
-               LEFT JOIN lolland.gameboardfile gf on gb.id = gf.gameboard_id
-                 WHERE 
-                 gb.category !='공지' AND
-                     title LIKE #{keyword}
-                    OR board_content LIKE #{keyword}
-                    OR category LIKE #{keyword}
-               GROUP BY gb.id
-               ORDER BY gb.id DESC
-               LIMIT #{from},10
-                           
-               """)
+    SELECT 
+        gb.id,
+        gb.board_content,
+        gb.title,
+        gb.category,
+        gb.board_count,
+        gb.reg_time,
+        gb.member_id,
+        COUNT(DISTINCT gl.id) as count_like,
+        COUNT(DISTINCT gc.id) as count_comment,
+        COUNT(DISTINCT gf.id) as countFile
+    FROM gameboard gb
+    LEFT JOIN lolland.gameboardlike gl ON gb.id = gl.game_board_id
+    LEFT JOIN lolland.gameboardcomment gc ON gb.id = gc.game_board_id
+    LEFT JOIN lolland.gameboardfile gf ON gb.id = gf.gameboard_id
+    WHERE 
+        gb.category != '공지' AND
+        (title LIKE #{keyword} OR board_content LIKE #{keyword} OR category LIKE #{keyword})
+    GROUP BY gb.id
+    ORDER BY gb.id DESC
+    LIMIT #{from}, 10
+""")
     List<GameBoard> selectAll(int from, String keyword);
+
 
     @Select("""
 SELECT *,COUNT(DISTINCT gl.id)count_like,
@@ -52,29 +53,34 @@ SELECT *,COUNT(DISTINCT gl.id)count_like,
                LEFT JOIN lolland.gameboardfile gf on gb.id = gf.gameboard_id
                WHERE gb.category !='공지'
                
- GROUP BY gb.id
- ORDER BY count_like DESC
- LIMIT 10
+ GROUP BY gb.id,gb.board_count
+ ORDER BY count_like DESC,count_comment DESC,gb.board_count DESC
+ LIMIT 5
 """)
     List<GameBoard> selectTop();
 
     @Select("""
-       SELECT *,
-            COUNT(DISTINCT gl.id)count_like,
-            COUNT(DISTINCT gc.id)count_comment,
-            COUNT(DISTINCT gf.id)countFile
-              from gameboard gb
-             LEFT JOIN lolland.gameboardlike gl on gb.id = gl.game_board_id
-             LEFT JOIN lolland.gameboardcomment gc on gb.id = gc.game_board_id
-             LEFT JOIN lolland.gameboardfile gf on gb.id = gf.gameboard_id
-                       WHERE category = '공지'
+       
+            SELECT gb.*,
+                (SELECT COUNT(DISTINCT gl.id) FROM lolland.gameboardlike gl WHERE gl.game_board_id = gb.id) AS count_like,
+                (SELECT COUNT(DISTINCT gc.id) FROM lolland.gameboardcomment gc WHERE gc.game_board_id = gb.id) AS count_comment,
+                (SELECT COUNT(DISTINCT gf.id) FROM lolland.gameboardfile gf WHERE gf.gameboard_id = gb.id) AS countFile
+         FROM gameboard gb
+         LEFT JOIN lolland.gameboardlike gl ON gb.id = gl.game_board_id
+         LEFT JOIN lolland.gameboardcomment gc ON gb.id = gc.game_board_id
+         LEFT JOIN lolland.gameboardfile gf ON gb.id = gf.gameboard_id
+         WHERE gb.category = '공지'
+         ORDER BY gb.id;
+         
                        """)
     List<GameBoard> selectNotice();
 
     @Select("""
-SELECT *
-FROM gameboard
-WHERE id=#{id}
+SELECT *,
+            COUNT(DISTINCT gc.id)count_comment
+            FROM gameboard gb
+             LEFT JOIN lolland.gameboardcomment gc on gb.id = gc.game_board_id
+WHERE gb.id=#{id}
 """)
     GameBoard selectById(Integer id);
 
@@ -101,4 +107,16 @@ WHERE id= #{id}
             """)
     int countAll(String keyword);
 
+    @Select("""
+SELECT * FROM gameboard
+WHERE member_id=#{writer}
+LIMIT 5
+""")
+List <GameBoard> selectByMemberId(String writer);
+
+    @Select("""
+SELECT member_name,member_email,member_phone_number FROM member
+WHERE member_login_id=#{writer}
+            """)
+    Member selectMemberById(String writer);
 }

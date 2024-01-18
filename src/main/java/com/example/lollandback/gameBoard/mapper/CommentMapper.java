@@ -76,7 +76,14 @@ VALUES (#{comment_content},#{game_board_id},#{parent_id},#{member_id})
 
 
 
+@Select("""
+SELECT id,comment_content from gameboardcomment
+WHERE member_id=#{member_id}
+ORDER BY id DESC
+LIMIT 5
 
+""")
+    List<Comment> selectByMemberId(String member_id);
 
 
     @Delete(""" 

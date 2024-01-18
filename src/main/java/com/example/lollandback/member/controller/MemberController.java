@@ -2,23 +2,17 @@ package com.example.lollandback.member.controller;
 
 import com.example.lollandback.member.domain.EditMemberAndAddress;
 import com.example.lollandback.member.domain.Member;
-import com.example.lollandback.member.domain.MemberAddress;
 import com.example.lollandback.member.domain.MemberAndAddress;
-import com.example.lollandback.member.dto.EmailSendCodeDto;
 import com.example.lollandback.member.dto.MemberDto;
-import com.example.lollandback.member.service.MemberEmailService;
+import com.example.lollandback.member.dto.SetRandomPasswordDto;
 import com.example.lollandback.member.service.MemberService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,10 +32,15 @@ public class MemberController {
             return service.findIdByNameAndEmail(memberDto.getMember_name(), memberDto.getMember_email());
     }
 
+    // 비밀번호 찾기
+    @GetMapping("findPassword")
+    public ResponseEntity findPassword(MemberDto memberDto) {
+        return service.findUserByIdAndEmail(memberDto.getMember_login_id(), memberDto.getMember_email());
+    }
+
     // 회원 가입시 아이디 중복 체크
     @GetMapping("checkId")
     public ResponseEntity checkUserId(@RequestParam String member_login_id) {
-        System.out.println("member_login_id = " + member_login_id);
         if(service.checkUserId(member_login_id) != null){
             return ResponseEntity.badRequest().build();
         } else {
@@ -97,14 +96,33 @@ public class MemberController {
 
     // 회원 정보 수정
     @PutMapping("edit")
-    public void editMember(@SessionAttribute("login")Member login, @RequestBody @Valid EditMemberAndAddress editMemberAndAddress) {
+    public ResponseEntity editMember(@RequestBody @Valid EditMemberAndAddress editMemberAndAddress) {
+
+        if (service.editMember(editMemberAndAddress)){
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
+    // 회원 비밀번호 수정
+    @PutMapping("editPassword")
+    public void editPassword(@SessionAttribute("login")Member login,
+                                @RequestBody String member_password) {
         System.out.println("login = " + login);
-        System.out.println("editMemberAndAddress = " + editMemberAndAddress);
-        //        if (service.editMember(login, memberAndAddress)){
-//            return ResponseEntity.ok().build();
+        System.out.println("member_password = " + member_password);
+//        if(service.editPassword(login, member)){
+//           return ResponseEntity.ok().build();
 //        } else {
 //            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 //        }
+    }
+
+    // 회원 비밀 번호를 임시 비밀 번호로 셋팅 ---------------------------------------------------------
+    @PutMapping("setRandomPassword")
+    public void setRandomPassword (@RequestBody SetRandomPasswordDto setRandomPasswordDto) {
+
+        service.setRandomPassword(setRandomPasswordDto);
     }
 
     // 회원 탈퇴

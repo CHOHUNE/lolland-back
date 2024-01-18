@@ -1,7 +1,9 @@
 package com.example.lollandback.member.mapper;
 
+import com.example.lollandback.member.domain.EditMember;
 import com.example.lollandback.member.domain.Member;
 import com.example.lollandback.member.dto.MemberDto;
+import com.example.lollandback.member.dto.SetRandomPasswordDto;
 import org.apache.ibatis.annotations.*;
 
 @Mapper
@@ -72,4 +74,38 @@ public interface MemberMapper {
         AND member_email = #{memberEmail}
     """)
     String findIdByNameAndEmail(String memberName, String memberEmail);
+
+    @Select("""
+        SELECT COUNT(*) 
+        FROM member
+        WHERE member_login_id = #{memberLoginId}
+        AND member_email = #{memberEmail}
+    """)
+    Integer findUserByIdAndEmail(String memberLoginId, String memberEmail);
+
+    @Update("""
+        UPDATE member 
+        SET member_password = #{member_password} 
+        WHERE member_login_id = #{member_login_id}
+    """)
+    void setPasswordByLoginId(SetRandomPasswordDto setRandomPasswordDto);
+
+    @Update("""
+        UPDATE member 
+        SET 
+        member_login_id = #{member_login_id},
+        member_name = #{member_name},
+        member_phone_number = #{member_phone_number},
+        member_email = #{member_email}
+        WHERE id = #{id}
+    """)
+    boolean editMember(EditMember member);
+
+    @Update("""
+        UPDATE member
+        SET
+        member_password = #{memberPassword}
+        WHERE id = #{id} 
+    """)
+    boolean editPasswordById(Long id, String memberPassword);
 }
