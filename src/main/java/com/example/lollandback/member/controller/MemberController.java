@@ -2,23 +2,17 @@ package com.example.lollandback.member.controller;
 
 import com.example.lollandback.member.domain.EditMemberAndAddress;
 import com.example.lollandback.member.domain.Member;
-import com.example.lollandback.member.domain.MemberAddress;
 import com.example.lollandback.member.domain.MemberAndAddress;
-import com.example.lollandback.member.dto.EmailSendCodeDto;
 import com.example.lollandback.member.dto.MemberDto;
-import com.example.lollandback.member.service.MemberEmailService;
+import com.example.lollandback.member.dto.SetRandomPasswordDto;
 import com.example.lollandback.member.service.MemberService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -110,6 +104,13 @@ public class MemberController {
 //        } else {
 //            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 //        }
+    }
+
+    // 회원 비밀 번호를 임시 비밀 번호로 셋팅 ---------------------------------------------------------
+    @PutMapping("setRandomPassword")
+    public void setRandomPassword (@RequestBody SetRandomPasswordDto setRandomPasswordDto) {
+        System.out.println("setRandomPasswordDto = " + setRandomPasswordDto);
+        service.setRandomPassword(setRandomPasswordDto);
     }
 
     // 회원 탈퇴

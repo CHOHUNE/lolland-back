@@ -5,6 +5,7 @@ import com.example.lollandback.member.domain.MemberAddress;
 import com.example.lollandback.member.domain.MemberAndAddress;
 import com.example.lollandback.member.dto.MemberAddressDto;
 import com.example.lollandback.member.dto.MemberDto;
+import com.example.lollandback.member.dto.SetRandomPasswordDto;
 import com.example.lollandback.member.mapper.MemberAddressMapper;
 import com.example.lollandback.member.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
@@ -110,5 +111,9 @@ public class MemberService {
             return ResponseEntity.badRequest().build();
         }
 
+    }
+
+    public void setRandomPassword(SetRandomPasswordDto setRandomPasswordDto) {
+        mapper.setPasswordByLoginId(setRandomPasswordDto);
     }
 }
