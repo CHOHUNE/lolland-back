@@ -1,6 +1,7 @@
 package com.example.lollandback.gameBoard.mapper;
 
 import com.example.lollandback.gameBoard.domain.GameBoard;
+import com.example.lollandback.member.domain.Member;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -54,7 +55,7 @@ SELECT *,COUNT(DISTINCT gl.id)count_like,
                
  GROUP BY gb.id,gb.board_count
  ORDER BY count_like DESC,count_comment DESC,gb.board_count DESC
- LIMIT 10
+ LIMIT 5
 """)
     List<GameBoard> selectTop();
 
@@ -106,4 +107,16 @@ WHERE id= #{id}
             """)
     int countAll(String keyword);
 
+    @Select("""
+SELECT * FROM gameboard
+WHERE member_id=#{writer}
+LIMIT 5
+""")
+List <GameBoard> selectByMemberId(String writer);
+
+    @Select("""
+SELECT member_name,member_email,member_phone_number FROM member
+WHERE member_login_id=#{writer}
+            """)
+    Member selectMemberById(String writer);
 }

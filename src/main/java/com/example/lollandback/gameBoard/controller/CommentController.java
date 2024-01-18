@@ -42,6 +42,11 @@ CommentController {
         return commentService.list(id);
     }
 
+
+
+//    @GetMapping("list/written/comment/{id}")
+
+
     @DeleteMapping("{id}")
     public void remove(@PathVariable Integer id) {
         commentService.remove(id);
