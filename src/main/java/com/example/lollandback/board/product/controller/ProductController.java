@@ -49,8 +49,8 @@ public class ProductController {
 
     // --------------------------- 상품 리스트 로직 ---------------------------
     @GetMapping("list")
-    public List<Product> list() {
-        return productService.list();
+    public List<Product> list(@RequestParam(value = "p", defaultValue = "1") Integer page) {
+        return productService.list(page);
     }
 
     // --------------------------- 상품 보기 로직 ---------------------------
