@@ -18,8 +18,12 @@ public class Comment {
     private  String comment_content;
     private Integer depth;
 
-    public String getAgo(){
-        return AppUtil.getAgo(reg_time);
+    public String getAgo() {
+        if (reg_time != null) {
+            return AppUtil.getAgo(reg_time);
+        } else {
+            return "Unknown";
+        }
     }
 
 
