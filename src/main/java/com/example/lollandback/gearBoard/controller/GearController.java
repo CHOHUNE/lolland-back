@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -21,8 +22,8 @@ public class GearController {
 
 @PostMapping("saves")
 public ResponseEntity saves(  GearBoard gearBoard,
-                              @RequestParam(value = "files[]", required = false) MultipartFile[] files,
-                              @SessionAttribute(value = "login", required = false) Member login) {
+                              @RequestParam(value = "uploadFiles[]", required = false) MultipartFile[] files,
+                              @SessionAttribute(value = "login", required = false) Member login) throws IOException {
 /*
   파일 넘어오는거 확인
     if (files != null) {
@@ -65,7 +66,13 @@ public ResponseEntity saves(  GearBoard gearBoard,
     }
 
     @PutMapping("saveup")
-    public  void saveup(@RequestBody GearBoard gearBoard){
+    public  void saveup( GearBoard gearBoard,
+                         @RequestParam(value = "removeFileIds[]",required = false) List<Integer> removeFilesIds,
+                         @RequestParam(value = "uploadFiles[]",required = false) MultipartFile[] uploadFiles,
+                         @SessionAttribute(value = "login" ,required = false)Member login){
+        System.out.println("removeFilesIds = " + removeFilesIds);
+        System.out.println("uploadFiles = " + uploadFiles);
+        System.out.println("login = " + login);
         System.out.println("gearBoard = " + gearBoard);
         service.saveup(gearBoard);
     }
