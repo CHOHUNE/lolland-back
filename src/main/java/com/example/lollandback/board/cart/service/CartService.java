@@ -24,9 +24,7 @@ public class CartService {
     @Value("${image.file.prefix}")
     private String urlPrefix;
 
-    public CartDtoWithLoginId fetchCartByMember(String memberLoginId) {
-        Member member = memberMapper.selectById(memberLoginId);
-        Long memberId = member.getId();
+    public CartDtoWithLoginId fetchCartByMember(Long memberId, String memberLoginId) {
         List<CartDto> cartDtoList = cartMapper.fetchCartByMemberLoginId(memberId);
 
         if(cartDtoList != null) {
@@ -42,8 +40,10 @@ public class CartService {
         return cartDtoWithLoginId;
     }
 
-    public void addProductToCart(Cart cart) {
-        cartMapper.addProductToCart(cart);
+    public void addProductToCart(List<Cart> cartList) {
+        for(Cart cart : cartList) {
+            cartMapper.addProductToCart(cart);
+        }
     }
 
     @Transactional

@@ -28,11 +28,19 @@ public interface ProductMapper {
 
 
     @Insert("""
-            INSERT INTO product (category_id, subcategory_id, company_id, product_name, product_content, product_price, total_stock)
-            VALUES (#{category_id}, #{subcategory_id}, #{company_id}, #{product_name}, #{product_content}, #{product_price}, #{total_stock})
-            """)
+        INSERT INTO product (category_id, subcategory_id, company_id, product_name, product_content, product_price, member_id)
+        VALUES 
+            (#{category_id}, 
+            #{subcategory_id}, 
+            #{company_id}, 
+            #{product_name}, 
+            #{product_content}, 
+            #{product_price}, 
+            #{member_id})
+        """)
     @Options(useGeneratedKeys = true, keyProperty = "product_id")
     int insert(Product product);
+
 
     @Select("""
             SELECT *

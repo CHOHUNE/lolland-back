@@ -98,4 +98,16 @@ public interface MemberAddressMapper {
         WHERE id = #{id}
     """)
     void editAddress(MemberAddress memberAddress);
+
+
+    @Update("""
+        UPDATE memberaddress
+        SET
+        member_address = #{memberAddress.member_address},
+        member_detail_address = #{memberAddress.member_detail_address},
+        member_post_code = #{memberAddress.member_post_code}
+        WHERE member_id = #{memberId} 
+        AND member_address_type = 'main'
+    """)
+    boolean editMainAddress(Long memberId, MemberAddress memberAddress);
 }

@@ -6,6 +6,7 @@ import com.example.lollandback.board.product.dto.ProductDto;
 import com.example.lollandback.board.product.dto.ProductOptionsDto;
 import com.example.lollandback.board.product.dto.ProductUpdateDto;
 import com.example.lollandback.board.product.mapper.*;
+import com.example.lollandback.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -45,7 +46,8 @@ public class ProductService {
 
     // --------------------------- 상품 저장 로직 ---------------------------
     @Transactional
-    public boolean save(Product product, Company company, MultipartFile[] mainImg, MultipartFile[] contentImg, List<ProductOptionsDto> optionList) throws IOException {
+    public boolean save(Product product, Member login, Company company, MultipartFile[] mainImg, MultipartFile[] contentImg, List<ProductOptionsDto> optionList) throws IOException {
+
         Long total_stock = 0L;
         // 제조사 정보 저장
         if (companyMapper.insert(company) != 1) {
@@ -58,6 +60,12 @@ public class ProductService {
             }
             product.setTotal_stock(total_stock);
         }
+
+        // 로그인된 사용자의 ID 설정
+        if (login != null) {
+            product.setMember_id(login.getId());
+        }
+
         // 상품 정보 저장
         if (productMapper.insert(product) != 1) {
             return false;
