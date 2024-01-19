@@ -90,11 +90,11 @@ public class GameBoardService {
 
     }
 
-    public Map<String, Object> list(Integer page, String keyword) {
+    public Map<String, Object> list(Integer page, String keyword, String category) {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> pageInfo = new HashMap<>();
 
-        int countAll = mapper.countAll("%" + keyword + "%");
+        int countAll = mapper.countAll("%" + keyword + "%",category);
         int lastPageNumber = (countAll - 1) / 10 + 1;
         int startPageNumber = (page - 1) / 10 * 10 + 1;
         int endPageNumber = startPageNumber + 9;
@@ -113,7 +113,7 @@ public class GameBoardService {
         }
 
         int from = (page - 1) * 10;
-        map.put("gameBoardList", mapper.selectAll(from, "%" + keyword + "%"));
+        map.put("gameBoardList", mapper.selectAll(from, "%" + keyword + "%",category));
         map.put("pageInfo", pageInfo);
 
         return map;
