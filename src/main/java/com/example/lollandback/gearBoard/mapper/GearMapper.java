@@ -11,6 +11,11 @@ public interface GearMapper {
                             insert into gearboard (gear_title, gear_content, category,member_id)
                             values (#{gear_title},#{gear_content},#{category},#{member_id});
     """)
+    //  생성되기전에 미리  데이터 값 추가하기
+    // 파일이 어떤게시물의 파일인지 알아야해서
+    @Options(useGeneratedKeys = true,keyProperty = "gear_id")
+
+
     int insert(GearBoard gearBoard);
 
 

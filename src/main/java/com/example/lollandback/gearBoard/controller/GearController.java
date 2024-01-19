@@ -23,18 +23,19 @@ public class GearController {
 public ResponseEntity saves(  GearBoard gearBoard,
                               @RequestParam(value = "files[]", required = false) MultipartFile[] files,
                               @SessionAttribute(value = "login", required = false) Member login) {
-
+/*
+  파일 넘어오는거 확인
     if (files != null) {
         for (int i = 0; i < files.length; i++) {
             System.out.println("file = " + files[i].getOriginalFilename());
             System.out.println("file.getSize() = " + files[i].getSize());
         }
     }
-
+*/
     if (!service.validate(gearBoard)){
         return  ResponseEntity.badRequest().build();
     }
-    if (service.saves(gearBoard,login)){
+    if (service.saves(gearBoard,files,login)){
     return ResponseEntity.ok().build();
     }else{
         return  ResponseEntity.internalServerError().build();

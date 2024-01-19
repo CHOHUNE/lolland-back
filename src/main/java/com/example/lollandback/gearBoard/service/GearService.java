@@ -9,14 +9,9 @@ import com.example.lollandback.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
-import java.io.IOException;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -109,8 +104,24 @@ public class GearService {
 //    }
 
 
-    public boolean saves(GearBoard gearBoard, Member login) {
+    public boolean saves(GearBoard gearBoard, MultipartFile[] files, Member login) {
+
             gearBoard.setMember_id(login.getMember_login_id());
-            return mapper.insert(gearBoard)==1;
+                   int cnt =  mapper.insert(gearBoard);
+
+                    // gearboardfile 테이블에 files !! 정보 저장 !!
+        if (files!=null){
+            for (int i = 0; i < files.length ; i++) {
+                    gearFileMapper.insert(gearBoard.getGear_id(), files[i].getOriginalFilename());
+
+            }
+        }
+                    // gearboardId, name ,id (pk) 정보만 저장
+
+
+                   //파일 을 버켓에 업로드 한다.
+
+
+            return cnt==1;
     }
 }

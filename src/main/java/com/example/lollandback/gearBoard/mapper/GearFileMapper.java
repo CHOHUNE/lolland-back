@@ -9,16 +9,13 @@ import java.util.List;
 
 @Mapper
 public interface GearFileMapper {
-    
+//    @Insert("""
+//            insert into gearfile (name, gearboard_id) values (#{gearboard_id},#{name});
+//            """)
+//    int insert(Integer gearId, String originalFilename);
+
     @Insert("""
-                insert into gearboardfile (file_name, file_url, gameboard_id) 
-                values (#{file_name},#{file_url},#{gameboard_id});
-        """)
-    int insert(Integer gearId, String originalFilename, String fileUrl);
-
-
-//    @Select("""
-//                select * from gearboardfile where gearboard_id=#{gearboard_id};
-//        """)
-//    List<GearBoardFile> selectNamesBygearboardId(Integer gearboard_id);
+            insert into gearfile (gearboard_id,name) values (#{gear_id},#{originalFilename});
+            """)
+    int insert(Integer gear_id, String originalFilename);
 }
