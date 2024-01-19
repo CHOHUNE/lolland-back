@@ -19,7 +19,9 @@ import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -115,8 +117,19 @@ public class ProductService {
         s3.putObject(objectRequest, RequestBody.fromInputStream(mainImg.getInputStream(), mainImg.getSize()));
     }
 
-    // --------------------------- 상품 리스트 로직 ---------------------------
-    public List<Product> list(Integer page) {
+    // --------------------------- 상품 리스트 / 페이징 로직 ---------------------------
+    public Map<String, Object> list(Integer page) {
+        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> pageInfo = new HashMap<>();
+
+        int countAll = productMapper.countAll();
+        int lastPageNumber = (countAll - 1) / 10 + 1;
+        int startPageNumber = (page - 1) / 10 * 10 + 1;
+        int endPageNumber = startPageNumber + 9;
+        endPageNumber = Math.min(endPageNumber, lastPageNumber);
+
+        pageInfo.put("startPageNumber", startPageNumber);
+        pageInfo.put("endPageNumber", endPageNumber);
 
         int from = (page - 1) * 10;
 
@@ -126,7 +139,10 @@ public class ProductService {
             productsImg.forEach(img -> img.setMain_img_uri(urlPrefix + "lolland/product/productMainImg/" + productListImg.getProduct_id() + "/" + img.getMain_img_uri()));
             productListImg.setMainImgs(productsImg);
         });
-        return product;
+
+        map.put("product",product);
+        map.put("pageInfo", pageInfo);
+        return map;
     }
 
     // --------------------------- 상품 보기 로직 ---------------------------

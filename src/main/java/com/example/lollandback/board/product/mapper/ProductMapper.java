@@ -89,4 +89,11 @@ public interface ProductMapper {
     WHERE product_id = #{product_id}
     """)
     int updateById(ProductUpdateDto productDto);
+
+    @Select("""
+            SELECT COUNT(*)
+            FROM product;
+            """)
+    int countAll();
+
 }

@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -49,7 +50,9 @@ public class ProductController {
 
     // --------------------------- 상품 리스트 로직 ---------------------------
     @GetMapping("list")
-    public List<Product> list(@RequestParam(value = "p", defaultValue = "1") Integer page) {
+    public Map<String, Object> list(@RequestParam(value = "p", defaultValue = "1") Integer page) {
+
+
         return productService.list(page);
     }
 
