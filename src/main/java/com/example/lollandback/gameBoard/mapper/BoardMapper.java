@@ -17,6 +17,7 @@ VALUES (#{title},#{board_content},#{category},#{member_id})
     int insert(GameBoard gameBoard);
 
     @Select("""
+    <script>
     SELECT 
         gb.id,
         gb.board_content,
@@ -34,12 +35,33 @@ VALUES (#{title},#{board_content},#{category},#{member_id})
     LEFT JOIN lolland.gameboardfile gf ON gb.id = gf.gameboard_id
     WHERE 
         gb.category != '공지' AND
-        (title LIKE #{keyword} OR board_content LIKE #{keyword} OR category LIKE #{keyword})
+                (<trim prefixOverrides="OR">
+                        <if test="category == 'all' or category == 'title'">
+                            OR gb.title LIKE #{keyword}
+                        </if>
+                        <if test="category == 'all' or category == 'content'">
+                            OR gb.board_content LIKE #{keyword}
+                        </if>
+                    </trim>)
     GROUP BY gb.id
-    ORDER BY gb.id DESC
+
+    ORDER BY
+            <choose>
+                <when test="sortBy == 'board_count'">
+                    gb.board_count
+                </when>
+                <when test="sortBy == 'count_like'">
+                    count_like
+                </when>
+                <otherwise>
+                    gb.id
+                </otherwise>
+            </choose> DESC
     LIMIT #{from}, 10
+    </script>
 """)
-    List<GameBoard> selectAll(int from, String keyword);
+    List<GameBoard> selectAll(int from, String keyword, String category,String sortBy);
+
 
 
     @Select("""
@@ -75,6 +97,16 @@ SELECT *,COUNT(DISTINCT gl.id)count_like,
                        """)
     List<GameBoard> selectNotice();
 
+@Select("""
+        SELECT title,id FROM gameboard
+ WHERE DATE(reg_time) = CURRENT_DATE
+ ORDER BY board_count DESC
+ LIMIT 5;
+  
+
+""")
+    List<GameBoard> selectToday();
+
     @Select("""
 SELECT *,
             COUNT(DISTINCT gc.id)count_comment
@@ -101,11 +133,22 @@ WHERE id= #{id}
     void boardCount(Integer id);
 
     @Select("""
-            SELECT COUNT(*) FROM gameboard
-       WHERE title LIKE #{keyword}
-       OR board_content LIKE #{keyword}
-            """)
-    int countAll(String keyword);
+            <script>
+                    
+                    SELECT COUNT(*) FROM gameboard
+                            WHERE
+                     <trim prefixOverrides="OR">
+                               <if test="category == 'all' or category == 'title'">
+                                   OR title LIKE #{keyword}
+                               </if>
+                               <if test="category == 'all' or category == 'content'">
+                                   OR board_content LIKE #{keyword}
+                               </if>
+                           </trim>
+                       </script>
+                    """)
+    int countAll(String keyword, String category);
+
 
     @Select("""
 SELECT * FROM gameboard
