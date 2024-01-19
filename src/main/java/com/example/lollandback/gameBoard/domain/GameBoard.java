@@ -1,6 +1,8 @@
 package com.example.lollandback.gameBoard.domain;
 
 import com.example.lollandback.gameBoard.util.AppUtil;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.Data;
 
 import java.math.BigInteger;
@@ -14,7 +16,10 @@ public class GameBoard {
     private String title;
     private String board_content;
     private Long id;
+
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime reg_time;
+
     private String category;
     private Long count_comment;
     private Long count_like;
@@ -25,7 +30,8 @@ public class GameBoard {
     private List<GameBoardFile> files;
 
     public String getAgo() {
-        return AppUtil.getAgo(reg_time);
+        return reg_time != null ? AppUtil.getAgo(reg_time) : null;
     }
+
 
 }

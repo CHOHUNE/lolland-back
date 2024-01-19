@@ -198,6 +198,9 @@ public class GameBoardService {
         return mapper.selectTop();
     }
 
+    public List<GameBoard> today(){
+        return mapper.selectToday();}
+
     public List<GameBoard> writtenPost(String writer) {
 
         return mapper.selectByMemberId(writer);

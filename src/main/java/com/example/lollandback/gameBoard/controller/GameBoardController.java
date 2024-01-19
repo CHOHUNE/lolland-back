@@ -55,6 +55,11 @@ public class GameBoardController {
         return gameboardService.top();
     }
 
+    @GetMapping("list/today")
+    public List<GameBoard> today(){
+        return gameboardService.today();
+    }
+
     @GetMapping("list/written/post/{memberId}")
     public List<GameBoard> writtenPost(@PathVariable String memberId) {
         return gameboardService.writtenPost(memberId);

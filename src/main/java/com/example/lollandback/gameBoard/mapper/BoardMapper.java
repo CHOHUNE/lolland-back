@@ -97,6 +97,16 @@ SELECT *,COUNT(DISTINCT gl.id)count_like,
                        """)
     List<GameBoard> selectNotice();
 
+@Select("""
+        SELECT title,id FROM gameboard
+ WHERE DATE(reg_time) = CURRENT_DATE
+ ORDER BY board_count DESC
+ LIMIT 5;
+  
+
+""")
+    List<GameBoard> selectToday();
+
     @Select("""
 SELECT *,
             COUNT(DISTINCT gc.id)count_comment
