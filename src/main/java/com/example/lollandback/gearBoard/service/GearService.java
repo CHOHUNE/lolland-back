@@ -9,11 +9,18 @@ import com.example.lollandback.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
+@Transactional(rollbackFor = Exception.class)
 @RequiredArgsConstructor
 @Service
 public class GearService {
@@ -70,7 +77,13 @@ public class GearService {
 
 
     public GearBoard getId(Integer gearId) {
-        return  mapper.getId(gearId);
+              GearBoard board =  mapper.getId(gearId);
+
+              List<String> fileNames =gearFileMapper.selectNameByGearboardId(gearId);
+              fileNames= fileNames.stream().map(name->urlPrefix+"lolland/gearboard/"+gearId+"/"+name).toList();
+
+              board.setFileNames(fileNames);
+        return board;
     }
 
     public void remove(Integer gear_id) {
@@ -103,8 +116,7 @@ public class GearService {
 //        return gearBoard;
 //    }
 
-
-    public boolean saves(GearBoard gearBoard, MultipartFile[] files, Member login) {
+    public boolean saves(GearBoard gearBoard, MultipartFile[] files, Member login) throws IOException {
 
             gearBoard.setMember_id(login.getMember_login_id());
                    int cnt =  mapper.insert(gearBoard);
@@ -113,15 +125,26 @@ public class GearService {
         if (files!=null){
             for (int i = 0; i < files.length ; i++) {
                     gearFileMapper.insert(gearBoard.getGear_id(), files[i].getOriginalFilename());
-
+                    // gearboardId, name ,id (pk) 정보만 저장
+                   //파일 을 버켓에 업로드 한다.
+                    upload(gearBoard.getGear_id(), files[i]);
             }
         }
-                    // gearboardId, name ,id (pk) 정보만 저장
-
-
-                   //파일 을 버켓에 업로드 한다.
-
-
             return cnt==1;
     }
+
+
+    private void upload(Integer gear_id,MultipartFile file) throws IOException {
+        String key = "lolland/gearboard/" + gear_id + "/" + file.getOriginalFilename();
+
+        PutObjectRequest objectRequest = PutObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .acl(ObjectCannedACL.PUBLIC_READ)
+                .build();
+
+        s3.putObject(objectRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+
+    }
+
 }

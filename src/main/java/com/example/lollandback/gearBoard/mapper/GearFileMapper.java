@@ -18,4 +18,10 @@ public interface GearFileMapper {
             insert into gearfile (gearboard_id,name) values (#{gear_id},#{originalFilename});
             """)
     int insert(Integer gear_id, String originalFilename);
+
+    @Select("""
+                select name from gearfile where gearboard_id =#{gearId};
+        """)
+
+    List<String> selectNameByGearboardId(Integer gearId);
 }
