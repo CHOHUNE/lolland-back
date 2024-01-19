@@ -1,6 +1,7 @@
 package com.example.lollandback.gearBoard.mapper;
 
 //import com.example.lollandback.gearBoard.domain.GearBoardFile;
+import com.example.lollandback.gearBoard.domain.GearFile;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -20,8 +21,8 @@ public interface GearFileMapper {
     int insert(Integer gear_id, String originalFilename);
 
     @Select("""
-                select name from gearfile where gearboard_id =#{gearId};
+                select id, name from gearfile where gearboard_id =#{gear_id};
         """)
 
-    List<String> selectNameByGearboardId(Integer gearId);
+    List<GearFile> selectNameByGearboardId(Integer gear_id);
 }

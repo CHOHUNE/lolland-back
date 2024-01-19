@@ -21,11 +21,20 @@ public interface GearMapper {
 
 
 
-
+//
+//    select gear_id, gear_title, gear_content, category,
+//            (select count(f.id) from gearfile f where f.gearboard_id= b.gear_id)countFile
+//    from gearboard b join lolland.gearfile f on b.gear_id = f.gearboard_id
+//    where category=#{category};
 
     @Select("""
-                    select * from gearboard where category=#{category};
-    """)
+              select distinct gear_id, gear_title, gear_content, category,
+                  (select COUNT(DISTINCT f.id) from gearfile f where f.gearboard_id= b.gear_id) countFile
+              from gearboard b join lolland.gearfile f on b.gear_id = f.gearboard_id
+            where category=#{category};
+                
+                
+            """)
     List<GearBoard> list(String category);
 
 
@@ -33,7 +42,7 @@ public interface GearMapper {
     @Select("""
                 select * from gearboard where gear_id=#{gear_id};
         """)
-    GearBoard getId(Integer gearId);
+    GearBoard getId(Integer gear_id);
 
     @Delete("""
                 delete from gearboard where gear_id=#{gear_id};

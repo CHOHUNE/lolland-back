@@ -22,7 +22,7 @@ public class GearController {
 
 @PostMapping("saves")
 public ResponseEntity saves(  GearBoard gearBoard,
-                              @RequestParam(value = "files[]", required = false) MultipartFile[] files,
+                              @RequestParam(value = "uploadFiles[]", required = false) MultipartFile[] files,
                               @SessionAttribute(value = "login", required = false) Member login) throws IOException {
 /*
   파일 넘어오는거 확인

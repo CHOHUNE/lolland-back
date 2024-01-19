@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class GearBoard {
+public class  GearBoard {
     private Integer gear_id;
     private String  gear_title ;
     private String  gear_content;
@@ -15,11 +15,15 @@ public class GearBoard {
     private LocalDateTime gear_inserted ;
     private Integer gear_views;
     private Integer gear_recommand;
+    // gear_uploadFiles 는  카운트 파일임
     private String gear_uploadFiles;
+
+   private Integer countFile;
+
 
     private String member_id;
 
-    private List<String> fileNames;
+    private List<GearFile> files;
 
 
 

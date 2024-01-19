@@ -3,6 +3,7 @@ package com.example.lollandback.gearBoard.service;
 
 import com.example.lollandback.gearBoard.domain.GearBoard;
 //import com.example.lollandback.gearBoard.domain.GearBoardFile;
+import com.example.lollandback.gearBoard.domain.GearFile;
 import com.example.lollandback.gearBoard.mapper.GearFileMapper;
 import com.example.lollandback.gearBoard.mapper.GearMapper;
 import com.example.lollandback.member.domain.Member;
@@ -76,13 +77,15 @@ public class GearService {
     }
 
 
-    public GearBoard getId(Integer gearId) {
-              GearBoard board =  mapper.getId(gearId);
+    public GearBoard getId(Integer gear_id) {
+              GearBoard board =  mapper.getId(gear_id);
 
-              List<String> fileNames =gearFileMapper.selectNameByGearboardId(gearId);
-              fileNames= fileNames.stream().map(name->urlPrefix+"lolland/gearboard/"+gearId+"/"+name).toList();
-
-              board.setFileNames(fileNames);
+              List<GearFile> gearFiles =gearFileMapper.selectNameByGearboardId(gear_id);
+                for (GearFile gearFile : gearFiles){
+                    String url=urlPrefix+"lolland/gearboard/"+gear_id+"/"+gearFile.getName();
+                    gearFile.setUrl(url);
+                }
+            board.setFiles(gearFiles);
         return board;
     }
 
