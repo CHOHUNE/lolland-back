@@ -42,7 +42,7 @@ public class GameBoardController {
             @RequestParam(value = "c", defaultValue = "all") String category,
             @RequestParam(value="s", defaultValue = "")String sortBy) {
 
-        return gameboardService.list(page, keyword,category);
+        return gameboardService.list(page, keyword,category,sortBy);
     }
 
     @GetMapping("list/notice")

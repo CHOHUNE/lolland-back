@@ -90,7 +90,7 @@ public class GameBoardService {
 
     }
 
-    public Map<String, Object> list(Integer page, String keyword, String category) {
+    public Map<String, Object> list(Integer page, String keyword, String category,String sortBy) {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> pageInfo = new HashMap<>();
 
@@ -113,7 +113,7 @@ public class GameBoardService {
         }
 
         int from = (page - 1) * 10;
-        map.put("gameBoardList", mapper.selectAll(from, "%" + keyword + "%",category));
+        map.put("gameBoardList", mapper.selectAll(from, "%" + keyword + "%",category,sortBy));
         map.put("pageInfo", pageInfo);
 
         return map;

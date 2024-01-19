@@ -44,11 +44,24 @@ VALUES (#{title},#{board_content},#{category},#{member_id})
                         </if>
                     </trim>)
     GROUP BY gb.id
-    ORDER BY gb.id DESC
+
+    ORDER BY
+            <choose>
+                <when test="sortBy == 'board_count'">
+                    gb.board_count
+                </when>
+                <when test="sortBy == 'count_like'">
+                    count_like
+                </when>
+                <otherwise>
+                    gb.id
+                </otherwise>
+            </choose> DESC
     LIMIT #{from}, 10
     </script>
 """)
-    List<GameBoard> selectAll(int from, String keyword, String category);
+    List<GameBoard> selectAll(int from, String keyword, String category,String sortBy);
+
 
 
     @Select("""
