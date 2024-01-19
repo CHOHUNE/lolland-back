@@ -17,7 +17,6 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -82,8 +81,37 @@ public class GearService {
         gearFileMapper.deleteByGearBoardId(gear_id);
     }
 
-    public void saveup(GearBoard gearBoard) {
-        mapper.saveup(gearBoard);
+    public boolean saveup(GearBoard gearBoard, List<Integer> removeFilesIds, MultipartFile[] uploadFiles) throws IOException {
+
+        //파일 지우기
+        //s3 에서 지우기
+
+        if (removeFilesIds != null) {
+            for (Integer id: removeFilesIds){
+                //s3에서 지우기
+                GearFile file = gearFileMapper.selectByyId(id);
+                String key = "lolland/gearboard/" + gearBoard.getGear_id() + "/" + file.getName();
+
+                DeleteObjectRequest objectRequest = DeleteObjectRequest.builder()
+                        .bucket(bucket)
+                        .key(key)
+                        .build();
+                s3.deleteObject(objectRequest);
+                //db에서 지우기
+                gearFileMapper.deleteById(id);
+            }
+        }
+
+        //파일 추가하기
+        if (uploadFiles!=null){
+            for (MultipartFile file : uploadFiles){
+                upload(gearBoard.getGear_id(), file);
+            //db 에 추가하기
+            gearFileMapper.insert(gearBoard.getGear_id(),file.getOriginalFilename());
+            }
+        }
+
+        return mapper.saveup(gearBoard)==1;
     }
 
     public boolean validate(GearBoard gearBoard) {

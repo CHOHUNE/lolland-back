@@ -45,10 +45,6 @@ public ResponseEntity saves(  GearBoard gearBoard,
 
 
 
-
-
-
-//      .get("/api/gearboard/list?category=" + category)
     @GetMapping("list")
     public List<GearBoard> list(@RequestParam String category){
         return service.list(category);
@@ -69,12 +65,12 @@ public ResponseEntity saves(  GearBoard gearBoard,
     public  void saveup( GearBoard gearBoard,
                          @RequestParam(value = "removeFileIds[]",required = false) List<Integer> removeFilesIds,
                          @RequestParam(value = "uploadFiles[]",required = false) MultipartFile[] uploadFiles,
-                         @SessionAttribute(value = "login" ,required = false)Member login){
+                         @SessionAttribute(value = "login" ,required = false)Member login) throws IOException {
         System.out.println("removeFilesIds = " + removeFilesIds);
         System.out.println("uploadFiles = " + uploadFiles);
         System.out.println("login = " + login);
         System.out.println("gearBoard = " + gearBoard);
-        service.saveup(gearBoard);
+        service.saveup(gearBoard,removeFilesIds,uploadFiles);
     }
 
 
