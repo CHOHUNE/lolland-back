@@ -46,8 +46,9 @@ public interface ProductMapper {
             SELECT *
             FROM product
             ORDER BY product_reg_time DESC
+            LIMIT #{from}, 10
             """)
-    List<Product> list();
+    List<Product> list(Integer from);
 
     @Select("""
             SELECT *
