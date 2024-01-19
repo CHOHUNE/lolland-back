@@ -19,6 +19,8 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.WebRequest;
 import software.amazon.awssdk.services.s3.S3Client;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class MemberService {
@@ -118,5 +120,9 @@ public class MemberService {
 
     public void editPassword(Member login, EditPasswordDto editPasswordDto) {
         mapper.editPasswordById(login.getId(), editPasswordDto.getMember_password());
+    }
+
+    public List<MemberDto> getAllMember() {
+        return mapper.getAllMember();
     }
 }

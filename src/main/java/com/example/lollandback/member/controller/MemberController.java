@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/member")
@@ -137,5 +139,11 @@ public class MemberController {
 
         // 실패시 서버 에러 던지기
         return ResponseEntity.internalServerError().build();
+    }
+
+    // 회원 목록 전체 조회
+    @GetMapping("listAll")
+    public List<MemberDto> getAllMember() {
+        return service.getAllMember();
     }
 }
