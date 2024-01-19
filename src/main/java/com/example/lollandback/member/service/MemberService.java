@@ -4,6 +4,7 @@ import com.example.lollandback.member.domain.EditMemberAndAddress;
 import com.example.lollandback.member.domain.Member;
 import com.example.lollandback.member.domain.MemberAddress;
 import com.example.lollandback.member.domain.MemberAndAddress;
+import com.example.lollandback.member.dto.EditPasswordDto;
 import com.example.lollandback.member.dto.MemberAddressDto;
 import com.example.lollandback.member.dto.MemberDto;
 import com.example.lollandback.member.dto.SetRandomPasswordDto;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.WebRequest;
 import software.amazon.awssdk.services.s3.S3Client;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -115,11 +118,15 @@ public class MemberService {
         mapper.setPasswordByLoginId(setRandomPasswordDto);
     }
 
-    public boolean editPassword(Member login, Member member) {
+    public void editPassword(Member login, EditPasswordDto editPasswordDto) {
+        mapper.editPasswordById(login.getId(), editPasswordDto.getMember_password());
+    }
 
-        if (mapper.editPasswordById(login.getId(), member.getMember_password())) {
-            return true;
-        }
-        return false;
+    public List<MemberDto> getAllMember() {
+        return mapper.getAllMember();
+    }
+
+    public void deletedMemberByAdmin(Long id) {
+        mapper.deleteById(id);
     }
 }

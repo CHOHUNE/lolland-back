@@ -6,6 +6,8 @@ import com.example.lollandback.member.dto.MemberDto;
 import com.example.lollandback.member.dto.SetRandomPasswordDto;
 import org.apache.ibatis.annotations.*;
 
+import java.util.List;
+
 @Mapper
 public interface MemberMapper {
     @Insert("""
@@ -107,5 +109,10 @@ public interface MemberMapper {
         member_password = #{memberPassword}
         WHERE id = #{id} 
     """)
-    boolean editPasswordById(Long id, String memberPassword);
+    void editPasswordById(Long id, String memberPassword);
+
+    @Select("""
+        SELECT * FROM member WHERE member_type = 'user'
+    """)
+    List<MemberDto> getAllMember();
 }

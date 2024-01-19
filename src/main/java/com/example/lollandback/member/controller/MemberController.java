@@ -3,6 +3,7 @@ package com.example.lollandback.member.controller;
 import com.example.lollandback.member.domain.EditMemberAndAddress;
 import com.example.lollandback.member.domain.Member;
 import com.example.lollandback.member.domain.MemberAndAddress;
+import com.example.lollandback.member.dto.EditPasswordDto;
 import com.example.lollandback.member.dto.MemberDto;
 import com.example.lollandback.member.dto.SetRandomPasswordDto;
 import com.example.lollandback.member.service.MemberService;
@@ -13,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -108,14 +111,9 @@ public class MemberController {
     // 회원 비밀번호 수정
     @PutMapping("editPassword")
     public void editPassword(@SessionAttribute("login")Member login,
-                                @RequestBody String member_password) {
-        System.out.println("login = " + login);
-        System.out.println("member_password = " + member_password);
-//        if(service.editPassword(login, member)){
-//           return ResponseEntity.ok().build();
-//        } else {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-//        }
+                             @RequestBody @Valid EditPasswordDto editPasswordDto) {
+        service.editPassword(login, editPasswordDto);
+
     }
 
     // 회원 비밀 번호를 임시 비밀 번호로 셋팅 ---------------------------------------------------------
@@ -141,5 +139,26 @@ public class MemberController {
 
         // 실패시 서버 에러 던지기
         return ResponseEntity.internalServerError().build();
+    }
+
+    // 회원 목록 전체 조회 (user인 사람들만)
+    @GetMapping("listAll")
+    public List<MemberDto> getAllMember() {
+        return service.getAllMember();
+    }
+
+    // 관리자가 탈퇴 회원 id 번호로 삭제하는 로직 (admin만 건드세요)
+    @DeleteMapping("DeleteMember/{id}")
+    public ResponseEntity deletedMemberByAdmin(@SessionAttribute("login") Member login,
+                                    @PathVariable Long id) {
+        System.out.println("login = " + login);
+        System.out.println("id = " + id);
+        if (login.getMember_type().equals("admin")) {
+            service.deletedMemberByAdmin(id);
+
+            return ResponseEntity.ok().build();
+        }else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

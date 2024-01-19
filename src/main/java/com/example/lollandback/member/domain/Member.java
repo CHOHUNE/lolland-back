@@ -13,7 +13,7 @@ public class Member {
     private Long id;
 
     @NotBlank(message = "아이디를 입력 해주세요.")
-    @Size(min = 3, max = 20, message = "아이디는 최소 3글자 최대 20글자 사이로 작성해주세요.")
+    @Size(min = 5, max = 20, message = "아이디는 최소 5글자 최대 20글자 사이로 작성해주세요.")
     @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "아이디는 영문과 숫자로만 입력해주세요.")
     private String member_login_id;
 
