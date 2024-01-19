@@ -15,6 +15,6 @@ public class CartDtoWithLoginId {
 
     public CartDtoWithLoginId(List<CartDto> cartDtoList, String member_login_id) {
         this.cartDtoList = cartDtoList;
-        this.member_login_id=member_login_id;
+        this.member_login_id = member_login_id;
     }
 }
