@@ -107,5 +107,5 @@ public interface MemberMapper {
         member_password = #{memberPassword}
         WHERE id = #{id} 
     """)
-    boolean editPasswordById(Long id, String memberPassword);
+    void editPasswordById(Long id, String memberPassword);
 }

@@ -4,6 +4,7 @@ import com.example.lollandback.member.domain.EditMemberAndAddress;
 import com.example.lollandback.member.domain.Member;
 import com.example.lollandback.member.domain.MemberAddress;
 import com.example.lollandback.member.domain.MemberAndAddress;
+import com.example.lollandback.member.dto.EditPasswordDto;
 import com.example.lollandback.member.dto.MemberAddressDto;
 import com.example.lollandback.member.dto.MemberDto;
 import com.example.lollandback.member.dto.SetRandomPasswordDto;
@@ -115,11 +116,7 @@ public class MemberService {
         mapper.setPasswordByLoginId(setRandomPasswordDto);
     }
 
-    public boolean editPassword(Member login, Member member) {
-
-        if (mapper.editPasswordById(login.getId(), member.getMember_password())) {
-            return true;
-        }
-        return false;
+    public void editPassword(Member login, EditPasswordDto editPasswordDto) {
+        mapper.editPasswordById(login.getId(), editPasswordDto.getMember_password());
     }
 }
