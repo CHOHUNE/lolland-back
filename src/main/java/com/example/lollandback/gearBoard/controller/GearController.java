@@ -66,7 +66,13 @@ public ResponseEntity saves(  GearBoard gearBoard,
     }
 
     @PutMapping("saveup")
-    public  void saveup(@RequestBody GearBoard gearBoard){
+    public  void saveup( GearBoard gearBoard,
+                         @RequestParam(value = "removeFileIds[]",required = false) List<Integer> removeFilesIds,
+                         @RequestParam(value = "uploadFiles[]",required = false) MultipartFile[] uploadFiles,
+                         @SessionAttribute(value = "login" ,required = false)Member login){
+        System.out.println("removeFilesIds = " + removeFilesIds);
+        System.out.println("uploadFiles = " + uploadFiles);
+        System.out.println("login = " + login);
         System.out.println("gearBoard = " + gearBoard);
         service.saveup(gearBoard);
     }
