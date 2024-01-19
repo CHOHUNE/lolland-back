@@ -9,6 +9,7 @@ import com.example.lollandback.member.dto.MemberAddressDto;
 import com.example.lollandback.member.dto.MemberDto;
 import com.example.lollandback.member.dto.SetRandomPasswordDto;
 import com.example.lollandback.member.mapper.MemberAddressMapper;
+import com.example.lollandback.member.mapper.MemberImageMapper;
 import com.example.lollandback.member.mapper.MemberMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import java.util.List;
 public class MemberService {
     private final MemberMapper mapper;
     private final MemberAddressMapper memberAddressMapper;
+    private final MemberImageMapper memberImageMapper;
 
     private final S3Client s3;
 
@@ -43,6 +45,8 @@ public class MemberService {
         mapper.insertUser(member);
         // 주소 생성
         memberAddressMapper.insertAddress(member.getId(),memberAddress);
+        // 회원 가입시 기본 이미지 설정
+        memberImageMapper.insertDefaultImage(member.getId());
     }
 
     public boolean loginUser(Member member, WebRequest request) {
