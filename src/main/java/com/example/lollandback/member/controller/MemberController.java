@@ -151,8 +151,6 @@ public class MemberController {
     @DeleteMapping("DeleteMember/{id}")
     public ResponseEntity deletedMemberByAdmin(@SessionAttribute("login") Member login,
                                     @PathVariable Long id) {
-        System.out.println("login = " + login);
-        System.out.println("id = " + id);
         if (login.getMember_type().equals("admin")) {
             service.deletedMemberByAdmin(id);
 
