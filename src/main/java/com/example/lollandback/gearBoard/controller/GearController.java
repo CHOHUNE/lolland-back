@@ -2,9 +2,11 @@ package com.example.lollandback.gearBoard.controller;
 
 import com.example.lollandback.gearBoard.domain.GearBoard;
 import com.example.lollandback.gearBoard.service.GearService;
+import com.example.lollandback.member.domain.Member;
 import lombok.RequiredArgsConstructor;
-import org.apache.ibatis.annotations.Delete;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -17,12 +19,31 @@ public class GearController {
     private final GearService service;
 
 
-
-
-    @PostMapping("save")
-    public  void save(@RequestBody GearBoard gearBoard){
-        service.save(gearBoard);
+@PostMapping("saves")
+public ResponseEntity saves(  GearBoard gearBoard,
+                              @RequestParam(value = "files[]", required = false) MultipartFile[] files,
+                              @SessionAttribute(value = "login", required = false) Member login) {
+/*
+  파일 넘어오는거 확인
+    if (files != null) {
+        for (int i = 0; i < files.length; i++) {
+            System.out.println("file = " + files[i].getOriginalFilename());
+            System.out.println("file.getSize() = " + files[i].getSize());
+        }
     }
+*/
+    if (!service.validate(gearBoard)){
+        return  ResponseEntity.badRequest().build();
+    }
+    if (service.saves(gearBoard,files,login)){
+    return ResponseEntity.ok().build();
+    }else{
+        return  ResponseEntity.internalServerError().build();
+    }
+}
+
+
+
 
 
 
