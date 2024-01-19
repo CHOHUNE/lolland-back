@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,16 +26,7 @@ public class CartService {
     private String urlPrefix;
 
     public CartDtoWithLoginId fetchCartByMember(Long memberId, String memberLoginId) {
-        List<CartDto> cartDtoList = cartMapper.fetchCartByMemberLoginId(memberId);
-
-        if(cartDtoList != null) {
-            cartDtoList.forEach(cartDto -> {
-                List<String> modifiedMainImgUri = cartDto.getMain_img_uri().stream()
-                        .map(uri -> urlPrefix + "lolland/product/productMainImg/" +  cartDto.getProduct_id() + "/" + uri)
-                        .collect(Collectors.toList());
-                cartDto.setMain_img_uri(modifiedMainImgUri);
-            });
-        }
+        List<CartDto> cartDtoList = cartMapper.fetchCartByMemberId(memberId, urlPrefix);
 
         CartDtoWithLoginId cartDtoWithLoginId = new CartDtoWithLoginId(cartDtoList, memberLoginId);
         return cartDtoWithLoginId;
@@ -42,7 +34,14 @@ public class CartService {
 
     public void addProductToCart(List<Cart> cartList) {
         for(Cart cart : cartList) {
-            cartMapper.addProductToCart(cart);
+            Cart existingCart = cartMapper.getCartByProductAndOption(cart.getMember_id(), cart.getProduct_id(), cart.getOption_id());
+            if (existingCart != null) {
+                int newQuantity = existingCart.getQuantity() + 1;
+                existingCart.setQuantity(newQuantity);
+                cartMapper.updateCartQuantity(existingCart);
+            } else {
+                cartMapper.addProductToCart(cart);
+            }
         }
     }
 
