@@ -141,7 +141,7 @@ public class MemberController {
         return ResponseEntity.internalServerError().build();
     }
 
-    // 회원 목록 전체 조회
+    // 회원 목록 전체 조회 (user인 사람들만)
     @GetMapping("listAll")
     public List<MemberDto> getAllMember() {
         return service.getAllMember();
