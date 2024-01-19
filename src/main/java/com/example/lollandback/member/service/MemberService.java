@@ -125,4 +125,8 @@ public class MemberService {
     public List<MemberDto> getAllMember() {
         return mapper.getAllMember();
     }
+
+    public void deletedMemberByAdmin(Long id) {
+        mapper.deleteById(id);
+    }
 }

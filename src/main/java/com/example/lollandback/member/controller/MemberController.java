@@ -146,4 +146,19 @@ public class MemberController {
     public List<MemberDto> getAllMember() {
         return service.getAllMember();
     }
+
+    // 관리자가 탈퇴 회원 id 번호로 삭제하는 로직 (admin만 건드세요)
+    @DeleteMapping("DeleteMember/{id}")
+    public ResponseEntity deletedMemberByAdmin(@SessionAttribute("login") Member login,
+                                    @PathVariable Long id) {
+        System.out.println("login = " + login);
+        System.out.println("id = " + id);
+        if (login.getMember_type().equals("admin")) {
+            service.deletedMemberByAdmin(id);
+
+            return ResponseEntity.ok().build();
+        }else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }
