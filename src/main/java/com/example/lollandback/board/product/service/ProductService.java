@@ -116,8 +116,11 @@ public class ProductService {
     }
 
     // --------------------------- 상품 리스트 로직 ---------------------------
-    public List<Product> list() {
-        List<Product> product = productMapper.list();
+    public List<Product> list(Integer page) {
+
+        int from = (page - 1) * 10;
+
+        List<Product> product = productMapper.list(from);
         product.forEach(productListImg -> {
             List<ProductImg> productsImg = mainImgMapper.selectNamesByProductId(productListImg.getProduct_id());
             productsImg.forEach(img -> img.setMain_img_uri(urlPrefix + "lolland/product/productMainImg/" + productListImg.getProduct_id() + "/" + img.getMain_img_uri()));
