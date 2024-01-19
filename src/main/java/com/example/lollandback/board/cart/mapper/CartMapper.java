@@ -19,7 +19,7 @@ public interface CartMapper {
             p.product_name, 
             p.product_price, 
             com.company_name, 
-            CONCAT(#{urlPrefix}, 'lolland/product/productMainImg/', c.product_id, '/', SUBSTRING_INDEX(GROUP_CONCAT(img.main_img_uri ORDER BY img.main_img_id ASC), ',', 1)) AS main_img_uri, 
+            CONCAT(#{urlPrefix}, 'lolland/product/productMainImg/', c.product_id, '/', SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT img.main_img_uri ORDER BY img.main_img_id ASC), ',', 1)) AS main_img_uri, 
             op.option_id,
             op.option_name
         FROM cart c
@@ -30,15 +30,17 @@ public interface CartMapper {
         LEFT JOIN productimg img ON p.product_id = img.product_id
         INNER JOIN productoptions op ON op.option_id = c.option_id
         WHERE c.member_id = #{memberId}
+        GROUP BY c.product_id, c.option_id
     """)
     List<CartDto> fetchCartByMemberId(Long memberId, String urlPrefix);
+
 
     @Select("""
         SELECT *
         FROM cart
-        WHERE member_id = #{memberId} AND product_id = #{product_id} AND option_id = #{option_id}
+        WHERE member_id = #{member_id} AND product_id = #{product_id} AND option_id = #{option_id}
     """)
-    Cart getCartByProductAndOption(Long memberId, Long productId, Long optionId);
+    Cart getCartByProductAndOption(Long member_id, Long product_id, Long option_id);
 
     @Insert("""
         INSERT INTO cart (member_id, product_id, option_id, quantity)
@@ -46,7 +48,7 @@ public interface CartMapper {
     """)
     void addProductToCart(Cart cart);
 
-    @Update("UPDATE cart SET quantity = #{quantity} WHERE cart_id = #{cartId}")
+    @Update("UPDATE cart SET quantity = #{quantity} WHERE cart_id = #{cart_id}")
     void updateCartQuantity(Cart cart);
 
     @Delete("""
@@ -59,12 +61,14 @@ public interface CartMapper {
         <script>
             DELETE FROM cart
             WHERE cart_id IN
-            <foreach collection="cartIds" open="(" separator="," close=")">
+            <foreach collection="cartIds" item="cartId" open="(" separator="," close=")">
                 #{cartId}
             </foreach>
         </script>
     """)
-    void deleteSelected(List<Long> cartIds);
+    void deleteSelected(@Param("cartIds") List<Long> cartIds);
+
+
 
     @Delete("""
         DELETE FROM cart

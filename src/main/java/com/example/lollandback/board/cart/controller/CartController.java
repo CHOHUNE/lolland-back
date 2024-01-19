@@ -42,15 +42,15 @@ public class CartController {
 
     @PostMapping("/add")
     public ResponseEntity addProductToCart(@SessionAttribute("login") Member login, @RequestBody ReceiveCartDto cartDto) {
-        Long memberId = login.getId();
-        Long productId = cartDto.getProduct_id();
+        Long member_id = login.getId();
+        Long product_id = cartDto.getProduct_id();
 
         List<OptionPurchaseDto> selectedOptionList = cartDto.getSelectedOptionList();
 
         List<Cart> cartList = new ArrayList<>();
 
         for (OptionPurchaseDto optionDto : selectedOptionList) {
-            Cart cart = new Cart(memberId, productId, optionDto);
+            Cart cart = new Cart(member_id, product_id, optionDto);
             cartList.add(cart);
         }
 
@@ -59,6 +59,7 @@ public class CartController {
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             System.out.println("상품 카트에 추가 중 에러 발생: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -83,6 +84,7 @@ public class CartController {
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             System.out.println("선택된 카트 상품 삭제 도중 에러 발생" + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
