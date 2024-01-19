@@ -4,10 +4,7 @@ import com.example.lollandback.member.domain.EditMemberAndAddress;
 import com.example.lollandback.member.domain.Member;
 import com.example.lollandback.member.domain.MemberAddress;
 import com.example.lollandback.member.domain.MemberAndAddress;
-import com.example.lollandback.member.dto.EditPasswordDto;
-import com.example.lollandback.member.dto.MemberAddressDto;
-import com.example.lollandback.member.dto.MemberDto;
-import com.example.lollandback.member.dto.SetRandomPasswordDto;
+import com.example.lollandback.member.dto.*;
 import com.example.lollandback.member.mapper.MemberAddressMapper;
 import com.example.lollandback.member.mapper.MemberImageMapper;
 import com.example.lollandback.member.mapper.MemberMapper;
@@ -76,10 +73,15 @@ public class MemberService {
     }
 
     public MemberDto getMemberInfo(Member login) {
+        // 회원 주소록
         MemberAddressDto memberAddress = memberAddressMapper.selectByMemberIdToMainAddress(login.getMember_login_id());
+
+        // 회원 이미지
+        MemberImageDto memberImage = memberImageMapper.selectByMemberIdToImage(login.getId());
 
         MemberDto member = mapper.selectByMemberId(login.getMember_login_id());
         member.setMemberAddressDto(memberAddress);
+        member.setMemberImageDto(memberImage);
         return member;
     }
 

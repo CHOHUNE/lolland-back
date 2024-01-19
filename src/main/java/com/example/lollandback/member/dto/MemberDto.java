@@ -15,4 +15,6 @@ public class MemberDto {
     private LocalDateTime reg_time;
 
     private MemberAddressDto memberAddressDto;
+
+    private MemberImageDto memberImageDto;
 }
