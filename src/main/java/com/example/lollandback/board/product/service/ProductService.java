@@ -51,9 +51,10 @@ public class ProductService {
     // --------------------------- 상품 저장 로직 ---------------------------
     @Transactional
     public boolean save(Product product, Member login, Company company, MultipartFile[] mainImg, MultipartFile[] contentImg, List<ProductOptionsDto> optionList) throws IOException {
-        if (productMapper.existsByName(product.getProduct_name())) {
-            return false;
-        }
+        // 상품명 중복 검증
+//        if (productMapper.existsByName(product.getProduct_name())) {
+//            return false;
+//        }
         Long total_stock = 0L;
         // 제조사 정보 저장
         if (companyMapper.insert(company) != 1) {
@@ -126,7 +127,8 @@ public class ProductService {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> pageInfo = new HashMap<>();
 
-        int countAll = productMapper.countAll();
+//        int countAll = productMapper.countAll();
+        int countAll = productMapper.countAll("%" + keyword + "%");
         int lastPageNumber = (countAll - 1) / 10 + 1;
         int startPageNumber = (page - 1) / 10 * 10 + 1;
         int endPageNumber = startPageNumber + 9;

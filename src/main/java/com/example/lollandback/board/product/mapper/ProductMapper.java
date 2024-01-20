@@ -107,12 +107,14 @@ public interface ProductMapper {
 
     @Select("""
             SELECT COUNT(*)
-            FROM product;
+            FROM product
+            WHERE product_name LIKE #{kewyord}
             """)
-    int countAll();
+    int countAll(String keyword);
 
-    @Select("""
-            SELECT COUNT(*) > 0 FROM product WHERE product_name = #{product_name}
-            """)
-    boolean existsByName(String productName);
+    // 상품명 중복 검증
+//    @Select("""
+//            SELECT COUNT(*) > 0 FROM product WHERE product_name = #{product_name}
+//            """)
+//    boolean existsByName(String productName);
 }
