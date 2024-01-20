@@ -6,6 +6,7 @@ import com.example.lollandback.board.product.dto.ProductDto;
 import com.example.lollandback.board.product.dto.ProductOptionsDto;
 import com.example.lollandback.board.product.dto.ProductUpdateDto;
 import com.example.lollandback.board.product.mapper.*;
+import com.example.lollandback.board.review.mapper.ReviewMapper;
 import com.example.lollandback.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,6 +41,7 @@ public class ProductService {
     private final ProductMainImg mainImgMapper;
     private final ProductOptionMapper productOptionMapper;
     private final ProductContentImg contentImgMapper;
+    private final ReviewMapper reviewMapper;
 
     // --------------------------- 상품 저장 시 대분류/소분류 보여주기 로직 ---------------------------
     public List<CategoryDto> getAllCategories() {
@@ -120,7 +122,7 @@ public class ProductService {
     }
 
     // --------------------------- 상품 리스트 / 페이징 로직 ---------------------------
-    public Map<String, Object> list(Integer page) {
+    public Map<String, Object> list(Integer page, String keyword) {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> pageInfo = new HashMap<>();
 
@@ -132,6 +134,7 @@ public class ProductService {
         int prevPageNumber = startPageNumber - 10;
         int nextPageNumber = endPageNumber + 1;
 
+        pageInfo.put("currentPageNumber", page);
         pageInfo.put("startPageNumber", startPageNumber);
         pageInfo.put("endPageNumber", endPageNumber);
         if (prevPageNumber > 0) {
@@ -143,7 +146,7 @@ public class ProductService {
 
         int from = (page - 1) * 10;
 
-        List<Product> product = productMapper.list(from);
+        List<Product> product = productMapper.list(from, "%" + keyword + "%");
         product.forEach(productListImg -> {
             List<ProductImg> productsImg = mainImgMapper.selectNamesByProductId(productListImg.getProduct_id());
             productsImg.forEach(img -> img.setMain_img_uri(urlPrefix + "lolland/product/productMainImg/" + productListImg.getProduct_id() + "/" + img.getMain_img_uri()));
@@ -191,6 +194,7 @@ public class ProductService {
     }
 
     // --------------------------- 상품 삭제 로직 ---------------------------
+    @Transactional
     public void remove(Long productId) {
         // 1. 메인 이미지삭제
         deleteMainImg(productId);
@@ -198,10 +202,13 @@ public class ProductService {
         deleteDetailsImg(productId);
         // 3. 옵션삭제
         productOptionMapper.deleteByOption(productId);
-        // 4. 상품삭제
+        // 4. 리뷰 삭제
+        reviewMapper.deleteReviewByProductId(productId);
+        // 5. 상품삭제
         productMapper.deleteByProduct(productId);
-        // 5. 제조사 삭제
+        // 6. 제조사 삭제
         companyMapper.deleteByCompany(productId);
+
     }
 
     // ------------ 메인 이미지 삭제 ------------

@@ -50,10 +50,11 @@ public class ProductController {
 
     // --------------------------- 상품 리스트 로직 ---------------------------
     @GetMapping("list")
-    public Map<String, Object> list(@RequestParam(value = "p", defaultValue = "1") Integer page) {
+    public Map<String, Object> list(@RequestParam(value = "p", defaultValue = "1") Integer page,
+                                    @RequestParam(value = "k", defaultValue = "") String keyword) {
 
 
-        return productService.list(page);
+        return productService.list(page, keyword);
     }
 
     // --------------------------- 상품 보기 로직 ---------------------------
