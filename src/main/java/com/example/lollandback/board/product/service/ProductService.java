@@ -122,7 +122,7 @@ public class ProductService {
         s3.putObject(objectRequest, RequestBody.fromInputStream(mainImg.getInputStream(), mainImg.getSize()));
     }
 
-    // --------------------------- 상품 리스트 / 페이징 로직 ---------------------------
+    // --------------------------- 상품 리스트 / 페이징 / 검색 로직 ---------------------------
     public Map<String, Object> list(Integer page, String keyword, String category) {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> pageInfo = new HashMap<>();
@@ -198,18 +198,27 @@ public class ProductService {
     // --------------------------- 상품 삭제 로직 ---------------------------
     @Transactional
     public void remove(Long productId) {
-        // 1. 메인 이미지삭제
-        deleteMainImg(productId);
-        // 2. 설명 이미지삭제
-        deleteDetailsImg(productId);
-        // 3. 옵션삭제
-        productOptionMapper.deleteByOption(productId);
-        // 4. 리뷰 삭제
-        reviewMapper.deleteReviewByProductId(productId);
-        // 5. 상품삭제
-        productMapper.deleteByProduct(productId);
-        // 6. 제조사 삭제
-        companyMapper.deleteByCompany(productId);
+//        // 1. 메인 이미지삭제
+//        deleteMainImg(productId);
+//        // 2. 설명 이미지삭제
+//        deleteDetailsImg(productId);
+//        // 3. 옵션삭제
+//        productOptionMapper.deleteByOption(productId);
+//        // 4. 리뷰 삭제
+//        reviewMapper.deleteReviewByProductId(productId);
+//        // 5. q&a 삭제
+//
+//        // 6. cart 삭제
+//
+//        // 7. answer 삭제
+//
+//        // 8. productorder 삭제
+//
+//        // 9. 상품삭제
+//        productMapper.deleteByProduct(productId);
+//        // 10. 제조사 삭제
+//        companyMapper.deleteByCompany(productId);
+        productMapper.deleteById(productId);
 
     }
 

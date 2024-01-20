@@ -73,7 +73,7 @@ public class ProductController {
     }
 
     // --------------------------- 상품 삭제 로직 ---------------------------
-    @DeleteMapping("remove/{product_id}")
+    @PutMapping("remove/{product_id}")
     public void remove(@PathVariable Long product_id) {
         productService.remove(product_id);
     }
