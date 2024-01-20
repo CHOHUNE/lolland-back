@@ -43,6 +43,7 @@ public interface ProductMapper {
 
 
     @Select("""
+            <script>
             SELECT 
                 p.product_id,
                 p.product_name,
@@ -58,12 +59,20 @@ public interface ProductMapper {
                 co.company_name
             FROM product p JOIN company co 
             ON p.company_id = co.company_id
-            WHERE product_name LIKE #{keyword}
-                OR co.company_name LIKE #{keyword}
+            WHERE 
+                    <trim prefixOverrides="OR">
+                        <if test="category == 'all' or category == 'product_name'">
+                            OR p.product_name LIKE #{keyword}
+                        </if>
+                        <if test="category == 'all' or category == 'company_name'">
+                             OR co.company_name LIKE #{keyword}
+                        </if>
+                    </trim>
             ORDER BY product_reg_time DESC
             LIMIT #{from}, 10
+            </script>
             """)
-    List<Product> list(Integer from, String keyword);
+    List<Product> list(Integer from, String keyword, String category);
 
     @Select("""
             SELECT *
@@ -106,11 +115,22 @@ public interface ProductMapper {
     int updateById(ProductUpdateDto productDto);
 
     @Select("""
+            <script>
             SELECT COUNT(*)
-            FROM product
-            WHERE product_name LIKE #{kewyord}
+            FROM product p JOIN company co 
+            ON p.company_id = co.company_id
+            WHERE 
+                <trim prefixOverrides="OR">
+                    <if test="category == 'all' or category == 'product_name'">
+                        OR p.product_name LIKE #{keyword}
+                    </if>
+                    <if test="category == 'all' or category == 'company_name'">
+                         OR co.company_name LIKE #{keyword}
+                    </if>
+                </trim>
+            </script>
             """)
-    int countAll(String keyword);
+    int countAll(String keyword, String category);
 
     // 상품명 중복 검증
 //    @Select("""

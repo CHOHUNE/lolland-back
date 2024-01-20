@@ -123,12 +123,12 @@ public class ProductService {
     }
 
     // --------------------------- 상품 리스트 / 페이징 로직 ---------------------------
-    public Map<String, Object> list(Integer page, String keyword) {
+    public Map<String, Object> list(Integer page, String keyword, String category) {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> pageInfo = new HashMap<>();
 
 //        int countAll = productMapper.countAll();
-        int countAll = productMapper.countAll("%" + keyword + "%");
+        int countAll = productMapper.countAll("%" + keyword + "%", category);
         int lastPageNumber = (countAll - 1) / 10 + 1;
         int startPageNumber = (page - 1) / 10 * 10 + 1;
         int endPageNumber = startPageNumber + 9;
@@ -148,7 +148,7 @@ public class ProductService {
 
         int from = (page - 1) * 10;
 
-        List<Product> product = productMapper.list(from, "%" + keyword + "%");
+        List<Product> product = productMapper.list(from, "%" + keyword + "%", category);
         product.forEach(productListImg -> {
             List<ProductImg> productsImg = mainImgMapper.selectNamesByProductId(productListImg.getProduct_id());
             productsImg.forEach(img -> img.setMain_img_uri(urlPrefix + "lolland/product/productMainImg/" + productListImg.getProduct_id() + "/" + img.getMain_img_uri()));
