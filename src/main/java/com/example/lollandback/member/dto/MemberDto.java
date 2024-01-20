@@ -13,6 +13,7 @@ public class MemberDto {
     private String member_email;
     private String member_type;
     private LocalDateTime reg_time;
+    private String member_introduce;
 
     private MemberAddressDto memberAddressDto;
 

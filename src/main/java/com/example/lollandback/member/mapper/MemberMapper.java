@@ -17,7 +17,8 @@ public interface MemberMapper {
             member_name, 
             member_phone_number, 
             member_email, 
-            member_type
+            member_type,
+            member_introduce
         )
         VALUES (
             #{member_login_id},
@@ -25,7 +26,8 @@ public interface MemberMapper {
             #{member_name},
             #{member_phone_number},
             #{member_email},
-            #{member_type}
+            #{member_type},
+            #{member_introduce}
         )
         """)
     @Options(useGeneratedKeys = true, keyProperty = "id")
@@ -58,7 +60,7 @@ public interface MemberMapper {
     String selectByLoginIdAndPassword(String memberLoginId, String password);
 
     @Select("""
-        SELECT id, member_login_id, member_name, member_phone_number, member_email, member_type,reg_time FROM member
+        SELECT id, member_login_id, member_name, member_phone_number, member_email, member_type,reg_time, member_introduce FROM member
         WHERE member_login_id = #{memberLoginId}
     """)
     MemberDto selectByMemberId(String memberLoginId);
@@ -98,7 +100,8 @@ public interface MemberMapper {
         member_login_id = #{member_login_id},
         member_name = #{member_name},
         member_phone_number = #{member_phone_number},
-        member_email = #{member_email}
+        member_email = #{member_email},
+        member_introduce = #{member_introduce}
         WHERE id = #{id}
     """)
     boolean editMember(EditMember member);
