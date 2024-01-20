@@ -96,4 +96,8 @@ public interface ProductMapper {
             """)
     int countAll();
 
+    @Select("""
+            SELECT COUNT(*) > 0 FROM product WHERE product_name = #{product_name}
+            """)
+    boolean existsByName(String productName);
 }

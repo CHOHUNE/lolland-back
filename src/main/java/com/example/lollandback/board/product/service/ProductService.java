@@ -49,7 +49,9 @@ public class ProductService {
     // --------------------------- 상품 저장 로직 ---------------------------
     @Transactional
     public boolean save(Product product, Member login, Company company, MultipartFile[] mainImg, MultipartFile[] contentImg, List<ProductOptionsDto> optionList) throws IOException {
-
+        if (productMapper.existsByName(product.getProduct_name())) {
+            return false;
+        }
         Long total_stock = 0L;
         // 제조사 정보 저장
         if (companyMapper.insert(company) != 1) {
@@ -127,9 +129,17 @@ public class ProductService {
         int startPageNumber = (page - 1) / 10 * 10 + 1;
         int endPageNumber = startPageNumber + 9;
         endPageNumber = Math.min(endPageNumber, lastPageNumber);
+        int prevPageNumber = startPageNumber - 10;
+        int nextPageNumber = endPageNumber + 1;
 
         pageInfo.put("startPageNumber", startPageNumber);
         pageInfo.put("endPageNumber", endPageNumber);
+        if (prevPageNumber > 0) {
+            pageInfo.put("prevPageNumber", prevPageNumber);
+        }
+        if (nextPageNumber <= lastPageNumber) {
+            pageInfo.put("nextPageNumber", nextPageNumber);
+        }
 
         int from = (page - 1) * 10;
 
@@ -140,7 +150,7 @@ public class ProductService {
             productListImg.setMainImgs(productsImg);
         });
 
-        map.put("product",product);
+        map.put("product", product);
         map.put("pageInfo", pageInfo);
         return map;
     }
