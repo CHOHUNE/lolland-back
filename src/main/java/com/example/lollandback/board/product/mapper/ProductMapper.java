@@ -117,22 +117,23 @@ public interface ProductMapper {
     int updateById(ProductUpdateDto productDto);
 
     @Select("""
-            <script>
-            SELECT COUNT(*)
-            FROM product p JOIN company co 
-            ON p.company_id = co.company_id
-            WHERE 
-                <trim prefixOverrides="OR">
-                    <if test="category == 'all' or category == 'product_name'">
-                        OR p.product_name LIKE #{keyword}
-                    </if>
-                    <if test="category == 'all' or category == 'company_name'">
-                         OR co.company_name LIKE #{keyword}
-                    </if>
-                </trim>
-            </script>
-            """)
+        <script>
+        SELECT COUNT(*)
+        FROM product p JOIN company co 
+        ON p.company_id = co.company_id
+        WHERE p.product_status = 'none'
+            <trim prefix="AND (" suffix=")" prefixOverrides="OR">
+                <if test="category == 'all' or category == 'product_name'">
+                    OR p.product_name LIKE #{keyword}
+                </if>
+                <if test="category == 'all' or category == 'company_name'">
+                    OR co.company_name LIKE #{keyword}
+                </if>
+            </trim>
+        </script>
+        """)
     int countAll(String keyword, String category);
+
 
     @Update("""
             UPDATE product
