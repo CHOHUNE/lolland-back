@@ -1,5 +1,6 @@
 package com.example.lollandback.board.product.service;
 
+import com.example.lollandback.board.like.service.ProductLikeService;
 import com.example.lollandback.board.product.domain.*;
 import com.example.lollandback.board.product.dto.CategoryDto;
 import com.example.lollandback.board.product.dto.ProductDto;
@@ -42,6 +43,7 @@ public class ProductService {
     private final ProductOptionMapper productOptionMapper;
     private final ProductContentImg contentImgMapper;
     private final ReviewMapper reviewMapper;
+    private final ProductLikeService productLikeService;
 
     // --------------------------- 상품 저장 시 대분류/소분류 보여주기 로직 ---------------------------
     public List<CategoryDto> getAllCategories() {
@@ -195,7 +197,7 @@ public class ProductService {
 
     }
 
-    // --------------------------- 상품 삭제 로직 ---------------------------
+    // --------------------------- 상품 삭제(숨김) 로직 ---------------------------
     @Transactional
     public void remove(Long productId) {
 //        // 1. 메인 이미지삭제
@@ -218,6 +220,10 @@ public class ProductService {
 //        productMapper.deleteByProduct(productId);
 //        // 10. 제조사 삭제
 //        companyMapper.deleteByCompany(productId);
+
+        // 찜목록 삭제
+        productLikeService.removeList(productId);
+        // 상품 숨김
         productMapper.deleteById(productId);
 
     }

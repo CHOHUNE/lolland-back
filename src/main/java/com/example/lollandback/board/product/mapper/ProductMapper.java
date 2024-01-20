@@ -70,7 +70,7 @@ public interface ProductMapper {
             AND co.company_name LIKE #{keyword}
         </if>
         ORDER BY p.product_reg_time DESC
-        LIMIT #{from}, 10
+        LIMIT #{from}, 16
         </script>
         """)
     List<Product> list(Integer from, String keyword, String category);

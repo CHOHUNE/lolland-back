@@ -72,7 +72,7 @@ public class ProductController {
         return ResponseEntity.ok(options);
     }
 
-    // --------------------------- 상품 삭제 로직 ---------------------------
+    // --------------------------- 상품 삭제(숨김) 로직 ---------------------------
     @PutMapping("remove/{product_id}")
     public void remove(@PathVariable Long product_id) {
         productService.remove(product_id);
