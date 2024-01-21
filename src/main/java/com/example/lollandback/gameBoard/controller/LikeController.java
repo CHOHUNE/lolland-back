@@ -34,7 +34,7 @@ public class LikeController {
             @PathVariable Integer boardId,
             @SessionAttribute(value="login",required = false)Member login
     ) {
-        return ResponseEntity.ok(service.get(boardId,login));
+        return ResponseEntity.ok(service.   get(boardId,login));
     }
 }
 

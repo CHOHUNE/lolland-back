@@ -50,6 +50,11 @@ public ResponseEntity saves(  GearBoard gearBoard,
         return service.list(category);
     }
 
+    @GetMapping("listAll")
+    public List<GearBoard> list(){
+    return service.listAll();
+    }
+
 
     @GetMapping("gear_id/{gear_id}")
     public GearBoard getId(@PathVariable Integer gear_id){

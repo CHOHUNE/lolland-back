@@ -63,5 +63,10 @@ public interface GearMapper {
         """)
 
     GearBoard selectById(Integer gear_id);
+
+    @Select("""
+                select * from gearboard;
+        """)
+    List<GearBoard> listAll();
 }
 

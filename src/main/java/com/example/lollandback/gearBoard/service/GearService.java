@@ -159,15 +159,7 @@ public class GearService {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
+    public List<GearBoard> listAll() {
+      return   mapper.listAll();
+    }
 }
