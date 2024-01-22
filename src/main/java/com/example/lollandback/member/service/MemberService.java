@@ -131,8 +131,10 @@ public class MemberService {
         mapper.editPasswordById(login.getId(), editPasswordDto.getMember_password());
     }
 
-    public List<MemberDto> getAllMember() {
-        return mapper.getAllMember();
+    public List<MemberDto> getAllMember(Integer page) {
+        int from = (page - 1) * 10;
+
+        return mapper.getAllMember(from);
     }
 
     public void deletedMemberByAdmin(Long id) {

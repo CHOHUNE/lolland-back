@@ -114,8 +114,10 @@ public interface MemberMapper {
     """)
     void editPasswordById(Long id, String memberPassword);
 
+    // user 인 회원 10명씩 조회
     @Select("""
         SELECT * FROM member WHERE member_type = 'user'
+        LIMIT #{from}, 10;
     """)
-    List<MemberDto> getAllMember();
+    List<MemberDto> getAllMember(Integer from);
 }

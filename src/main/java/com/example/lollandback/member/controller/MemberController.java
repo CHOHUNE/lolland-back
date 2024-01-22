@@ -142,8 +142,8 @@ public class MemberController {
 
     // 회원 목록 전체 조회 (user인 사람들만)
     @GetMapping("listAll")
-    public List<MemberDto> getAllMember() {
-        return service.getAllMember();
+    public List<MemberDto> getAllMember(@RequestParam(value = "page", defaultValue = "1") Integer page) {
+        return service.getAllMember(page);
     }
 
     // 관리자가 탈퇴 회원 id 번호로 삭제하는 로직 (admin만 건드세요)
