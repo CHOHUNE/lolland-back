@@ -4,11 +4,9 @@ import com.example.lollandback.member.domain.EditMemberAndAddress;
 import com.example.lollandback.member.domain.Member;
 import com.example.lollandback.member.domain.MemberAddress;
 import com.example.lollandback.member.domain.MemberAndAddress;
-import com.example.lollandback.member.dto.EditPasswordDto;
-import com.example.lollandback.member.dto.MemberAddressDto;
-import com.example.lollandback.member.dto.MemberDto;
-import com.example.lollandback.member.dto.SetRandomPasswordDto;
+import com.example.lollandback.member.dto.*;
 import com.example.lollandback.member.mapper.MemberAddressMapper;
+import com.example.lollandback.member.mapper.MemberImageMapper;
 import com.example.lollandback.member.mapper.MemberMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +17,16 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.WebRequest;
 import software.amazon.awssdk.services.s3.S3Client;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberMapper mapper;
     private final MemberAddressMapper memberAddressMapper;
+    private final MemberImageMapper memberImageMapper;
 
     private final S3Client s3;
 
@@ -43,6 +44,11 @@ public class MemberService {
         mapper.insertUser(member);
         // 주소 생성
         memberAddressMapper.insertAddress(member.getId(),memberAddress);
+
+        // 기본 이미지 경로
+        String fileUrl = urlPrefix + "lolland/user/default/defaultImage.png";
+        // 회원 가입시 기본 이미지 설정
+        memberImageMapper.insertDefaultImage(member.getId(), fileUrl);
     }
 
     public boolean loginUser(Member member, WebRequest request) {
@@ -72,10 +78,15 @@ public class MemberService {
     }
 
     public MemberDto getMemberInfo(Member login) {
+        // 회원 주소록
         MemberAddressDto memberAddress = memberAddressMapper.selectByMemberIdToMainAddress(login.getMember_login_id());
+
+        // 회원 이미지
+        MemberImageDto memberImage = memberImageMapper.selectByMemberIdToImage(login.getId());
 
         MemberDto member = mapper.selectByMemberId(login.getMember_login_id());
         member.setMemberAddressDto(memberAddress);
+        member.setMemberImageDto(memberImage);
         return member;
     }
 
@@ -122,8 +133,34 @@ public class MemberService {
         mapper.editPasswordById(login.getId(), editPasswordDto.getMember_password());
     }
 
-    public List<MemberDto> getAllMember() {
-        return mapper.getAllMember();
+    public Map<String, Object> getAllMember(Integer page) {
+        // 프론트에 리턴할 정보들
+        Map<String, Object> map = new HashMap<>();
+
+        // 페이지 정보
+        Map<String, Object> pageInfo = new HashMap<>();
+
+        // 마지막 페이지를 정하기 위해 모든 회원 수를 조회 (user만)
+        int countUser = mapper.countAllMember();
+        int lastPageNumber = (countUser - 1) / 10 + 1;
+        // 시작 페이지
+        int startPageNumber = (page-1) / 10 * 10 + 1;
+        // 마지막 페이지
+        int endPageNumber = startPageNumber + 9;
+        endPageNumber = Math.min(endPageNumber, lastPageNumber);
+
+        pageInfo.put("startPageNumber", startPageNumber);
+        pageInfo.put("lastPageNumber", lastPageNumber);
+
+
+        // 프론트로부터 받은 페이지 넘버
+        int from = (page - 1) * 10;
+
+        // 모든 회원 정보
+        map.put("allMember", mapper.getAllMember(from));
+        map.put("pageInfo", pageInfo);
+
+        return map;
     }
 
     public void deletedMemberByAdmin(Long id) {

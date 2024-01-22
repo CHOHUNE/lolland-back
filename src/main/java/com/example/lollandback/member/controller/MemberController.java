@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -100,7 +101,6 @@ public class MemberController {
     // 회원 정보 수정
     @PutMapping("edit")
     public ResponseEntity editMember(@RequestBody @Valid EditMemberAndAddress editMemberAndAddress) {
-
         if (service.editMember(editMemberAndAddress)){
             return ResponseEntity.ok().build();
         } else {
@@ -143,16 +143,16 @@ public class MemberController {
 
     // 회원 목록 전체 조회 (user인 사람들만)
     @GetMapping("listAll")
-    public List<MemberDto> getAllMember() {
-        return service.getAllMember();
+    public Map<String, Object> getAllMember(@RequestParam(value = "page", defaultValue = "1") Integer page) {
+
+
+        return service.getAllMember(page);
     }
 
     // 관리자가 탈퇴 회원 id 번호로 삭제하는 로직 (admin만 건드세요)
     @DeleteMapping("DeleteMember/{id}")
     public ResponseEntity deletedMemberByAdmin(@SessionAttribute("login") Member login,
                                     @PathVariable Long id) {
-        System.out.println("login = " + login);
-        System.out.println("id = " + id);
         if (login.getMember_type().equals("admin")) {
             service.deletedMemberByAdmin(id);
 

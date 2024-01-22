@@ -23,5 +23,7 @@ public class EditMember {
 
     @Email(message = "유효한 이메일을 입력해 주세요.")
     private String member_email;
+
     private String member_type;
+    private String member_introduce;
 }
