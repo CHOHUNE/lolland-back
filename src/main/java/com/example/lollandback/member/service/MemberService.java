@@ -42,8 +42,11 @@ public class MemberService {
         mapper.insertUser(member);
         // 주소 생성
         memberAddressMapper.insertAddress(member.getId(),memberAddress);
+
+        // 기본 이미지 경로
+        String fileUrl = urlPrefix + "lolland/user/default/defaultImage.png";
         // 회원 가입시 기본 이미지 설정
-        memberImageMapper.insertDefaultImage(member.getId());
+        memberImageMapper.insertDefaultImage(member.getId(), fileUrl);
     }
 
     public boolean loginUser(Member member, WebRequest request) {

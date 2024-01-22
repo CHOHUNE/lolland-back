@@ -100,7 +100,6 @@ public class MemberController {
     // 회원 정보 수정
     @PutMapping("edit")
     public ResponseEntity editMember(@RequestBody @Valid EditMemberAndAddress editMemberAndAddress) {
-
         if (service.editMember(editMemberAndAddress)){
             return ResponseEntity.ok().build();
         } else {
