@@ -29,7 +29,7 @@ public interface CartMapper {
         INNER JOIN company com ON p.company_id = com.company_id
         LEFT JOIN productimg img ON p.product_id = img.product_id
         INNER JOIN productoptions op ON op.option_id = c.option_id
-        WHERE c.member_id = #{memberId}
+        WHERE c.member_id = #{memberId} AND p.product_status = 'none'
         GROUP BY c.product_id, c.option_id
     """)
     List<CartDto> fetchCartByMemberId(Long memberId, String urlPrefix);
