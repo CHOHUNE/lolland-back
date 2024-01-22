@@ -1,5 +1,6 @@
 package com.example.lollandback.board.qna.service;
 
+import com.example.lollandback.board.qna.domain.Answer;
 import com.example.lollandback.board.qna.domain.Question;
 import com.example.lollandback.board.qna.dto.AnswerReadDto;
 import com.example.lollandback.board.qna.dto.QnaDto;
@@ -80,5 +81,9 @@ public class QnaService {
 
     public AnswerReadDto getQnaDetail(Long questionId) {
         return qnaMapper.getQuestionDetail(questionId);
+    }
+
+    public void addAnswer(Answer answer) {
+        qnaMapper.addAnswer(answer);
     }
 }

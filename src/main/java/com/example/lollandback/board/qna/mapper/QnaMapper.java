@@ -1,5 +1,6 @@
 package com.example.lollandback.board.qna.mapper;
 
+import com.example.lollandback.board.qna.domain.Answer;
 import com.example.lollandback.board.qna.domain.Question;
 import com.example.lollandback.board.qna.dto.AnswerReadDto;
 import com.example.lollandback.board.qna.dto.QnaDto;
@@ -125,4 +126,10 @@ public interface QnaMapper {
         WHERE q.question_id = #{questionId}
     """)
     AnswerReadDto getQuestionDetail(Long questionId);
+
+    @Insert("""
+        INSERT INTO answer (question_id, product_id, answer_content, member_id)
+        VALUES (#{question_id}, #{product_id}, #{answer_content}, #{member_id})
+    """)
+    void addAnswer(Answer answer);
 }
