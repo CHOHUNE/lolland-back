@@ -17,7 +17,9 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.WebRequest;
 import software.amazon.awssdk.services.s3.S3Client;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -131,10 +133,34 @@ public class MemberService {
         mapper.editPasswordById(login.getId(), editPasswordDto.getMember_password());
     }
 
-    public List<MemberDto> getAllMember(Integer page) {
+    public Map<String, Object> getAllMember(Integer page) {
+        // 프론트에 리턴할 정보들
+        Map<String, Object> map = new HashMap<>();
+
+        // 페이지 정보
+        Map<String, Object> pageInfo = new HashMap<>();
+
+        // 마지막 페이지를 정하기 위해 모든 회원 수를 조회 (user만)
+        int countUser = mapper.countAllMember();
+        int lastPageNumber = (countUser - 1) / 10 + 1;
+        // 시작 페이지
+        int startPageNumber = (page-1) / 10 * 10 + 1;
+        // 마지막 페이지
+        int endPageNumber = startPageNumber + 9;
+        endPageNumber = Math.min(endPageNumber, lastPageNumber);
+
+        pageInfo.put("startPageNumber", startPageNumber);
+        pageInfo.put("lastPageNumber", lastPageNumber);
+
+
+        // 프론트로부터 받은 페이지 넘버
         int from = (page - 1) * 10;
 
-        return mapper.getAllMember(from);
+        // 모든 회원 정보
+        map.put("allMember", mapper.getAllMember(from));
+        map.put("pageInfo", pageInfo);
+
+        return map;
     }
 
     public void deletedMemberByAdmin(Long id) {

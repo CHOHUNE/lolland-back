@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -142,7 +143,9 @@ public class MemberController {
 
     // 회원 목록 전체 조회 (user인 사람들만)
     @GetMapping("listAll")
-    public List<MemberDto> getAllMember(@RequestParam(value = "page", defaultValue = "1") Integer page) {
+    public Map<String, Object> getAllMember(@RequestParam(value = "page", defaultValue = "1") Integer page) {
+
+
         return service.getAllMember(page);
     }
 

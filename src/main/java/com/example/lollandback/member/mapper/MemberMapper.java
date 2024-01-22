@@ -120,4 +120,12 @@ public interface MemberMapper {
         LIMIT #{from}, 10;
     """)
     List<MemberDto> getAllMember(Integer from);
+
+    // user 인 회원 숫 알기
+    @Select("""
+        SELECT COUNT(*) FROM member WHERE member_type = 'user'
+    """)
+    int countAllMember();
+
+
 }
