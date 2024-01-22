@@ -23,8 +23,6 @@ public class QnaService {
 
 
     public Map<String, Object> getQnaByProduct(Long productId, Integer page, String keyword, String category) {
-        System.out.println("QnaService.getQnaByProduct");
-        System.out.println("productId = " + productId);
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> pageInfo = new HashMap<>();
 
