@@ -143,9 +143,17 @@ public interface ProductMapper {
             """)
     int deleteById(Long product_id);
 
-    // 상품명 중복 검증
-//    @Select("""
-//            SELECT COUNT(*) > 0 FROM product WHERE product_name = #{product_name}
-//            """)
-//    boolean existsByName(String productName);
+    @Select("""
+            SELECT *
+            FROM category
+            WHERE category_id = #{category_id}
+            """)
+    List<Product> findByCategoryId(Long categoryId);
+
+    @Select("""
+            SELECT *
+            FROM subcategory
+            WHERE subcategory_id = #{subcategory_id}
+            """)
+    List<Product> findBySubCategoryId(Long subcategoryId);
 }

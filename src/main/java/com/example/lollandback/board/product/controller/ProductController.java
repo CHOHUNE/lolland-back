@@ -2,14 +2,12 @@ package com.example.lollandback.board.product.controller;
 
 import com.example.lollandback.board.product.domain.Company;
 import com.example.lollandback.board.product.domain.Product;
-import com.example.lollandback.board.product.domain.ProductOptions;
 import com.example.lollandback.board.product.dto.*;
 import com.example.lollandback.board.product.service.ProductService;
 import com.example.lollandback.member.domain.Member;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.apache.ibatis.annotations.Delete;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -96,5 +94,21 @@ public class ProductController {
         }
     }
 
+    @GetMapping("/category/{category_id}")
+    public ResponseEntity<List<Product>> getCategoryById(@PathVariable Long category_id) {
+        List<Product> products = productService.findProductsByCategoryId(category_id);
+        if (products == null || products.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(products);
+    }
 
+    @GetMapping("/category/{category_id}/{subcategory_id}")
+    public ResponseEntity<List<Product>> getSubCategoryById(@PathVariable Long subcategory_id) {
+        List<Product> subproducts = productService.findProductsBySubCategory(subcategory_id);
+        if (subproducts == null || subproducts.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(subproducts);
+    }
 }

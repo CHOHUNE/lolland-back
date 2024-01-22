@@ -337,4 +337,12 @@ public class ProductService {
             throw e;
         }
     }
+
+    public List<Product> findProductsByCategoryId(Long categoryId) {
+        return productMapper.findByCategoryId(categoryId);
+    }
+
+    public List<Product> findProductsBySubCategory(Long subcategoryId) {
+        return productMapper.findBySubCategoryId(subcategoryId);
+    }
 }
