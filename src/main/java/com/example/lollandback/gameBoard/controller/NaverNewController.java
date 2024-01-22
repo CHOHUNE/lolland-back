@@ -35,8 +35,7 @@ public class NaverNewController {
                 .path("v1/search/news.json")
                 .queryParam("query", "리그오브레전드")
                 .queryParam("display", 8)
-                .queryParam("sta" +
-                            "rt", 1)
+                .queryParam("start", 1)
                 .queryParam("sort", "date")
                 .encode()
                 .build()

@@ -8,6 +8,8 @@ import com.example.lollandback.gameBoard.mapper.CommentMapper;
 import com.example.lollandback.gameBoard.mapper.FileMapper;
 import com.example.lollandback.gameBoard.mapper.LikeMapper;
 import com.example.lollandback.member.domain.Member;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,10 @@ public class GameBoardService {
     private final FileMapper fileMapper;
     private final LikeMapper likeMapper;
     private final CommentMapper commentMapper;
+
+    private final HttpSession session;
+    private HttpServletResponse response;
+
 
     private final S3Client s3;
 
@@ -125,10 +131,6 @@ public class GameBoardService {
         List<GameBoardFile> boardFiles = fileMapper.selectNamesBygameboardId(id);
         gameBoard.setFiles(boardFiles);
 
-//        for (GameBoardFile gameBoardFile:boardFiles) {
-//            String url = urlPrefix + "lolland/gameboard/" + id + "/" + gameBoardFile.getFile_name();
-//            gameBoardFile.setFile_url(url);
-//        }
 
         return gameBoard;
     }

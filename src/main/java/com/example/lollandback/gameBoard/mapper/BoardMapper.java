@@ -83,7 +83,7 @@ SELECT *,COUNT(DISTINCT gl.id)count_like,
 
     @Select("""
        
-            SELECT gb.*,
+            SELECT DISTINCT gb.*,
                 (SELECT COUNT(DISTINCT gl.id) FROM lolland.gameboardlike gl WHERE gl.game_board_id = gb.id) AS count_like,
                 (SELECT COUNT(DISTINCT gc.id) FROM lolland.gameboardcomment gc WHERE gc.game_board_id = gb.id) AS count_comment,
                 (SELECT COUNT(DISTINCT gf.id) FROM lolland.gameboardfile gf WHERE gf.gameboard_id = gb.id) AS countFile
