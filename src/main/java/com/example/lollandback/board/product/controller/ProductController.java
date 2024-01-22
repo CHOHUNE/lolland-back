@@ -9,13 +9,13 @@ import com.example.lollandback.member.domain.Member;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.apache.ibatis.annotations.Delete;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -49,8 +49,12 @@ public class ProductController {
 
     // --------------------------- 상품 리스트 로직 ---------------------------
     @GetMapping("list")
-    public List<Product> list(@RequestParam(value = "p", defaultValue = "1") Integer page) {
-        return productService.list(page);
+    public Map<String, Object> list(@RequestParam(value = "p", defaultValue = "1") Integer page,
+                                    @RequestParam(value = "k", defaultValue = "") String keyword,
+                                    @RequestParam(value = "c", defaultValue = "all") String category) {
+
+
+        return productService.list(page, keyword, category);
     }
 
     // --------------------------- 상품 보기 로직 ---------------------------
@@ -67,8 +71,8 @@ public class ProductController {
         return ResponseEntity.ok(options);
     }
 
-    // --------------------------- 상품 삭제 로직 ---------------------------
-    @DeleteMapping("remove/{product_id}")
+    // --------------------------- 상품 삭제(숨김) 로직 ---------------------------
+    @PutMapping("remove/{product_id}")
     public void remove(@PathVariable Long product_id) {
         productService.remove(product_id);
     }
@@ -89,5 +93,23 @@ public class ProductController {
         } else {
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    @GetMapping("/category/{category_id}")
+    public ResponseEntity<List<Product>> getCategoryById(@PathVariable Long category_id) {
+        List<Product> products = productService.findProductsByCategoryId(category_id);
+        if (products == null || products.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/category/{category_id}/{subcategory_id}")
+    public ResponseEntity<List<Product>> getSubCategoryById(@PathVariable Long subcategory_id) {
+        List<Product> subproducts = productService.findProductsBySubCategory(subcategory_id);
+        if (subproducts == null || subproducts.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(subproducts);
     }
 }
