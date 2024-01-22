@@ -1,7 +1,9 @@
 package com.example.lollandback.board.qna.service;
 
 import com.example.lollandback.board.qna.domain.Question;
+import com.example.lollandback.board.qna.dto.AnswerReadDto;
 import com.example.lollandback.board.qna.dto.QnaDto;
+import com.example.lollandback.board.qna.dto.QuestionListDto;
 import com.example.lollandback.board.qna.dto.QuestionUpdateDto;
 import com.example.lollandback.board.qna.mapper.QnaMapper;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,8 @@ public class QnaService {
 
 
     public Map<String, Object> getQnaByProduct(Long productId, Integer page, String keyword, String category) {
+        System.out.println("QnaService.getQnaByProduct");
+        System.out.println("productId = " + productId);
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> pageInfo = new HashMap<>();
 
@@ -68,4 +72,13 @@ public class QnaService {
         qnaMapper.deleteQuestionById(questionId);
     }
 
+
+    public List<QuestionListDto> viewQuestion(Long memberId) {
+
+        return qnaMapper.getQuestionsForAdmin(memberId);
+    }
+
+    public AnswerReadDto getQnaDetail(Long questionId) {
+        return qnaMapper.getQuestionDetail(questionId);
+    }
 }

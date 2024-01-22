@@ -68,8 +68,6 @@ public interface CartMapper {
     """)
     void deleteSelected(@Param("cartIds") List<Long> cartIds);
 
-
-
     @Delete("""
         DELETE FROM cart
         WHERE member_id = #{memberId}

@@ -1,7 +1,10 @@
 package com.example.lollandback.board.qna.controller;
 
+import com.example.lollandback.board.qna.domain.Answer;
 import com.example.lollandback.board.qna.domain.Question;
+import com.example.lollandback.board.qna.dto.AnswerReadDto;
 import com.example.lollandback.board.qna.dto.QnaDto;
+import com.example.lollandback.board.qna.dto.QuestionListDto;
 import com.example.lollandback.board.qna.dto.QuestionUpdateDto;
 import com.example.lollandback.board.qna.service.QnaService;
 import com.example.lollandback.member.domain.Member;
@@ -76,5 +79,38 @@ public class QnaController {
         }
     }
 
+    @GetMapping("/view")
+    public ResponseEntity<List<QuestionListDto>> showQuestion(@SessionAttribute("login") Member login) {
+        Long member_id = login.getId();
+        if(member_id != null) {
+            try {
+                return ResponseEntity.ok(qnaService.viewQuestion(member_id));
+            } catch (Exception e) {
+                System.out.println("문의 불러오는 도중 에러 발생: " + e);
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
 
+    @GetMapping("/admin/{question_id}")
+    public ResponseEntity<AnswerReadDto> viewAnswer(@SessionAttribute("login") Member login, @PathVariable Long question_id) {
+        if(login.getMember_type().equals("admin")) {
+            try{
+                return ResponseEntity.ok(qnaService.getQnaDetail(question_id));
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+    }
+
+    @PutMapping("/answer/write")
+    public ResponseEntity writeAnswer(@SessionAttribute("login") Member login, @RequestBody Answer answer) {
+
+        return null;
+    }
 }

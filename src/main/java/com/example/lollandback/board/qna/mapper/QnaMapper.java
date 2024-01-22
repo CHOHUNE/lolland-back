@@ -1,7 +1,9 @@
 package com.example.lollandback.board.qna.mapper;
 
 import com.example.lollandback.board.qna.domain.Question;
+import com.example.lollandback.board.qna.dto.AnswerReadDto;
 import com.example.lollandback.board.qna.dto.QnaDto;
+import com.example.lollandback.board.qna.dto.QuestionListDto;
 import com.example.lollandback.board.qna.dto.QuestionUpdateDto;
 import org.apache.ibatis.annotations.*;
 
@@ -17,8 +19,8 @@ public interface QnaMapper {
             JOIN member m ON q.member_id = m.id
             JOIN product p ON q.product_id = p.product_id
             WHERE
-                 p.product_id = #{productId} AND
-                <trim prefixOverrides="OR">
+                 q.product_id = #{productId} AND
+                <trim prefixOverrides="OR" prefix="(" suffix=")">
                     <if test="category == 'all' or category == 'title'">
                         OR q.question_title LIKE #{keyword}
                     </if>
@@ -41,10 +43,10 @@ public interface QnaMapper {
             FROM question q 
             JOIN member m ON q.member_id = m.id
             LEFT JOIN answer a ON q.question_id = a.question_id
-            JOIN product p ON q.product_id = p.product_id
+            LEFT JOIN product p ON q.product_id = p.product_id
             WHERE 
-                p.product_id = #{productId} AND
-                <trim prefixOverrides="OR">
+                 q.product_id = #{productId} AND
+                <trim prefixOverrides="OR" prefix="(" suffix=")">
                     <if test="category == 'all' or category == 'title'">
                         OR q.question_title LIKE #{keyword}
                     </if>
@@ -100,4 +102,27 @@ public interface QnaMapper {
     """)
     void updateQuestionById(QuestionUpdateDto questionUpdateDto);
 
+    @Select("""
+        SELECT q.question_id, q.question_title, q.question_reg_time, p.product_name
+        FROM question q 
+        LEFT JOIN product p ON q.product_id = p.product_id
+        WHERE p.member_id = #{memberId}
+    """)
+    List<QuestionListDto> getQuestionsForAdmin(Long memberId);
+
+    @Select("""
+        SELECT 
+            q.question_id, 
+            q.question_title, 
+            q.question_content, 
+            a.answer_id,
+            a.answer_content,
+            p.product_id,
+            p.product_name
+        FROM question q 
+        LEFT JOIN answer a ON q.question_id = a.question_id
+        LEFT JOIN product p ON q.product_id = p.product_id
+        WHERE q.question_id = #{questionId}
+    """)
+    AnswerReadDto getQuestionDetail(Long questionId);
 }
