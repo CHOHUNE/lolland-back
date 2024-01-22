@@ -104,6 +104,7 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
+
     @GetMapping("/category/{category_id}/{subcategory_id}")
     public ResponseEntity<List<Product>> getSubCategoryById(@PathVariable Long subcategory_id) {
         List<Product> subproducts = productService.findProductsBySubCategory(subcategory_id);
