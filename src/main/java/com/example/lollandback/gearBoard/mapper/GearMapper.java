@@ -29,9 +29,10 @@ public interface GearMapper {
 
     @Select("""
             
-            SELECT gear_id, gear_title, gear_content, category,
-                   (SELECT COUNT(id) FROM lolland.gearfile f WHERE f.gearboard_id = b.gear_id) AS countFile
-            FROM gearboard b
+                        SELECT gear_recommand,gear_id, gear_title, gear_content, category, gear_inserted,gear_views
+                        ,       (SELECT COUNT(id) FROM lolland.gearfile f WHERE f.gearboard_id = b.gear_id) AS countFile
+                               ,(select count(c.id) from lolland.gearcomment c  where c.boardid = gear_id) as commnetcount
+                        FROM gearboard b
             where category=#{category};
             """)
     List<GearBoard> list(String category);
@@ -64,8 +65,12 @@ public interface GearMapper {
 
     GearBoard selectById(Integer gear_id);
 
-    @Select("""
-                select * from gearboard;
+    @Select("""    
+            SELECT gear_recommand,gear_id, gear_title, gear_content, category, gear_inserted,gear_views
+            ,       (SELECT COUNT(id) FROM lolland.gearfile f WHERE f.gearboard_id = b.gear_id) AS countFile
+                   ,(select count(c.id) from lolland.gearcomment c  where c.boardid = gear_id) as commnetcount
+            FROM gearboard b
+    
         """)
     List<GearBoard> listAll();
 }

@@ -3,6 +3,7 @@ package com.example.lollandback.gearBoard.service;
 
 import com.example.lollandback.gearBoard.domain.GearBoard;
 import com.example.lollandback.gearBoard.domain.GearFile;
+import com.example.lollandback.gearBoard.mapper.GearCommentMapper;
 import com.example.lollandback.gearBoard.mapper.GearFileMapper;
 import com.example.lollandback.gearBoard.mapper.GearMapper;
 import com.example.lollandback.member.domain.Member;
@@ -56,9 +57,11 @@ public class GearService {
 
     public boolean  remove(Integer gear_id) {
 
+
+
+        // 맴버가 작성한 댓글 삭제
         deleteFile(gear_id);
         // 첨부 파일 지우기
-
       return mapper.remove(gear_id)==1;
     }
 

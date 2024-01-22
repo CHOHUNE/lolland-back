@@ -17,7 +17,7 @@ public class  GearBoard {
     private Integer gear_recommand;
     // gear_uploadFiles 는  카운트 파일임
     private String gear_uploadFiles;
-
+   private Integer commnetcount;
    private Integer countFile;
 
 

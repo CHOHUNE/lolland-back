@@ -12,6 +12,7 @@ public class GearComment {
     private Long memberId;
     private  String  comment;
     private LocalDateTime inserted;
+    private String member_name;
 
 
 
