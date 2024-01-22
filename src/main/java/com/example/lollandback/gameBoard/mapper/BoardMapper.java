@@ -43,6 +43,7 @@ VALUES (#{title},#{board_content},#{category},#{member_id})
                             OR gb.board_content LIKE #{keyword}
                         </if>
                     </trim>)
+                    OR gb.category LIKE #{keyword}
     GROUP BY gb.id
 
     ORDER BY

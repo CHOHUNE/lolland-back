@@ -134,9 +134,7 @@ public class GameBoardService {
     public GameBoard get(Integer id) {
 
         String cookieValue = getCookieValue("board_" + id);
-
         if (cookieValue == null) {
-
             boardCount(id);
             addCookie("board_"+id,"viewed");
         }
@@ -146,7 +144,6 @@ public class GameBoardService {
         GameBoard gameBoard = mapper.selectById(id);
         List<GameBoardFile> boardFiles = fileMapper.selectNamesBygameboardId(id);
         gameBoard.setFiles(boardFiles);
-
 
         return gameBoard;
     }
