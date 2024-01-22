@@ -23,7 +23,7 @@ public class GameBoard {
     private String category;
     private Long count_comment;
     private Long count_like;
-    private Long board_count;
+    private Double board_count;
     private Long countFile;
     private String member_id;
 
