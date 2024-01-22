@@ -78,11 +78,12 @@ public class QnaController {
     }
 
     @GetMapping("/view")
-    public ResponseEntity<List<QuestionListDto>> showQuestion(@SessionAttribute("login") Member login) {
+    public ResponseEntity<Map<String, Object>> showQuestion(@SessionAttribute("login") Member login,
+                                                              @RequestParam(value="p", defaultValue = "1") Integer page) {
         Long member_id = login.getId();
         if(member_id != null) {
             try {
-                return ResponseEntity.ok(qnaService.viewQuestion(member_id));
+                return ResponseEntity.ok(qnaService.viewQuestion(member_id, page));
             } catch (Exception e) {
                 System.out.println("문의 불러오는 도중 에러 발생: " + e);
                 e.printStackTrace();

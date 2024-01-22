@@ -68,8 +68,34 @@ public class QnaService {
     }
 
 
-    public List<QuestionListDto> viewQuestion(Long memberId) {
-        return qnaMapper.getQuestionsForAdmin(memberId);
+    public Map<String, Object> viewQuestion(Long memberId, Integer page) {
+        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> pageInfo = new HashMap<>();
+
+        int countAll = qnaMapper.countAllQuestions(memberId);
+
+        int lastPageNumber = (countAll - 1) / 10 + 1;
+        int startPageNumber = ((page - 1) / 10) * 10 + 1;
+        int endPageNumber = startPageNumber + 9;
+        endPageNumber = Math.min(endPageNumber, lastPageNumber);
+        int prevPageNumber = startPageNumber - 10;
+        int nextPageNumber = endPageNumber + 1;
+
+        pageInfo.put("currentPageNumber", page);
+        pageInfo.put("startPageNumber", startPageNumber);
+        pageInfo.put("endPageNumber", endPageNumber);
+
+        if(prevPageNumber > 0) {
+            pageInfo.put("prevPageNumber", prevPageNumber);
+        }
+        if(nextPageNumber <= lastPageNumber) {
+            pageInfo.put("nextPageNumber", nextPageNumber);
+        }
+
+        int from = (page - 1) * 10;
+        map.put("qnaList", qnaMapper.getQuestionsForAdmin(from, memberId));
+        map.put("pageInfo", pageInfo);
+        return map;
     }
 
     public AnswerReadDto getQnaDetail(Long questionId) {

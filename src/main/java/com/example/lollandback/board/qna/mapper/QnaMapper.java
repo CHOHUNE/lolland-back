@@ -107,8 +107,18 @@ public interface QnaMapper {
         LEFT JOIN product p ON q.product_id = p.product_id
         WHERE p.member_id = #{memberId}
         ORDER BY q.question_reg_time DESC
+        LIMIT #{from}, 10
     """)
-    List<QuestionListDto> getQuestionsForAdmin(Long memberId);
+    List<QuestionListDto> getQuestionsForAdmin(Integer from, Long memberId);
+
+    @Select("""
+        SELECT COUNT(*)
+        FROM question q
+        LEFT JOIN product p ON q.product_id = p.product_id
+        WHERE p.member_id = #{memberId}
+        ORDER BY q.question_reg_time DESC
+    """)
+    int countAllQuestions(Long memberId);
 
     @Select("""
         SELECT 
@@ -155,10 +165,10 @@ public interface QnaMapper {
     void deleteAnswerByMember(Long member_id);
 
     // ------- 해당 상품에 등록된 모든 문의 답변 삭제 ----------
+
     @Delete("""
         DELETE FROM answer
         WHERE product_id = #{product_id}
     """)
     void deleteAnswerByProduct(Long product_id);
-
 }
