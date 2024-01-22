@@ -8,6 +8,8 @@ import com.example.lollandback.gameBoard.mapper.CommentMapper;
 import com.example.lollandback.gameBoard.mapper.FileMapper;
 import com.example.lollandback.gameBoard.mapper.LikeMapper;
 import com.example.lollandback.member.domain.Member;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +38,11 @@ public class GameBoardService {
     private final CommentMapper commentMapper;
 
     private final HttpSession session;
-    private HttpServletResponse response;
+    private final HttpServletResponse response;
+    private final HttpServletRequest request;
+
+
+
 
 
     private final S3Client s3;
@@ -126,14 +132,53 @@ public class GameBoardService {
     }
 
     public GameBoard get(Integer id) {
-        GameBoard gameBoard = mapper.selectById(id);
 
+        String cookieValue = getCookieValue("board_" + id);
+
+        if (cookieValue == null) {
+
+            boardCount(id);
+            addCookie("board_"+id,"viewed");
+        }
+
+
+//      게시물, 파일 조회 부분
+        GameBoard gameBoard = mapper.selectById(id);
         List<GameBoardFile> boardFiles = fileMapper.selectNamesBygameboardId(id);
         gameBoard.setFiles(boardFiles);
 
 
         return gameBoard;
     }
+
+    public String getCookieValue(String cookieName) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookieName.equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
+
+    //쿠키 생성 및 응답 추가 : 맥스 에이지는 24시간으로 설정
+    public void addCookie(String name, String value){
+        Cookie cookie = new Cookie(name, value);
+        cookie.setMaxAge(24 * 60 * 60);
+        response.addCookie(cookie);
+    }
+
+
+
+    public void boardCount(Integer id) {
+        mapper.boardCount(id);
+
+    }
+
+
 
     public boolean update(GameBoard gameBoard, List<Integer> removeFileIds, MultipartFile[] uploadFiles) throws IOException{
         if (removeFileIds != null) {
@@ -187,10 +232,7 @@ public class GameBoardService {
         fileMapper.deleteByBoard(id);
     }
 
-    public void boardCount(Integer id) {
-        mapper.boardCount(id);
 
-    }
 
     public List<GameBoard> notice() {
         return mapper.selectNotice();

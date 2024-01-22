@@ -53,6 +53,7 @@ VALUES (#{title},#{board_content},#{category},#{member_id})
                 <when test="sortBy == 'count_like'">
                     count_like
                 </when>
+                
                 <otherwise>
                     gb.id
                 </otherwise>

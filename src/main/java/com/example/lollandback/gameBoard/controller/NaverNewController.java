@@ -28,7 +28,7 @@ public class NaverNewController {
     @GetMapping("naver")
     public String naver() {
 
-        String query = "갈비집";
+        String query = "뉴스";
         String encode = Base64.getEncoder().encodeToString(query.getBytes(StandardCharsets.UTF_8));
 
         URI uri = UriComponentsBuilder.fromUriString("https://openapi.naver.com/")
