@@ -4,6 +4,7 @@ import com.example.lollandback.board.qna.domain.Answer;
 import com.example.lollandback.board.qna.domain.Question;
 import com.example.lollandback.board.qna.dto.*;
 import com.example.lollandback.board.qna.service.QnaService;
+import com.example.lollandback.board.review.domain.Review;
 import com.example.lollandback.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -107,13 +108,42 @@ public class QnaController {
 
     @PutMapping("/answer/write")
     public ResponseEntity writeAnswer(@SessionAttribute("login") Member login, @RequestBody AnswerWrite answerWrite) {
-        System.out.println("QnaController.writeAnswer");
         if(login.getMember_type().equals("admin")) {
             Long member_id = login.getId();
             try {
                Answer answer = new Answer(member_id, answerWrite);
                qnaService.addAnswer(answer);
                return ResponseEntity.ok().build();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+    }
+
+    @PutMapping("/answer/update")
+    public ResponseEntity updateAnswer(@SessionAttribute("login") Member login, @RequestBody AnswerUpdate newAnswer) {
+        if(login.getMember_type().equals("admin")) {
+            try {
+                qnaService.updateAnswer(newAnswer);
+                return ResponseEntity.ok().build();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+    }
+
+    @DeleteMapping("/answer/delete")
+    public ResponseEntity deleteAnswer(@SessionAttribute("login") Member login, @RequestParam Long answer_id) {
+        if(login.getMember_type().equals("admin")) {
+            try {
+                qnaService.deleteAnswerById(answer_id);
+                return ResponseEntity.ok().build();
             } catch (Exception e) {
                 e.printStackTrace();
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

@@ -2,10 +2,7 @@ package com.example.lollandback.board.qna.service;
 
 import com.example.lollandback.board.qna.domain.Answer;
 import com.example.lollandback.board.qna.domain.Question;
-import com.example.lollandback.board.qna.dto.AnswerReadDto;
-import com.example.lollandback.board.qna.dto.QnaDto;
-import com.example.lollandback.board.qna.dto.QuestionListDto;
-import com.example.lollandback.board.qna.dto.QuestionUpdateDto;
+import com.example.lollandback.board.qna.dto.*;
 import com.example.lollandback.board.qna.mapper.QnaMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +17,6 @@ import java.util.Map;
 public class QnaService {
 
     private final QnaMapper qnaMapper;
-
 
     public Map<String, Object> getQnaByProduct(Long productId, Integer page, String keyword, String category) {
         Map<String, Object> map = new HashMap<>();
@@ -67,13 +63,12 @@ public class QnaService {
 
     @Transactional
     public void deleteQuestionById(Long questionId) {
-        qnaMapper.deleteAnswerByQuestionId(questionId);
+        qnaMapper.deleteAnswerByQuestionId(questionId); //답변 먼저 다 삭제
         qnaMapper.deleteQuestionById(questionId);
     }
 
 
     public List<QuestionListDto> viewQuestion(Long memberId) {
-
         return qnaMapper.getQuestionsForAdmin(memberId);
     }
 
@@ -83,5 +78,15 @@ public class QnaService {
 
     public void addAnswer(Answer answer) {
         qnaMapper.addAnswer(answer);
+    }
+
+    @Transactional
+    public void updateAnswer(AnswerUpdate newAnswer) {
+        qnaMapper.updateAnswer(newAnswer);
+    }
+
+    @Transactional
+    public void deleteAnswerById(Long answer_id) {
+        qnaMapper.deleteAnswerById(answer_id);
     }
 }
