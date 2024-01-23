@@ -18,7 +18,6 @@ import org.springframework.web.context.request.WebRequest;
 import software.amazon.awssdk.services.s3.S3Client;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -133,7 +132,7 @@ public class MemberService {
         mapper.editPasswordById(login.getId(), editPasswordDto.getMember_password());
     }
 
-    public Map<String, Object> getAllMember(Integer page) {
+    public Map<String, Object> getAllMember(Integer page, String loginId, String name) {
         // 프론트에 리턴할 정보들
         Map<String, Object> map = new HashMap<>();
 
@@ -141,7 +140,7 @@ public class MemberService {
         Map<String, Object> pageInfo = new HashMap<>();
 
         // 마지막 페이지를 정하기 위해 모든 회원 수를 조회 (user만)
-        int countUser = mapper.countAllMember();
+        int countUser = mapper.countAllMember(loginId, name);
         //
         int lastPageNumber = (countUser - 1) / 10 + 1;
 
@@ -172,7 +171,7 @@ public class MemberService {
         int from = (page - 1) * 10;
 
         // 모든 회원 정보
-        map.put("allMember", mapper.getAllMember(from));
+        map.put("allMember", mapper.getAllMember(from, loginId, name));
         map.put("pageInfo", pageInfo);
 
         return map;

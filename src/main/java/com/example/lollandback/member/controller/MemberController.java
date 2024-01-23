@@ -143,10 +143,12 @@ public class MemberController {
 
     // 회원 목록 전체 조회 (user인 사람들만)
     @GetMapping("listAll")
-    public Map<String, Object> getAllMember(@RequestParam(value = "page", defaultValue = "1") Integer page) {
+    public Map<String, Object> getAllMember(@RequestParam(value = "page", defaultValue = "1") Integer page,
+                                            @RequestParam(value = "id",required = false)String loginId,
+                                            @RequestParam(value = "name", required = false)String name) {
 
 
-        return service.getAllMember(page);
+        return service.getAllMember(page, loginId, name);
     }
 
     // 관리자가 탈퇴 회원 id 번호로 삭제하는 로직 (admin만 건드세요)
