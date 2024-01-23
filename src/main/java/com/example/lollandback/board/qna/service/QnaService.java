@@ -69,6 +69,7 @@ public class QnaService {
 
 
     public Map<String, Object> viewQuestion(Long memberId, Integer page) {
+        System.out.println("QnaService.viewQuestion");
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> pageInfo = new HashMap<>();
 
@@ -80,6 +81,10 @@ public class QnaService {
         endPageNumber = Math.min(endPageNumber, lastPageNumber);
         int prevPageNumber = startPageNumber - 10;
         int nextPageNumber = endPageNumber + 1;
+
+        System.out.println("nextPageNumber = " + nextPageNumber);
+        System.out.println("prevPageNumber = " + prevPageNumber);
+        System.out.println("startPageNumber = " + startPageNumber);
 
         pageInfo.put("currentPageNumber", page);
         pageInfo.put("startPageNumber", startPageNumber);
@@ -93,8 +98,9 @@ public class QnaService {
         }
 
         int from = (page - 1) * 10;
-        map.put("qnaList", qnaMapper.getQuestionsForAdmin(from, memberId));
+        map.put("questionList", qnaMapper.getQuestionsForAdmin(from, memberId));
         map.put("pageInfo", pageInfo);
+        System.out.println("map.get(pageInfo) = " + map.get("pageInfo"));
         return map;
     }
 

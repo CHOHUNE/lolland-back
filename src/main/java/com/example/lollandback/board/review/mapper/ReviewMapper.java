@@ -26,11 +26,6 @@ public interface ReviewMapper {
     """)
     List<Integer> getAllRatesByProduct(Long product_id);
 
-    @Select("""
-        SELECT * FROM review
-        WHERE member_id = #{member_id}
-    """)
-    List<ReviewDto> getAllReviewsByMember(Long member_id);
 
     @Select("""
         SELECT product_id FROM review
@@ -55,6 +50,24 @@ public interface ReviewMapper {
         WHERE member_id = #{memberId}
     """)
     List<Long> getProductIdsByMember(Long memberId);
+
+    @Select("""
+        SELECT COUNT(*)
+        FROM review r
+        JOIN member m ON r.member_id = m.id
+        WHERE r.member_id = #{member_id}
+    """)
+    int countAll(Long member_id);
+
+    @Select("""
+        SELECT r.review_id, r.review_content, r.rate, r.review_reg_time, p.product_name
+        FROM review r
+        LEFT JOIN product p ON r.product_id = p.product_id
+        WHERE member_id = #{member_id}
+        ORDER BY r.review_reg_time DESC
+        LIMIT #{from}, 10
+    """)
+    List<ReviewDto> getAllReviewsByMember(Integer from, Long member_id);
 
     @Select("""
         SELECT COUNT(*)

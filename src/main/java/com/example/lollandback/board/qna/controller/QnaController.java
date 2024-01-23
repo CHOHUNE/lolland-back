@@ -80,6 +80,7 @@ public class QnaController {
     @GetMapping("/view")
     public ResponseEntity<Map<String, Object>> showQuestion(@SessionAttribute("login") Member login,
                                                               @RequestParam(value="p", defaultValue = "1") Integer page) {
+        System.out.println("QnaController.showQuestion");
         Long member_id = login.getId();
         if(member_id != null) {
             try {
