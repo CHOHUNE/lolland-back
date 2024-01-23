@@ -110,4 +110,10 @@ public interface MemberAddressMapper {
         AND member_address_type = 'main'
     """)
     boolean editMainAddress(Long memberId, MemberAddress memberAddress);
+
+    @Delete("""
+        DELETE FROM memberaddress 
+        WHERE member_id =#{memberId}
+    """)
+    void deleteByMemberId(Long memberId);
 }
