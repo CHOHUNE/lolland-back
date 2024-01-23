@@ -4,6 +4,7 @@ import com.example.lollandback.board.qna.domain.Answer;
 import com.example.lollandback.board.qna.domain.Question;
 import com.example.lollandback.board.qna.dto.*;
 import com.example.lollandback.board.qna.service.QnaService;
+import com.example.lollandback.board.review.domain.Review;
 import com.example.lollandback.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -37,6 +38,32 @@ public class QnaController {
     @GetMapping("/fetchMine")
     public List<QnaDto> fetchMine(@SessionAttribute("login") Member login, @RequestParam Long product_id) {
         return qnaService.getQnaByMemberAndProduct(login.getId(), product_id);
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<Map<String, Object>> getQnaByMember(@SessionAttribute Member login,
+                                                                 @RequestParam(value="p", defaultValue = "1") Integer page) {
+        if(login.getId() != null) {
+            return ResponseEntity.ok(qnaService.getQnaByMember(login.getId(), page));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
+    @GetMapping("/member/{question_id}")
+    public ResponseEntity<AnswerReadDto> getQnaByMember(@SessionAttribute("login") Member login,
+                                                        @PathVariable Long question_id) {
+        if(question_id != null && login.getId() != null) {
+            try {
+                return ResponseEntity.ok(qnaService.getQnaDetail(question_id));
+            } catch (Exception e) {
+                System.out.println("문의 상세 정보 가져오는 도중 에러 발생: " + e);
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
     @PostMapping("/submit")
@@ -77,11 +104,12 @@ public class QnaController {
     }
 
     @GetMapping("/view")
-    public ResponseEntity<List<QuestionListDto>> showQuestion(@SessionAttribute("login") Member login) {
+    public ResponseEntity<Map<String, Object>> showQuestion(@SessionAttribute("login") Member login,
+                                                              @RequestParam(value="p", defaultValue = "1") Integer page) {
         Long member_id = login.getId();
         if(member_id != null) {
             try {
-                return ResponseEntity.ok(qnaService.viewQuestion(member_id));
+                return ResponseEntity.ok(qnaService.viewQuestion(member_id, page));
             } catch (Exception e) {
                 System.out.println("문의 불러오는 도중 에러 발생: " + e);
                 e.printStackTrace();
@@ -107,13 +135,42 @@ public class QnaController {
 
     @PutMapping("/answer/write")
     public ResponseEntity writeAnswer(@SessionAttribute("login") Member login, @RequestBody AnswerWrite answerWrite) {
-        System.out.println("QnaController.writeAnswer");
         if(login.getMember_type().equals("admin")) {
             Long member_id = login.getId();
             try {
                Answer answer = new Answer(member_id, answerWrite);
                qnaService.addAnswer(answer);
                return ResponseEntity.ok().build();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+    }
+
+    @PutMapping("/answer/update")
+    public ResponseEntity updateAnswer(@SessionAttribute("login") Member login, @RequestBody AnswerUpdate newAnswer) {
+        if(login.getMember_type().equals("admin")) {
+            try {
+                qnaService.updateAnswer(newAnswer);
+                return ResponseEntity.ok().build();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+    }
+
+    @DeleteMapping("/answer/delete")
+    public ResponseEntity deleteAnswer(@SessionAttribute("login") Member login, @RequestParam Long answer_id) {
+        if(login.getMember_type().equals("admin")) {
+            try {
+                qnaService.deleteAnswerById(answer_id);
+                return ResponseEntity.ok().build();
             } catch (Exception e) {
                 e.printStackTrace();
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
