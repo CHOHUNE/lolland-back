@@ -37,7 +37,7 @@ public interface ReviewMapper {
     @Select("""
         <script>
             SELECT DISTINCT product_id
-            FROM reviews
+            FROM review
             WHERE review_id IN
             <foreach collection="reviewIds" item="review_id" open="(" separator="," close=")">
                 #{review_id}
@@ -47,7 +47,7 @@ public interface ReviewMapper {
     List<Long> getProductIdsByReview(List<Long> reviewIds);
 
     @Select("""
-        SELECT product_id FROM review
+        SELECT DISTINCT product_id FROM review
         WHERE member_id = #{memberId}
     """)
     List<Long> getProductIdsByMember(Long memberId);
@@ -131,8 +131,8 @@ public interface ReviewMapper {
         <script>
             DELETE FROM review
             WHERE review_id IN
-            <foreach collection="reviewIds" open="(" seperator="," close=")">
-                #{review_id}
+            <foreach collection="reviewIds" item="reviewId" open="(" separator="," close=")">
+              #{reviewId}
             </foreach>
         </script>
     """)
