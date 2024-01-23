@@ -6,6 +6,7 @@ import com.example.lollandback.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -39,4 +40,7 @@ public class LikeService {
         return Map.of("like", like != null, "countLike", countLike);
     }
 
+    public List<Like> getList(Member login) {
+        return likeMapper.selectLoginId(login.getMember_login_id());
+    }
 }
