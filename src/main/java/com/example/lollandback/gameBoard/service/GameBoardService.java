@@ -1,6 +1,7 @@
 package com.example.lollandback.gameBoard.service;
 
 
+import com.example.lollandback.gameBoard.domain.BoardWriter;
 import com.example.lollandback.gameBoard.domain.GameBoard;
 import com.example.lollandback.gameBoard.domain.GameBoardFile;
 import com.example.lollandback.gameBoard.mapper.BoardMapper;
@@ -203,14 +204,11 @@ public class GameBoardService {
     public boolean delete(Integer id) {
 
         commentMapper.deleteByBoardId(id);
-
         likeMapper.deleteByBoardId(id);
 
         deleteFile(id);
 
-
         return mapper.deleteById(id) == 1;
-
     }
 
     private void deleteFile(Integer id) {
@@ -247,7 +245,7 @@ public class GameBoardService {
         return mapper.selectByMemberId(writer);
     }
 
-    public Member postMemberInfo(String writer) {
+    public BoardWriter postMemberInfo(String writer) {
         return mapper.selectMemberById(writer);
 
     }
