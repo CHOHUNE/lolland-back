@@ -150,10 +150,6 @@ public interface ProductMapper {
             """)
     List<Product> findByCategoryId(Long categoryId);
 
-    @Select("""
-            SELECT *
-            FROM subcategory
-            WHERE subcategory_id = #{subcategory_id}
-            """)
-    List<Product> findBySubCategoryId(Long subcategoryId);
+
+
 }

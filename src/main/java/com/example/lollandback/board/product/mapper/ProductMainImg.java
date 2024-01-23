@@ -1,5 +1,6 @@
 package com.example.lollandback.board.product.mapper;
 
+import com.example.lollandback.board.product.domain.Product;
 import com.example.lollandback.board.product.domain.ProductImg;
 import org.apache.ibatis.annotations.*;
 
@@ -46,4 +47,18 @@ public interface ProductMainImg {
             WHERE main_img_id = #{main_img_id}
             """)
     void deleteById(Integer main_img_id);
+
+    @Select("""
+            SELECT main_img_id, main_img_uri
+            FROM productimg
+            WHERE product_id = #{product_id}
+            """)
+    List<ProductImg> selectNamesByCategoryId(Long productId);
+
+    @Select("""
+            SELECT main_img_id, main_img_uri
+            FROM productimg
+            WHERE product_id = #{product_id}
+            """)
+    List<Product> selectNamesBySubCategoryId(Long subcategoryId);
 }
