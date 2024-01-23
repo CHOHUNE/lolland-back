@@ -4,6 +4,7 @@ import com.example.lollandback.gearBoard.domain.GearLike;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
 @Mapper
 public interface GearLikeMapper {
@@ -18,4 +19,15 @@ public interface GearLikeMapper {
                 insert into lolland.gearlike (gearboardId, memberId) values (#{gearboardId},#{memberId});
         """)
     int insert(GearLike gearLike);
+
+    @Select("""
+                select count(id ) from lolland.gearlike where gearboardId=#{gearboardId};
+        """)
+    int countByBoardId(Integer gear_id);
+
+    @Select("""
+                select * from lolland.gearlike where gearboardId=#{gear_id} and memberId=#{id};
+        """)
+
+    GearLike selectbyId(Integer gear_id, Long id);
 }

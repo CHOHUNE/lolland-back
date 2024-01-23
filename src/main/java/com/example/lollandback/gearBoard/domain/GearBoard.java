@@ -20,6 +20,7 @@ public class  GearBoard {
    private Integer commnetcount;
    private Integer countFile;
 
+   private Integer countLike;
 
     private String member_id;
 

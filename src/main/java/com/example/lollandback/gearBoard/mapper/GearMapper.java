@@ -28,12 +28,31 @@ public interface GearMapper {
 
 
     @Select("""
-            
-                        SELECT gear_recommand,gear_id, gear_title, gear_content, category, gear_inserted,gear_views
-                        ,       (SELECT COUNT(id) FROM lolland.gearfile f WHERE f.gearboard_id = b.gear_id) AS countFile
-                               ,(select count(c.id) from lolland.gearcomment c  where c.boardid = gear_id) as commnetcount
-                        FROM gearboard b
-            where category=#{category};
+            SELECT
+              b.gear_id,
+              b.gear_title,
+              b.gear_content,
+              b.category,
+              b.gear_inserted,
+              b.gear_views,
+              COUNT(DISTINCT f.id) AS countFile,
+              COUNT(DISTINCT c.id) AS commentCount,
+              COUNT(DISTINCT l.id) AS countLike
+            FROM
+              gearboard b
+            LEFT JOIN
+              lolland.gearfile f ON b.gear_id = f.gearboard_id
+            LEFT JOIN
+              lolland.gearcomment c ON b.gear_id = c.boardid
+            LEFT JOIN
+              lolland.gearlike l ON b.gear_id = l.gearboardId
+            WHERE
+              b.category = #{category}
+            GROUP BY
+              b.gear_id
+    ORDER BY
+         b.gear_inserted desc ;
+           
             """)
     List<GearBoard> list(String category);
 
@@ -66,11 +85,31 @@ public interface GearMapper {
     GearBoard selectById(Integer gear_id);
 
     @Select("""    
-            SELECT gear_recommand,gear_id, gear_title, gear_content, category, gear_inserted,gear_views
-            ,       (SELECT COUNT(id) FROM lolland.gearfile f WHERE f.gearboard_id = b.gear_id) AS countFile
-                   ,(select count(c.id) from lolland.gearcomment c  where c.boardid = gear_id) as commnetcount
-            FROM gearboard b
-    
+SELECT
+    b.gear_id,
+    b.gear_title,
+    b.gear_content,
+    b.category,
+    b.gear_inserted,
+    b.gear_views,
+    COUNT(DISTINCT f.id) AS countFile,
+    COUNT(DISTINCT c.id) AS commentCount,
+    COUNT(DISTINCT l.id) AS countLike
+FROM
+    gearboard b
+        LEFT JOIN
+    lolland.gearfile f ON b.gear_id = f.gearboard_id
+        LEFT JOIN
+    lolland.gearcomment c ON b.gear_id = c.boardid
+        LEFT JOIN
+    lolland.gearlike l ON b.gear_id = l.gearboardId
+-- WHERE
+--         b.category = #{category}
+GROUP BY
+    b.gear_id
+ORDER BY
+    b.gear_inserted desc ;
+
         """)
     List<GearBoard> listAll();
 }
