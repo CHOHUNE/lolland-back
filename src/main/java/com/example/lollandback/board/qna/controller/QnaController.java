@@ -40,6 +40,32 @@ public class QnaController {
         return qnaService.getQnaByMemberAndProduct(login.getId(), product_id);
     }
 
+    @GetMapping("/my")
+    public ResponseEntity<Map<String, Object>> getQnaByMember(@SessionAttribute Member login,
+                                                                 @RequestParam(value="p", defaultValue = "1") Integer page) {
+        if(login.getId() != null) {
+            return ResponseEntity.ok(qnaService.getQnaByMember(login.getId(), page));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
+    @GetMapping("/member/{question_id}")
+    public ResponseEntity<AnswerReadDto> getQnaByMember(@SessionAttribute("login") Member login,
+                                                        @PathVariable Long question_id) {
+        if(question_id != null && login.getId() != null) {
+            try {
+                return ResponseEntity.ok(qnaService.getQnaDetail(question_id));
+            } catch (Exception e) {
+                System.out.println("문의 상세 정보 가져오는 도중 에러 발생: " + e);
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
     @PostMapping("/submit")
     public ResponseEntity addQuestion(@SessionAttribute("login") Member login, @RequestBody Question question) {
         question.setMember_id(login.getId());
@@ -80,7 +106,6 @@ public class QnaController {
     @GetMapping("/view")
     public ResponseEntity<Map<String, Object>> showQuestion(@SessionAttribute("login") Member login,
                                                               @RequestParam(value="p", defaultValue = "1") Integer page) {
-        System.out.println("QnaController.showQuestion");
         Long member_id = login.getId();
         if(member_id != null) {
             try {

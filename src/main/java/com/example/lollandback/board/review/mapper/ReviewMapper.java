@@ -1,6 +1,7 @@
 package com.example.lollandback.board.review.mapper;
 
 import com.example.lollandback.board.review.domain.Review;
+import com.example.lollandback.board.review.dto.MyReviewList;
 import com.example.lollandback.board.review.dto.ReviewDto;
 import com.example.lollandback.board.review.dto.ReviewUpdateDto;
 import org.apache.ibatis.annotations.*;
@@ -60,14 +61,15 @@ public interface ReviewMapper {
     int countAll(Long member_id);
 
     @Select("""
-        SELECT r.review_id, r.review_content, r.rate, r.review_reg_time, p.product_name
+        SELECT r.review_id, r.review_content, r.rate, r.review_reg_time, p.product_id, p.product_name
         FROM review r
         LEFT JOIN product p ON r.product_id = p.product_id
-        WHERE member_id = #{member_id}
+        INNER JOIN member m ON r.member_id = m.id
+        WHERE r.member_id = #{member_id}
         ORDER BY r.review_reg_time DESC
         LIMIT #{from}, 10
     """)
-    List<ReviewDto> getAllReviewsByMember(Integer from, Long member_id);
+    List<MyReviewList> getAllReviewsByMember(Integer from, Long member_id);
 
     @Select("""
         SELECT COUNT(*)

@@ -111,14 +111,33 @@ public interface QnaMapper {
     """)
     List<QuestionListDto> getQuestionsForAdmin(Integer from, Long memberId);
 
+    //해당 멤버가 등록한 "상품"의 question
     @Select("""
         SELECT COUNT(*)
         FROM question q
         LEFT JOIN product p ON q.product_id = p.product_id
         WHERE p.member_id = #{memberId}
-        ORDER BY q.question_reg_time DESC
     """)
     int countAllQuestions(Long memberId);
+
+    //해당 멤버가 작성한 question
+    @Select("""
+        SELECT COUNT(*)
+        FROM question q
+        WHERE q.member_id = #{memberId}
+    """)
+    int countAllMemberQuestion(Long memberId);
+
+    @Select("""
+        SELECT q.question_id, q.question_reg_time, q.question_title, a.answer_id, p.product_name
+        FROM question q
+        LEFT JOIN answer a ON q.question_id = a.question_id
+        LEFT JOIN product p ON q.product_id = p.product_id
+        WHERE q.member_id = #{member_id}
+        ORDER BY q.question_reg_time DESC
+        LIMIT #{from}, 10
+    """)
+    List<MyQuestionDto> getAllQnaByMember(Integer from, Long member_id);
 
     @Select("""
         SELECT 
@@ -171,4 +190,6 @@ public interface QnaMapper {
         WHERE product_id = #{product_id}
     """)
     void deleteAnswerByProduct(Long product_id);
+
+
 }
