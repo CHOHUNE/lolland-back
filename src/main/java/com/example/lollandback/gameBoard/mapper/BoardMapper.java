@@ -1,5 +1,6 @@
 package com.example.lollandback.gameBoard.mapper;
 
+import com.example.lollandback.gameBoard.domain.BoardWriter;
 import com.example.lollandback.gameBoard.domain.GameBoard;
 import com.example.lollandback.member.domain.Member;
 import org.apache.ibatis.annotations.*;
@@ -160,8 +161,8 @@ LIMIT 5
 List <GameBoard> selectByMemberId(String writer);
 
     @Select("""
-SELECT member_name,member_email,member_phone_number FROM member
-WHERE member_login_id=#{writer}
+SELECT m.member_name,m.member_email,m.member_phone_number,m.member_introduce,mi.file_url FROM member m JOIN lolland.memberimage mi ON m.id = mi.member_id
+WHERE member_login_id=#{writer} 
             """)
-    Member selectMemberById(String writer);
+    BoardWriter selectMemberById(String writer);
 }
