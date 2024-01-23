@@ -2,10 +2,7 @@ package com.example.lollandback.board.qna.mapper;
 
 import com.example.lollandback.board.qna.domain.Answer;
 import com.example.lollandback.board.qna.domain.Question;
-import com.example.lollandback.board.qna.dto.AnswerReadDto;
-import com.example.lollandback.board.qna.dto.QnaDto;
-import com.example.lollandback.board.qna.dto.QuestionListDto;
-import com.example.lollandback.board.qna.dto.QuestionUpdateDto;
+import com.example.lollandback.board.qna.dto.*;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -58,7 +55,7 @@ public interface QnaMapper {
                         OR m.member_login_id LIKE #{keyword}
                     </if>
                 </trim>
-                ORDER BY q.question_id DESC
+                ORDER BY q.question_reg_time DESC
                 LIMIT #{from}, 10
         </script>
     """)
@@ -97,7 +94,8 @@ public interface QnaMapper {
         UPDATE question
             SET
                 question_title = #{question_title},
-                question_content = #{question_content}
+                question_content = #{question_content},
+                question_reg_time = CURRENT_TIMESTAMP
             WHERE
                 question_id = #{question_id}
     """)
@@ -108,8 +106,38 @@ public interface QnaMapper {
         FROM question q 
         LEFT JOIN product p ON q.product_id = p.product_id
         WHERE p.member_id = #{memberId}
+        ORDER BY q.question_reg_time DESC
+        LIMIT #{from}, 10
     """)
-    List<QuestionListDto> getQuestionsForAdmin(Long memberId);
+    List<QuestionListDto> getQuestionsForAdmin(Integer from, Long memberId);
+
+    //해당 멤버가 등록한 "상품"의 question
+    @Select("""
+        SELECT COUNT(*)
+        FROM question q
+        LEFT JOIN product p ON q.product_id = p.product_id
+        WHERE p.member_id = #{memberId}
+    """)
+    int countAllQuestions(Long memberId);
+
+    //해당 멤버가 작성한 question
+    @Select("""
+        SELECT COUNT(*)
+        FROM question q
+        WHERE q.member_id = #{memberId}
+    """)
+    int countAllMemberQuestion(Long memberId);
+
+    @Select("""
+        SELECT q.question_id, q.question_reg_time, q.question_title, a.answer_id, p.product_name
+        FROM question q
+        LEFT JOIN answer a ON q.question_id = a.question_id
+        LEFT JOIN product p ON q.product_id = p.product_id
+        WHERE q.member_id = #{member_id}
+        ORDER BY q.question_reg_time DESC
+        LIMIT #{from}, 10
+    """)
+    List<MyQuestionDto> getAllQnaByMember(Integer from, Long member_id);
 
     @Select("""
         SELECT 
@@ -132,4 +160,36 @@ public interface QnaMapper {
         VALUES (#{question_id}, #{product_id}, #{answer_content}, #{member_id})
     """)
     void addAnswer(Answer answer);
+
+    @Update("""
+        UPDATE answer
+            SET answer_content = #{answer_content},
+                answer_reg_time = CURRENT_TIMESTAMP
+            WHERE answer_id = #{answer_id}
+    """)
+    void updateAnswer(AnswerUpdate newAnswer);
+
+    @Delete("""
+        DELETE FROM answer
+        WHERE answer_id = #{answer_id}
+    """)
+    void deleteAnswerById(Long answer_id);
+
+
+    // -------- 해당 관리자가 작성한 모든 문의 답변 삭제 --------
+    @Delete("""
+        DELETE FROM answer
+        WHERE member_id = #{member_id}
+    """)
+    void deleteAnswerByMember(Long member_id);
+
+    // ------- 해당 상품에 등록된 모든 문의 답변 삭제 ----------
+
+    @Delete("""
+        DELETE FROM answer
+        WHERE product_id = #{product_id}
+    """)
+    void deleteAnswerByProduct(Long product_id);
+
+
 }
