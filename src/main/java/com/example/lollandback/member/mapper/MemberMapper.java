@@ -144,4 +144,10 @@ public interface MemberMapper {
     int countAllMember(String loginId, String name);
 
 
+    @Select("""
+        SELECT COUNT(*) 
+        FROM member 
+        WHERE member_email = #{memberEmail} 
+    """)
+    int checkUserEmail(String memberEmail);
 }

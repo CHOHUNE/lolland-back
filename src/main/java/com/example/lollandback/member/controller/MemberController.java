@@ -33,7 +33,7 @@ public class MemberController {
     // 아이디 찾기
     @GetMapping("findId")
     public ResponseEntity findId(MemberDto memberDto) {
-            return service.findIdByNameAndEmail(memberDto.getMember_name(), memberDto.getMember_email());
+        return service.findIdByNameAndEmail(memberDto.getMember_name(), memberDto.getMember_email());
     }
 
     // 비밀번호 찾기
