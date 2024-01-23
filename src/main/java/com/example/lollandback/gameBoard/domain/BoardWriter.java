@@ -17,3 +17,4 @@ public class BoardWriter {
     private String file_url;
 
 }
+

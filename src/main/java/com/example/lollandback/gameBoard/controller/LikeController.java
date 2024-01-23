@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -36,5 +37,13 @@ public class LikeController {
     ) {
         return ResponseEntity.ok(service.get(boardId,login));
     }
+
+    @GetMapping("gameboard/likedpost")
+    public  ResponseEntity <List<Like>> listGet(
+            @SessionAttribute(value = "login", required = false) Member login
+    ) {
+        return ResponseEntity.ok(service.getList(login));
+    }
+
 }
 
