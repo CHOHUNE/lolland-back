@@ -339,10 +339,22 @@ public class ProductService {
     }
 
     public List<Product> findProductsByCategoryId(Long categoryId) {
-        return productMapper.findByCategoryId(categoryId);
+        List<Product> product = productMapper.findByCategoryId(categoryId);
+        product.forEach(productListImg -> {
+            List<ProductImg> productsImg = mainImgMapper.selectNamesByCategoryId(productListImg.getProduct_id());
+            productsImg.forEach(img -> img.setMain_img_uri(urlPrefix + "lolland/product/productMainImg/" + productListImg.getProduct_id() + "/" + img.getMain_img_uri()));
+            productListImg.setMainImgs(productsImg);
+        });
+        return product;
     }
 
     public List<Product> findProductsBySubCategory(Long subcategoryId) {
-        return productMapper.findBySubCategoryId(subcategoryId);
+        List<Product> product = mainImgMapper.selectNamesBySubCategoryId(subcategoryId);
+        product.forEach(productListImg -> {
+            List<ProductImg> productsImg = mainImgMapper.selectNamesByCategoryId(productListImg.getProduct_id());
+            productsImg.forEach(img -> img.setMain_img_uri(urlPrefix + "lolland/product/productMainImg/" + productListImg.getProduct_id() + "/" + img.getMain_img_uri()));
+            productListImg.setMainImgs(productsImg);
+        });
+        return product;
     }
 }
