@@ -4,7 +4,6 @@ import com.example.lollandback.board.qna.domain.Answer;
 import com.example.lollandback.board.qna.domain.Question;
 import com.example.lollandback.board.qna.dto.*;
 import com.example.lollandback.board.qna.service.QnaService;
-import com.example.lollandback.board.review.domain.Review;
 import com.example.lollandback.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -88,6 +87,35 @@ public class QnaController {
             System.out.println("문의 삭제 중 에러 발생 " + e.getStackTrace());
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @DeleteMapping("/delete/selected")
+    public ResponseEntity deleteSelectedQuestions(@RequestBody List<Long> question_ids) {
+
+        try {
+            qnaService.deleteSelectedQuestions(question_ids);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            System.out.println("선택된 문의 삭제 도중 에러 발생: " + e);
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @DeleteMapping("/delete/all")
+    public ResponseEntity deleteAllQuestionsByMember(@SessionAttribute("login") Member login) {
+        if(login.getId() != null) {
+            try {
+                qnaService.deleteAllQuestions(login.getId());
+                return ResponseEntity.ok().build();
+            } catch (Exception e) {
+                System.out.println("멤버의 모든 문의 삭제 도중 에러 발생: " + e);
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 
@@ -179,4 +207,5 @@ public class QnaController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
+
 }
