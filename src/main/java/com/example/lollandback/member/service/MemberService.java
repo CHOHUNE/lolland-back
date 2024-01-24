@@ -1,5 +1,6 @@
 package com.example.lollandback.member.service;
 
+import com.example.lollandback.gameBoard.domain.GameBoard;
 import com.example.lollandback.member.domain.EditMemberAndAddress;
 import com.example.lollandback.member.domain.Member;
 import com.example.lollandback.member.domain.MemberAddress;
@@ -18,6 +19,7 @@ import org.springframework.web.context.request.WebRequest;
 import software.amazon.awssdk.services.s3.S3Client;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -185,4 +187,7 @@ public class MemberService {
     }
 
 
+    public List<GameBoard> getGameBoardLike(Member login) {
+        return mapper.getGameBoardLikeByLoginId(login.getMember_login_id());
+    }
 }

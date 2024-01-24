@@ -1,5 +1,6 @@
 package com.example.lollandback.member.mapper;
 
+import com.example.lollandback.gameBoard.domain.GameBoard;
 import com.example.lollandback.member.domain.EditMember;
 import com.example.lollandback.member.domain.Member;
 import com.example.lollandback.member.dto.MemberDto;
@@ -150,4 +151,13 @@ public interface MemberMapper {
         WHERE member_email = #{memberEmail} 
     """)
     int checkUserEmail(String memberEmail);
+
+    @Select("""
+        SELECT g.id, g.category, g.title, g.board_content
+        FROM gameboard  g 
+        JOIN gameboardlike gl 
+        ON g.id = gl.game_board_id 
+        WHERE gl.member_id = #{memberLoginId};
+    """)
+    List<GameBoard> getGameBoardLikeByLoginId(String memberLoginId);
 }

@@ -1,5 +1,6 @@
 package com.example.lollandback.member.controller;
 
+import com.example.lollandback.gameBoard.domain.GameBoard;
 import com.example.lollandback.member.domain.EditMemberAndAddress;
 import com.example.lollandback.member.domain.Member;
 import com.example.lollandback.member.domain.MemberAndAddress;
@@ -162,5 +163,11 @@ public class MemberController {
         }else {
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    // 회원이 좋아요 한 게시글 목록 갖고 오기
+    @GetMapping("getGameBoardLike")
+    public List<GameBoard> getGameBoardLike(@SessionAttribute("login") Member login) {
+        return service.getGameBoardLike(login);
     }
 }
