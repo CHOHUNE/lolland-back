@@ -36,7 +36,7 @@ public interface GearMapper {
               b.gear_inserted,
               b.gear_views,
               COUNT(DISTINCT f.id) AS countFile,
-              COUNT(DISTINCT c.id) AS commentCount,
+              COUNT(DISTINCT c.id) AS commnetcount,
               COUNT(DISTINCT l.id) AS countLike
             FROM
               gearboard b
@@ -93,7 +93,7 @@ SELECT
     b.gear_inserted,
     b.gear_views,
     COUNT(DISTINCT f.id) AS countFile,
-    COUNT(DISTINCT c.id) AS commentCount,
+    COUNT(DISTINCT c.id) AS commnetcount,
     COUNT(DISTINCT l.id) AS countLike
 FROM
     gearboard b
@@ -122,7 +122,7 @@ ORDER BY
     b.gear_inserted,
     b.gear_views,
     COUNT(DISTINCT f.id) AS countFile,
-    COUNT(DISTINCT c.id) AS commentCount,
+    COUNT(DISTINCT c.id) AS commnetcount,
     COUNT(DISTINCT l.id) AS countLike
 FROM
     gearboard b
@@ -152,7 +152,7 @@ LIMIT 5;
     b.gear_inserted,
     b.gear_views,
     COUNT(DISTINCT f.id) AS countFile,
-    COUNT(DISTINCT c.id) AS commentCount,
+    COUNT(DISTINCT c.id) AS commnetcount,
     COUNT(DISTINCT l.id) AS countLike
 FROM
     gearboard b
