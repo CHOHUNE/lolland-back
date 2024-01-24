@@ -44,7 +44,12 @@ DELETE FROM gameboardlike WHERE game_board_id=#{id}
 
 
     @Select("""
-SELECT * FROM gameboardlike WHERE member_id=#{memberLoginId}
+SELECT gl.id,gl.game_board_id,gl.member_id,g.category,g.title,g.board_content FROM gameboardlike gl
+ LEFT JOIN lolland.gameboard g on g.id = gl.game_board_id
+ WHERE member_id=#{memberLoginId}
+
 """)
     List<Like> selectLoginId(String memberLoginId);
+
+//    카테고리, 제목, 내용, 좋아요한 시간,게시물 id
 }
