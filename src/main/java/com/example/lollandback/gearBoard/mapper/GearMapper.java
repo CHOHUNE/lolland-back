@@ -59,7 +59,27 @@ public interface GearMapper {
 
 
     @Select("""
-                select * from gearboard where gear_id=#{gear_id};
+               SELECT
+    b.gear_id,
+    b.gear_title,
+    b.gear_content,
+    b.category,
+    b.gear_inserted,
+    b.gear_views,
+    COUNT(DISTINCT f.id) AS countFile,
+    COUNT(DISTINCT c.id) AS commnetcount,
+    COUNT(DISTINCT l.id) AS countLike
+FROM
+    gearboard b
+        LEFT JOIN
+    lolland.gearfile f ON b.gear_id = f.gearboard_id
+        LEFT JOIN
+    lolland.gearcomment c ON b.gear_id = c.boardid
+        LEFT JOIN
+    lolland.gearlike l ON b.gear_id = l.gearboardId
+where b.gear_id=#{gear_id}
+GROUP BY
+    b.gear_id
         """)
     GearBoard getId(Integer gear_id);
 
