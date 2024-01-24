@@ -1,5 +1,6 @@
 package com.example.lollandback.gameBoard.mapper;
 
+import com.example.lollandback.gameBoard.domain.BoardWriter;
 import com.example.lollandback.gameBoard.domain.GameBoard;
 import com.example.lollandback.member.domain.Member;
 import org.apache.ibatis.annotations.*;
@@ -43,6 +44,7 @@ VALUES (#{title},#{board_content},#{category},#{member_id})
                             OR gb.board_content LIKE #{keyword}
                         </if>
                     </trim>)
+                    OR gb.category LIKE #{keyword}
     GROUP BY gb.id
 
     ORDER BY
@@ -53,6 +55,7 @@ VALUES (#{title},#{board_content},#{category},#{member_id})
                 <when test="sortBy == 'count_like'">
                     count_like
                 </when>
+                
                 <otherwise>
                     gb.id
                 </otherwise>
@@ -83,7 +86,7 @@ SELECT *,COUNT(DISTINCT gl.id)count_like,
 
     @Select("""
        
-            SELECT gb.*,
+            SELECT DISTINCT gb.*,
                 (SELECT COUNT(DISTINCT gl.id) FROM lolland.gameboardlike gl WHERE gl.game_board_id = gb.id) AS count_like,
                 (SELECT COUNT(DISTINCT gc.id) FROM lolland.gameboardcomment gc WHERE gc.game_board_id = gb.id) AS count_comment,
                 (SELECT COUNT(DISTINCT gf.id) FROM lolland.gameboardfile gf WHERE gf.gameboard_id = gb.id) AS countFile
@@ -158,8 +161,8 @@ LIMIT 5
 List <GameBoard> selectByMemberId(String writer);
 
     @Select("""
-SELECT member_name,member_email,member_phone_number FROM member
-WHERE member_login_id=#{writer}
+SELECT m.member_name,m.member_email,m.member_phone_number,m.member_introduce,mi.file_url FROM member m JOIN lolland.memberimage mi ON m.id = mi.member_id
+WHERE member_login_id=#{writer} 
             """)
-    Member selectMemberById(String writer);
+    BoardWriter selectMemberById(String writer);
 }

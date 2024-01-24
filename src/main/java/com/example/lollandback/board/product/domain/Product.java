@@ -17,6 +17,7 @@ public class Product {
     private String product_name;
     private String product_content;
     private Double product_price;
+    private String company_name;
     private Long total_stock;
     private Double average_rate;
     private LocalDateTime product_reg_time;

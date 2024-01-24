@@ -87,7 +87,7 @@ LIMIT 5
 
 
     @Delete(""" 
-DELETE FROM gameboardcomment WHERE id=#{id}
+DELETE FROM gameboardcomment WHERE id=#{id} OR parent_id=#{id}
 """)
     void deleteById(Integer id);
 

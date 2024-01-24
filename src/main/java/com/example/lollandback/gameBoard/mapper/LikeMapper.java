@@ -8,6 +8,8 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 @Mapper
 public interface LikeMapper {
 
@@ -39,4 +41,10 @@ SELECT * FROM gameboardlike WHERE game_board_id=#{game_board_id} AND member_id=#
 DELETE FROM gameboardlike WHERE game_board_id=#{id}
 """)
     int deleteByBoardId(Integer id);
+
+
+    @Select("""
+SELECT * FROM gameboardlike WHERE member_id=#{memberLoginId}
+""")
+    List<Like> selectLoginId(String memberLoginId);
 }

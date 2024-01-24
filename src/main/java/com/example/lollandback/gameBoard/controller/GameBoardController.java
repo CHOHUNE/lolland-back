@@ -1,8 +1,10 @@
 package com.example.lollandback.gameBoard.controller;
 
 
+import com.example.lollandback.gameBoard.domain.BoardWriter;
 import com.example.lollandback.gameBoard.service.GameBoardService;
 import com.example.lollandback.member.domain.Member;
+import com.example.lollandback.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +21,7 @@ import java.util.Map;
 public class GameBoardController {
 
     private final GameBoardService gameboardService;
+//    private final MemberService memberService;
 
     @PostMapping("/write")
     public ResponseEntity add(GameBoard gameboard, @RequestParam(value = "uploadFiles[]", required = false) MultipartFile[] files, @SessionAttribute(value = "login", required = false) Member login) throws IOException {
@@ -66,14 +69,15 @@ public class GameBoardController {
     }
 
     @GetMapping("list/info/{memberId}")
-    public Member memberInfo(@PathVariable String memberId) {
+    public BoardWriter memberInfo(@PathVariable String memberId) {
         return gameboardService.postMemberInfo(memberId);
     }
 
 
+
     @GetMapping("/id/{id}")
     public GameBoard get(@PathVariable Integer id) {
-        gameboardService.boardCount(id);
+
         return gameboardService.get(id);
     }
 
@@ -103,6 +107,8 @@ public class GameBoardController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+
 
 
 }

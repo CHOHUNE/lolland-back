@@ -1,11 +1,13 @@
 package com.example.lollandback.board.product.service;
 
+import com.example.lollandback.board.like.service.ProductLikeService;
 import com.example.lollandback.board.product.domain.*;
 import com.example.lollandback.board.product.dto.CategoryDto;
 import com.example.lollandback.board.product.dto.ProductDto;
 import com.example.lollandback.board.product.dto.ProductOptionsDto;
 import com.example.lollandback.board.product.dto.ProductUpdateDto;
 import com.example.lollandback.board.product.mapper.*;
+import com.example.lollandback.board.review.mapper.ReviewMapper;
 import com.example.lollandback.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +21,9 @@ import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +42,8 @@ public class ProductService {
     private final ProductMainImg mainImgMapper;
     private final ProductOptionMapper productOptionMapper;
     private final ProductContentImg contentImgMapper;
+    private final ReviewMapper reviewMapper;
+    private final ProductLikeService productLikeService;
 
     // --------------------------- 상품 저장 시 대분류/소분류 보여주기 로직 ---------------------------
     public List<CategoryDto> getAllCategories() {
@@ -47,7 +53,10 @@ public class ProductService {
     // --------------------------- 상품 저장 로직 ---------------------------
     @Transactional
     public boolean save(Product product, Member login, Company company, MultipartFile[] mainImg, MultipartFile[] contentImg, List<ProductOptionsDto> optionList) throws IOException {
-
+        // 상품명 중복 검증
+//        if (productMapper.existsByName(product.getProduct_name())) {
+//            return false;
+//        }
         Long total_stock = 0L;
         // 제조사 정보 저장
         if (companyMapper.insert(company) != 1) {
@@ -115,18 +124,42 @@ public class ProductService {
         s3.putObject(objectRequest, RequestBody.fromInputStream(mainImg.getInputStream(), mainImg.getSize()));
     }
 
-    // --------------------------- 상품 리스트 로직 ---------------------------
-    public List<Product> list(Integer page) {
+    // --------------------------- 상품 리스트 / 페이징 / 검색 로직 ---------------------------
+    public Map<String, Object> list(Integer page, String keyword, String category) {
+        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> pageInfo = new HashMap<>();
+
+//        int countAll = productMapper.countAll();
+        int countAll = productMapper.countAll("%" + keyword + "%", category);
+        int lastPageNumber = (countAll - 1) / 10 + 1;
+        int startPageNumber = (page - 1) / 10 * 10 + 1;
+        int endPageNumber = startPageNumber + 9;
+        endPageNumber = Math.min(endPageNumber, lastPageNumber);
+        int prevPageNumber = startPageNumber - 10;
+        int nextPageNumber = endPageNumber + 1;
+
+        pageInfo.put("currentPageNumber", page);
+        pageInfo.put("startPageNumber", startPageNumber);
+        pageInfo.put("endPageNumber", endPageNumber);
+        if (prevPageNumber > 0) {
+            pageInfo.put("prevPageNumber", prevPageNumber);
+        }
+        if (nextPageNumber <= lastPageNumber) {
+            pageInfo.put("nextPageNumber", nextPageNumber);
+        }
 
         int from = (page - 1) * 10;
 
-        List<Product> product = productMapper.list(from);
+        List<Product> product = productMapper.list(from, "%" + keyword + "%", category);
         product.forEach(productListImg -> {
             List<ProductImg> productsImg = mainImgMapper.selectNamesByProductId(productListImg.getProduct_id());
             productsImg.forEach(img -> img.setMain_img_uri(urlPrefix + "lolland/product/productMainImg/" + productListImg.getProduct_id() + "/" + img.getMain_img_uri()));
             productListImg.setMainImgs(productsImg);
         });
-        return product;
+
+        map.put("product", product);
+        map.put("pageInfo", pageInfo);
+        return map;
     }
 
     // --------------------------- 상품 보기 로직 ---------------------------
@@ -164,18 +197,35 @@ public class ProductService {
 
     }
 
-    // --------------------------- 상품 삭제 로직 ---------------------------
+    // --------------------------- 상품 삭제(숨김) 로직 ---------------------------
+    @Transactional
     public void remove(Long productId) {
-        // 1. 메인 이미지삭제
-        deleteMainImg(productId);
-        // 2. 설명 이미지삭제
-        deleteDetailsImg(productId);
-        // 3. 옵션삭제
-        productOptionMapper.deleteByOption(productId);
-        // 4. 상품삭제
-        productMapper.deleteByProduct(productId);
-        // 5. 제조사 삭제
-        companyMapper.deleteByCompany(productId);
+//        // 1. 메인 이미지삭제
+//        deleteMainImg(productId);
+//        // 2. 설명 이미지삭제
+//        deleteDetailsImg(productId);
+//        // 3. 옵션삭제
+//        productOptionMapper.deleteByOption(productId);
+//        // 4. 리뷰 삭제
+//        reviewMapper.deleteReviewByProductId(productId);
+//        // 5. q&a 삭제
+//
+//        // 6. cart 삭제
+//
+//        // 7. answer 삭제
+//
+//        // 8. productorder 삭제
+//
+//        // 9. 상품삭제
+//        productMapper.deleteByProduct(productId);
+//        // 10. 제조사 삭제
+//        companyMapper.deleteByCompany(productId);
+
+        // 찜목록 삭제
+        productLikeService.removeList(productId);
+        // 상품 숨김
+        productMapper.deleteById(productId);
+
     }
 
     // ------------ 메인 이미지 삭제 ------------
@@ -286,5 +336,25 @@ public class ProductService {
         } catch (Exception e) {
             throw e;
         }
+    }
+
+    public List<Product> findProductsByCategoryId(Long categoryId) {
+        List<Product> product = productMapper.findByCategoryId(categoryId);
+        product.forEach(productListImg -> {
+            List<ProductImg> productsImg = mainImgMapper.selectNamesByCategoryId(productListImg.getProduct_id());
+            productsImg.forEach(img -> img.setMain_img_uri(urlPrefix + "lolland/product/productMainImg/" + productListImg.getProduct_id() + "/" + img.getMain_img_uri()));
+            productListImg.setMainImgs(productsImg);
+        });
+        return product;
+    }
+
+    public List<Product> findProductsBySubCategory(Long subcategoryId) {
+        List<Product> product = mainImgMapper.selectNamesBySubCategoryId(subcategoryId);
+        product.forEach(productListImg -> {
+            List<ProductImg> productsImg = mainImgMapper.selectNamesByCategoryId(productListImg.getProduct_id());
+            productsImg.forEach(img -> img.setMain_img_uri(urlPrefix + "lolland/product/productMainImg/" + productListImg.getProduct_id() + "/" + img.getMain_img_uri()));
+            productListImg.setMainImgs(productsImg);
+        });
+        return product;
     }
 }

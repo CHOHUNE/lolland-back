@@ -30,15 +30,28 @@ public class ReviewController {
         return new GetReviewDto(reviewList, totalReview);
     }
 
-    @GetMapping("/fetchAll")
-    public List<ReviewDto> fetchMemberReviews(@SessionAttribute("login") Member login) {
-        Long member_id = login.getId();
-        return reviewService.getAllReviewsByMember(member_id);
-    }
+//    @GetMapping("/fetchAll")
+//    public List<ReviewDto> fetchMemberReviews(@SessionAttribute("login") Member login) {
+//        Long member_id = login.getId();
+//        return reviewService.getAllReviewsByMember(member_id);
+//    }
 
     @GetMapping("/rating-distribution")
     public Map<Integer, Long> getRatingDistribution(@RequestParam Long product_id) {
         return reviewService.getRatingDistribution(product_id);
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<Map<String, Object>> getMyReviews(@SessionAttribute("login") Member login,
+                                            @RequestParam(value="p", defaultValue = "1") Integer page) {
+        try {
+            Long member_id = login.getId();
+            return ResponseEntity.ok(reviewService.getAllReviewsByMember(member_id, page));
+        } catch (Exception e) {
+            System.out.println("내 리뷰 가져오는 도중 에러 발생: " + e);
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping("/submit")

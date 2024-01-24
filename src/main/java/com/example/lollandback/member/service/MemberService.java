@@ -4,11 +4,9 @@ import com.example.lollandback.member.domain.EditMemberAndAddress;
 import com.example.lollandback.member.domain.Member;
 import com.example.lollandback.member.domain.MemberAddress;
 import com.example.lollandback.member.domain.MemberAndAddress;
-import com.example.lollandback.member.dto.EditPasswordDto;
-import com.example.lollandback.member.dto.MemberAddressDto;
-import com.example.lollandback.member.dto.MemberDto;
-import com.example.lollandback.member.dto.SetRandomPasswordDto;
+import com.example.lollandback.member.dto.*;
 import com.example.lollandback.member.mapper.MemberAddressMapper;
+import com.example.lollandback.member.mapper.MemberImageMapper;
 import com.example.lollandback.member.mapper.MemberMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +17,15 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.WebRequest;
 import software.amazon.awssdk.services.s3.S3Client;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberMapper mapper;
     private final MemberAddressMapper memberAddressMapper;
+    private final MemberImageMapper memberImageMapper;
 
     private final S3Client s3;
 
@@ -43,6 +43,11 @@ public class MemberService {
         mapper.insertUser(member);
         // 주소 생성
         memberAddressMapper.insertAddress(member.getId(),memberAddress);
+
+        // 기본 이미지 경로
+        String fileUrl = urlPrefix + "lolland/user/default/defaultImage.png";
+        // 회원 가입시 기본 이미지 설정
+        memberImageMapper.insertDefaultImage(member.getId(), fileUrl);
     }
 
     public boolean loginUser(Member member, WebRequest request) {
@@ -72,10 +77,15 @@ public class MemberService {
     }
 
     public MemberDto getMemberInfo(Member login) {
+        // 회원 주소록
         MemberAddressDto memberAddress = memberAddressMapper.selectByMemberIdToMainAddress(login.getMember_login_id());
+
+        // 회원 이미지
+        MemberImageDto memberImage = memberImageMapper.selectByMemberIdToImage(login.getId());
 
         MemberDto member = mapper.selectByMemberId(login.getMember_login_id());
         member.setMemberAddressDto(memberAddress);
+        member.setMemberImageDto(memberImage);
         return member;
     }
 
@@ -122,11 +132,57 @@ public class MemberService {
         mapper.editPasswordById(login.getId(), editPasswordDto.getMember_password());
     }
 
-    public List<MemberDto> getAllMember() {
-        return mapper.getAllMember();
+    public Map<String, Object> getAllMember(Integer page, String loginId, String name) {
+        // 프론트에 리턴할 정보들
+        Map<String, Object> map = new HashMap<>();
+
+        // 페이지 정보
+        Map<String, Object> pageInfo = new HashMap<>();
+
+        // 마지막 페이지를 정하기 위해 모든 회원 수를 조회 (user만)
+        int countUser = mapper.countAllMember(loginId, name);
+        //
+        int lastPageNumber = (countUser - 1) / 10 + 1;
+
+        // 시작 페이지
+        int startPageNumber = (page-1) / 5 * 5 + 1;
+
+        // 마지막 페이지
+        int endPageNumber = startPageNumber + 4;
+        endPageNumber = Math.min(endPageNumber, lastPageNumber);
+        // 이전 페이지
+        int prevPageNumber = startPageNumber - 5;
+        // 다음 페이지
+        int nextPageNumber = endPageNumber + 1;
+
+        pageInfo.put("startPageNumber", startPageNumber);
+        pageInfo.put("endPageNumber", endPageNumber);
+        // 이전 버튼은 0보다 클때만
+        if (prevPageNumber > 0) {
+            pageInfo.put("prevPageNumber", prevPageNumber);
+        }
+        // 다음페이지 버튼은 마지막 페이지보다 작거나 같을때만
+        if (nextPageNumber <= lastPageNumber) {
+            pageInfo.put("nextPageNumber", nextPageNumber);
+        }
+
+
+        // 프론트로부터 받은 페이지 넘버
+        int from = (page - 1) * 10;
+
+        // 모든 회원 정보
+        map.put("allMember", mapper.getAllMember(from, loginId, name));
+        map.put("pageInfo", pageInfo);
+
+        return map;
     }
 
     public void deletedMemberByAdmin(Long id) {
+        // 회원 탈퇴전 주소 삭제
+        memberAddressMapper.deleteByMemberId(id);
+        // 회원 탈퇴
         mapper.deleteById(id);
     }
+
+
 }

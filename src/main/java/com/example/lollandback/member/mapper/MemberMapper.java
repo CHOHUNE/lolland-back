@@ -17,7 +17,8 @@ public interface MemberMapper {
             member_name, 
             member_phone_number, 
             member_email, 
-            member_type
+            member_type,
+            member_introduce
         )
         VALUES (
             #{member_login_id},
@@ -25,7 +26,8 @@ public interface MemberMapper {
             #{member_name},
             #{member_phone_number},
             #{member_email},
-            #{member_type}
+            #{member_type},
+            #{member_introduce}
         )
         """)
     @Options(useGeneratedKeys = true, keyProperty = "id")
@@ -58,7 +60,7 @@ public interface MemberMapper {
     String selectByLoginIdAndPassword(String memberLoginId, String password);
 
     @Select("""
-        SELECT id, member_login_id, member_name, member_phone_number, member_email, member_type,reg_time FROM member
+        SELECT id, member_login_id, member_name, member_phone_number, member_email, member_type,reg_time, member_introduce FROM member
         WHERE member_login_id = #{memberLoginId}
     """)
     MemberDto selectByMemberId(String memberLoginId);
@@ -98,7 +100,8 @@ public interface MemberMapper {
         member_login_id = #{member_login_id},
         member_name = #{member_name},
         member_phone_number = #{member_phone_number},
-        member_email = #{member_email}
+        member_email = #{member_email},
+        member_introduce = #{member_introduce}
         WHERE id = #{id}
     """)
     boolean editMember(EditMember member);
@@ -111,8 +114,40 @@ public interface MemberMapper {
     """)
     void editPasswordById(Long id, String memberPassword);
 
+    // user 인 회원 10명씩 조회
     @Select("""
+        <script>
         SELECT * FROM member WHERE member_type = 'user'
+        <if test="loginId != null and loginId != ''">
+            AND member_login_id = #{loginId}
+        </if>
+        <if test="name != null and name != ''">
+            AND member_name = #{name}
+        </if>
+        LIMIT #{from}, 10;
+        </script>
     """)
-    List<MemberDto> getAllMember();
+    List<MemberDto> getAllMember(Integer from, String loginId, String name);
+
+    // user 인 회원 숫 알기
+    @Select("""
+        <script>
+        SELECT COUNT(*) FROM member WHERE member_type = 'user'
+        <if test="loginId != null and loginId != ''">
+            AND member_login_id = #{loginId}
+        </if>
+        <if test="name != null and name != ''">
+            AND member_name = #{name}
+        </if>
+        </script>
+    """)
+    int countAllMember(String loginId, String name);
+
+
+    @Select("""
+        SELECT COUNT(*) 
+        FROM member 
+        WHERE member_email = #{memberEmail} 
+    """)
+    int checkUserEmail(String memberEmail);
 }

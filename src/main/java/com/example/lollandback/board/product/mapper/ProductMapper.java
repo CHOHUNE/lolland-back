@@ -43,12 +43,38 @@ public interface ProductMapper {
 
 
     @Select("""
-            SELECT *
-            FROM product
-            ORDER BY product_reg_time DESC
-            LIMIT #{from}, 10
-            """)
-    List<Product> list(Integer from);
+        <script>
+        SELECT 
+            p.product_id,
+            p.product_name,
+            p.product_content,
+            p.product_price,
+            p.total_stock,
+            p.average_rate,
+            p.product_reg_time,
+            p.category_id,
+            p.subcategory_id,
+            p.company_id,
+            p.member_id,
+            co.company_name
+        FROM product p JOIN company co 
+        ON p.company_id = co.company_id
+        WHERE p.product_status = 'none'
+        <if test="category == 'all'">
+            AND (p.product_name LIKE #{keyword} OR co.company_name LIKE #{keyword})
+        </if>
+        <if test="category == 'product_name'">
+            AND p.product_name LIKE #{keyword}
+        </if>
+        <if test="category == 'company_name'">
+            AND co.company_name LIKE #{keyword}
+        </if>
+        ORDER BY p.product_reg_time DESC
+        LIMIT #{from}, 16
+        </script>
+        """)
+    List<Product> list(Integer from, String keyword, String category);
+
 
     @Select("""
             SELECT *
@@ -89,4 +115,41 @@ public interface ProductMapper {
     WHERE product_id = #{product_id}
     """)
     int updateById(ProductUpdateDto productDto);
+
+    @Select("""
+        <script>
+        SELECT COUNT(*)
+        FROM product p JOIN company co 
+        ON p.company_id = co.company_id
+        WHERE p.product_status = 'none'
+            <trim prefix="AND (" suffix=")" prefixOverrides="OR">
+                <if test="category == 'all' or category == 'product_name'">
+                    OR p.product_name LIKE #{keyword}
+                </if>
+                <if test="category == 'all' or category == 'company_name'">
+                    OR co.company_name LIKE #{keyword}
+                </if>
+            </trim>
+        </script>
+        """)
+    int countAll(String keyword, String category);
+
+
+    @Update("""
+            UPDATE product
+            SET
+                product_status = 'delete'
+            WHERE product_id = #{product_id}
+            """)
+    int deleteById(Long product_id);
+
+    @Select("""
+            SELECT *
+            FROM category
+            WHERE category_id = #{category_id}
+            """)
+    List<Product> findByCategoryId(Long categoryId);
+
+
+
 }
