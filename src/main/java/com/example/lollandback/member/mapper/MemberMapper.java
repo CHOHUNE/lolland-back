@@ -1,5 +1,6 @@
 package com.example.lollandback.member.mapper;
 
+import com.example.lollandback.gameBoard.domain.GameBoard;
 import com.example.lollandback.member.domain.EditMember;
 import com.example.lollandback.member.domain.Member;
 import com.example.lollandback.member.dto.MemberDto;
@@ -116,16 +117,47 @@ public interface MemberMapper {
 
     // user 인 회원 10명씩 조회
     @Select("""
+        <script>
         SELECT * FROM member WHERE member_type = 'user'
+        <if test="loginId != null and loginId != ''">
+            AND member_login_id = #{loginId}
+        </if>
+        <if test="name != null and name != ''">
+            AND member_name = #{name}
+        </if>
         LIMIT #{from}, 10;
+        </script>
     """)
-    List<MemberDto> getAllMember(Integer from);
+    List<MemberDto> getAllMember(Integer from, String loginId, String name);
 
     // user 인 회원 숫 알기
     @Select("""
+        <script>
         SELECT COUNT(*) FROM member WHERE member_type = 'user'
+        <if test="loginId != null and loginId != ''">
+            AND member_login_id = #{loginId}
+        </if>
+        <if test="name != null and name != ''">
+            AND member_name = #{name}
+        </if>
+        </script>
     """)
-    int countAllMember();
+    int countAllMember(String loginId, String name);
 
 
+    @Select("""
+        SELECT COUNT(*) 
+        FROM member 
+        WHERE member_email = #{memberEmail} 
+    """)
+    int checkUserEmail(String memberEmail);
+
+    @Select("""
+        SELECT g.id, g.category, g.title, g.board_content
+        FROM gameboard  g 
+        JOIN gameboardlike gl 
+        ON g.id = gl.game_board_id 
+        WHERE gl.member_id = #{memberLoginId};
+    """)
+    List<GameBoard> getGameBoardLikeByLoginId(String memberLoginId);
 }

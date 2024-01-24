@@ -1,5 +1,8 @@
 package com.example.lollandback.member.service;
 
+import com.example.lollandback.gameBoard.domain.GameBoard;
+import com.example.lollandback.gameBoard.domain.Like;
+import com.example.lollandback.gameBoard.mapper.LikeMapper;
 import com.example.lollandback.member.domain.EditMemberAndAddress;
 import com.example.lollandback.member.domain.Member;
 import com.example.lollandback.member.domain.MemberAddress;
@@ -27,6 +30,7 @@ public class MemberService {
     private final MemberMapper mapper;
     private final MemberAddressMapper memberAddressMapper;
     private final MemberImageMapper memberImageMapper;
+    private final LikeMapper gameBoardLikeMapper;
 
     private final S3Client s3;
 
@@ -133,7 +137,7 @@ public class MemberService {
         mapper.editPasswordById(login.getId(), editPasswordDto.getMember_password());
     }
 
-    public Map<String, Object> getAllMember(Integer page) {
+    public Map<String, Object> getAllMember(Integer page, String loginId, String name) {
         // 프론트에 리턴할 정보들
         Map<String, Object> map = new HashMap<>();
 
@@ -141,29 +145,67 @@ public class MemberService {
         Map<String, Object> pageInfo = new HashMap<>();
 
         // 마지막 페이지를 정하기 위해 모든 회원 수를 조회 (user만)
-        int countUser = mapper.countAllMember();
+        int countUser = mapper.countAllMember(loginId, name);
+        //
         int lastPageNumber = (countUser - 1) / 10 + 1;
+
         // 시작 페이지
-        int startPageNumber = (page-1) / 10 * 10 + 1;
+        int startPageNumber = (page-1) / 5 * 5 + 1;
+
         // 마지막 페이지
-        int endPageNumber = startPageNumber + 9;
+        int endPageNumber = startPageNumber + 4;
         endPageNumber = Math.min(endPageNumber, lastPageNumber);
+        // 이전 페이지
+        int prevPageNumber = startPageNumber - 5;
+        // 다음 페이지
+        int nextPageNumber = endPageNumber + 1;
 
         pageInfo.put("startPageNumber", startPageNumber);
-        pageInfo.put("lastPageNumber", lastPageNumber);
+        pageInfo.put("endPageNumber", endPageNumber);
+        // 이전 버튼은 0보다 클때만
+        if (prevPageNumber > 0) {
+            pageInfo.put("prevPageNumber", prevPageNumber);
+        }
+        // 다음페이지 버튼은 마지막 페이지보다 작거나 같을때만
+        if (nextPageNumber <= lastPageNumber) {
+            pageInfo.put("nextPageNumber", nextPageNumber);
+        }
 
 
         // 프론트로부터 받은 페이지 넘버
         int from = (page - 1) * 10;
 
         // 모든 회원 정보
-        map.put("allMember", mapper.getAllMember(from));
+        map.put("allMember", mapper.getAllMember(from, loginId, name));
         map.put("pageInfo", pageInfo);
 
         return map;
     }
 
     public void deletedMemberByAdmin(Long id) {
+        // 회원 탈퇴전 주소 삭제
+        memberAddressMapper.deleteByMemberId(id);
+        // 회원 탈퇴
         mapper.deleteById(id);
+    }
+
+
+    public List<GameBoard> getGameBoardLike(Member login) {
+        return mapper.getGameBoardLikeByLoginId(login.getMember_login_id());
+    }
+
+    // 회원의 게임 게시글 좋아요 한 것 한개 삭제
+    public boolean deleteGameBoardLike(String memberLoginId, List<Integer> gameBoardId) {
+        Like like = new Like();
+
+        like.setMember_id(memberLoginId);
+        if (gameBoardId.size() > 0) {
+            for (int i = 0; i < gameBoardId.size(); i++) {
+                like.setGame_board_id(gameBoardId.get(i));
+                gameBoardLikeMapper.delete(like);
+            }
+            return true;
+        }
+        return false;
     }
 }

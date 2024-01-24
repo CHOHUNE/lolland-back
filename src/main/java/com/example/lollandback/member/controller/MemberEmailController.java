@@ -3,10 +3,8 @@ package com.example.lollandback.member.controller;
 import com.example.lollandback.member.dto.EmailSendCodeDto;
 import com.example.lollandback.member.service.MemberEmailService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,6 +31,17 @@ public class MemberEmailController {
     public void sendPasswordMail(@RequestBody EmailSendCodeDto emailSendCodeDto) {
 
         service.sendPasswordMail(emailSendCodeDto);
+    }
+
+    // 회원 가입시 이메일 체크
+    // 이미 가입된 이메일이 존재하면 badRequest를 던짐
+    @GetMapping("emailCheck")
+    public ResponseEntity checkUserEmail(@RequestParam String member_email) {
+        if(service.checkUserEmail(member_email)){
+            return ResponseEntity.badRequest().build();
+        } else {
+            return ResponseEntity.ok().build();
+        }
     }
 
 }

@@ -11,6 +11,11 @@ import java.util.List;
 
 @Mapper
 public interface GearFileMapper {
+
+    @Select("""
+                    select * from gearfile where id=#{id};
+    """)
+     GearFile selectByyId(Integer id) ;
 //    @Insert("""
 //            insert into gearfile (name, gearboard_id) values (#{gearboard_id},#{name});
 //            """)
@@ -32,4 +37,9 @@ public interface GearFileMapper {
                 delete from gearfile where gearboard_id=#{gear_id};
         """)
     int deleteByGearBoardId(Integer gear_id);
+
+    @Delete(""" 
+                delete from gearfile where  id=#{id};
+        """)
+    int deleteById(Integer id);
 }

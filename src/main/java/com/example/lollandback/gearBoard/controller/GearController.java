@@ -18,6 +18,17 @@ public class GearController {
 
 
     private final GearService service;
+// free
+    @GetMapping("best")
+    public List<GearBoard> listss(){
+        return service.listss();
+    }
+
+//today
+    @GetMapping("today")
+    public List<GearBoard> listto(){
+        return service.listto();
+    }
 
 
 @PostMapping("saves")
@@ -45,13 +56,14 @@ public ResponseEntity saves(  GearBoard gearBoard,
 
 
 
-
-
-
-//      .get("/api/gearboard/list?category=" + category)
     @GetMapping("list")
     public List<GearBoard> list(@RequestParam String category){
         return service.list(category);
+    }
+
+    @GetMapping("listAll")
+    public List<GearBoard> list(){
+    return service.listAll();
     }
 
 
@@ -69,12 +81,12 @@ public ResponseEntity saves(  GearBoard gearBoard,
     public  void saveup( GearBoard gearBoard,
                          @RequestParam(value = "removeFileIds[]",required = false) List<Integer> removeFilesIds,
                          @RequestParam(value = "uploadFiles[]",required = false) MultipartFile[] uploadFiles,
-                         @SessionAttribute(value = "login" ,required = false)Member login){
+                         @SessionAttribute(value = "login" ,required = false)Member login) throws IOException {
         System.out.println("removeFilesIds = " + removeFilesIds);
         System.out.println("uploadFiles = " + uploadFiles);
         System.out.println("login = " + login);
         System.out.println("gearBoard = " + gearBoard);
-        service.saveup(gearBoard);
+        service.saveup(gearBoard,removeFilesIds,uploadFiles);
     }
 
 

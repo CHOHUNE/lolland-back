@@ -1,5 +1,7 @@
 package com.example.lollandback.member.controller;
 
+import com.example.lollandback.gameBoard.domain.GameBoard;
+import com.example.lollandback.gameBoard.domain.Like;
 import com.example.lollandback.member.domain.EditMemberAndAddress;
 import com.example.lollandback.member.domain.Member;
 import com.example.lollandback.member.domain.MemberAndAddress;
@@ -33,7 +35,7 @@ public class MemberController {
     // 아이디 찾기
     @GetMapping("findId")
     public ResponseEntity findId(MemberDto memberDto) {
-            return service.findIdByNameAndEmail(memberDto.getMember_name(), memberDto.getMember_email());
+        return service.findIdByNameAndEmail(memberDto.getMember_name(), memberDto.getMember_email());
     }
 
     // 비밀번호 찾기
@@ -143,10 +145,12 @@ public class MemberController {
 
     // 회원 목록 전체 조회 (user인 사람들만)
     @GetMapping("listAll")
-    public Map<String, Object> getAllMember(@RequestParam(value = "page", defaultValue = "1") Integer page) {
+    public Map<String, Object> getAllMember(@RequestParam(value = "page", defaultValue = "1") Integer page,
+                                            @RequestParam(value = "id",required = false)String loginId,
+                                            @RequestParam(value = "name", required = false)String name) {
 
 
-        return service.getAllMember(page);
+        return service.getAllMember(page, loginId, name);
     }
 
     // 관리자가 탈퇴 회원 id 번호로 삭제하는 로직 (admin만 건드세요)
@@ -158,6 +162,23 @@ public class MemberController {
 
             return ResponseEntity.ok().build();
         }else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    // 회원이 좋아요 한 게임 게시글 목록 갖고 오기
+    @GetMapping("getGameBoardLike")
+    public List<GameBoard> getGameBoardLike(@SessionAttribute("login") Member login) {
+        return service.getGameBoardLike(login);
+    }
+
+    // 회원의 게임 게시글 좋아요 한 것 한개 삭제
+    @DeleteMapping("deleteGameBoardLike")
+    public ResponseEntity deleteGameBoardLike(@SessionAttribute("login")Member login,
+                                    @RequestBody List<Integer> gameBoardId ) {
+        if(service.deleteGameBoardLike(login.getMember_login_id(), gameBoardId)){
+            return ResponseEntity.ok().build();
+        } else {
             return ResponseEntity.badRequest().build();
         }
     }
