@@ -112,16 +112,6 @@ public class GameBoardController {
         }
     }
 
-//    알람 부분 ->
-    private final NotificationService notificationService;
-    public static Map<String, SseEmitter> sseEmitters = new ConcurrentHashMap<>();
 
-    @GetMapping("/notification/")
-    public SseEmitter notification (HttpServletRequest request,@SessionAttribute(value="login",required = false) Member login){
-        String userId = login.getMember_login_id();
-        SseEmitter sseEmitter = notificationService.subscribe(userId);
-
-        return sseEmitter;
-    }
 
 }
