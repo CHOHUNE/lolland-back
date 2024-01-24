@@ -96,20 +96,22 @@ public class ReviewController {
     //선택된 리뷰 삭제
     @DeleteMapping("/delete/selected")
     public ResponseEntity deleteSelected(@RequestBody List<Long> review_ids) {
+        System.out.println("review_ids = " + review_ids);
         try {
             reviewService.deleteSelectedReviews(review_ids);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             System.out.println("선택한 리뷰 삭제 중 에러 발생: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     //해당 멤버의 모든 리뷰 삭제
-    @DeleteMapping("/delete/{member_id}")
-    public ResponseEntity deleteAll(@PathVariable Long member_id) {
+    @DeleteMapping("/delete/all")
+    public ResponseEntity deleteAll(@SessionAttribute("login") Member login) {
         try {
-            reviewService.deleteAllReviewsByMember(member_id);
+            reviewService.deleteAllReviewsByMember(login.getId());
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             System.out.println("멤버의 리뷰 삭제 중 에러 발생: " + e.getMessage());

@@ -78,8 +78,8 @@ public class ReviewService {
 
     @Transactional
     public void deleteSelectedReviews(List<Long> reviewIds) {
-        reviewMapper.deleteSelectedReviews(reviewIds);
         List<Long> productIds = reviewMapper.getProductIdsByReview(reviewIds);
+        reviewMapper.deleteSelectedReviews(reviewIds);
         int updatedRows = reviewMapper.updateAvgRateOfProducts(productIds);
         if(updatedRows == productIds.size()) {
             System.out.println("모든 상품 평점 업데이트 완료");

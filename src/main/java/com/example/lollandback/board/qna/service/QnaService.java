@@ -5,7 +5,6 @@ import com.example.lollandback.board.qna.domain.Question;
 import com.example.lollandback.board.qna.dto.*;
 import com.example.lollandback.board.qna.mapper.QnaMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -146,5 +145,23 @@ public class QnaService {
         map.put("pageInfo", pageInfo);
 
         return map;
+    }
+
+    @Transactional
+    public void deleteSelectedQuestions(List<Long> questionIds) {
+        List<Long> answerIds = qnaMapper.getAllAnswersByQuestions(questionIds);
+        if(!answerIds.isEmpty()) {
+            qnaMapper.deleteSelectedAnswers(answerIds);
+        }
+        qnaMapper.deleteSelectedQuestions(questionIds);
+    }
+
+    @Transactional
+    public void deleteAllQuestions(Long memberId) {
+        List<Long> answerIds = qnaMapper.getAllAnswerByMember(memberId);
+        if(!answerIds.isEmpty()) {
+            qnaMapper.deleteSelectedAnswers(answerIds);
+        }
+        qnaMapper.deleteQuestionsByMember(memberId);
     }
 }

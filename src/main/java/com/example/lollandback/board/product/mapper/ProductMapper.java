@@ -1,6 +1,9 @@
 package com.example.lollandback.board.product.mapper;
 
+import com.example.lollandback.board.product.domain.Category;
+import com.example.lollandback.board.product.domain.Company;
 import com.example.lollandback.board.product.domain.Product;
+import com.example.lollandback.board.product.domain.SubCategory;
 import com.example.lollandback.board.product.dto.CategoryDto;
 import com.example.lollandback.board.product.dto.ProductUpdateDto;
 import com.example.lollandback.board.product.dto.SubCategoryDto;
@@ -145,11 +148,48 @@ public interface ProductMapper {
 
     @Select("""
             SELECT *
-            FROM category
-            WHERE category_id = #{category_id}
+            FROM product p JOIN category c ON p.category_id = c.category_id
+            WHERE p.category_id = #{category_id} AND p.product_status = 'none'
             """)
     List<Product> findByCategoryId(Long categoryId);
 
+    @Select("""
+        SELECT *
+        FROM product p
+        JOIN category c ON p.category_id = c.category_id
+        JOIN subcategory sub ON p.subcategory_id = sub.subcategory_id
+        WHERE p.category_id = #{category_id} 
+        AND p.subcategory_id = #{subcategory_id}
+        AND p.product_status = 'none'
+    """)
+    List<Product> findByCategoryIdAndSubcategoryId(Long category_id, Long subcategory_id);
 
 
+    @Select("""
+        SELECT *
+        FROM category
+        WHERE category_id = #{categoryId}
+    """)
+    Category getCategoryById(Long categoryId);
+
+    @Select("""
+        SELECT *
+        FROM subcategory
+        WHERE category_id = #{categoryId}
+    """)
+    List<SubCategoryDto> getSubcategoryById(Long categoryId);
+
+    @Select("""
+        SELECT *
+        FROM category
+    """)
+    List<Category> getAllCategories();
+
+    @Select("""
+        SELECT DISTINCT c.company_id, c.company_name
+        FROM company c
+        RIGHT JOIN product p ON p.company_id = c.company_id
+        WHERE p.category_id = #{categoryId} AND p.subcategory_id = #{subcategoryId} AND p.product_status = "none"
+    """)
+    List<Company> getAllCompanies(Long categoryId, Long subcategoryId);
 }

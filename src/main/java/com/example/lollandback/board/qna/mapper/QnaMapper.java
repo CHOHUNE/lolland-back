@@ -192,4 +192,51 @@ public interface QnaMapper {
     void deleteAnswerByProduct(Long product_id);
 
 
+    @Select("""
+        <script>
+            SELECT answer_id
+            FROM answer
+            WHERE question_id IN
+            <foreach collection="questionIds" item="question_id" open="(" seperator="," close=")">
+                #{question_id}
+            </foreach>
+        </script>
+    """)
+    List<Long> getAllAnswersByQuestions(List<Long> questionIds);
+
+    @Delete("""
+        <script>
+            DELETE FROM answer
+            WHERE answer_id IN
+            <foreach collection="answerIds" item="answerId" open="(" separator="," close=")">
+                #{answerId}
+            </foreach>
+        </script>
+    """)
+    void deleteSelectedAnswers(List<Long> answerIds);
+
+    @Delete("""
+        <script>
+            DELETE FROM question
+            WHERE question_id IN
+            <foreach collection="questionIds" item="question_id" open="(" separator="," close=")">
+                #{question_id}
+            </foreach>
+        </script>
+    """)
+    void deleteSelectedQuestions(List<Long> questionIds);
+
+    @Select("""
+        SELECT a.answer_id
+        FROM answer a 
+        RIGHT JOIN question q ON a.question_id = q.question_id
+        WHERE q.member_id = #{memberId}
+    """)
+    List<Long> getAllAnswerByMember(Long memberId);
+
+    @Delete("""
+        DELETE FROM question
+        WHERE member_id = #{memberId}
+    """)
+    void deleteQuestionsByMember(Long memberId);
 }
