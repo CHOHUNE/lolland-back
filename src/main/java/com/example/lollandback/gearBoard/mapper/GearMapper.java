@@ -59,27 +59,37 @@ public interface GearMapper {
 
 
     @Select("""
-               SELECT
-    b.gear_id,
-    b.gear_title,
-    b.gear_content,
-    b.category,
-    b.gear_inserted,
-    b.gear_views,
-    COUNT(DISTINCT f.id) AS countFile,
-    COUNT(DISTINCT c.id) AS commnetcount,
-    COUNT(DISTINCT l.id) AS countLike
-FROM
-    gearboard b
-        LEFT JOIN
-    lolland.gearfile f ON b.gear_id = f.gearboard_id
-        LEFT JOIN
-    lolland.gearcomment c ON b.gear_id = c.boardid
-        LEFT JOIN
-    lolland.gearlike l ON b.gear_id = l.gearboardId
-where b.gear_id=#{gear_id}
-GROUP BY
-    b.gear_id
+             
+             SELECT
+                 b.gear_id,
+                 b.gear_title,
+                 b.gear_content,
+                 b.category,
+                 b.gear_inserted,
+                 b.gear_views,
+                 COUNT(DISTINCT f.id) AS countFile,
+                 COUNT(DISTINCT c.id) AS commentcount,
+                 COUNT(DISTINCT l.id) AS countLike,
+                 m.member_introduce,
+                 m.member_name,
+                 m.id AS member_id,
+                 mi.file_name,
+                 mi.file_url
+             FROM
+                 gearboard b
+                     LEFT JOIN
+                 lolland.gearfile f ON b.gear_id = f.gearboard_id
+                     LEFT JOIN
+                 lolland.gearcomment c ON b.gear_id = c.boardid
+                     LEFT JOIN
+                 lolland.gearlike l ON b.gear_id = l.gearboardId
+                     JOIN
+                 member m ON b.member_id = m.member_login_id
+                     LEFT JOIN
+                 memberimage mi ON m.id = mi.member_id
+             where b.gear_id=#{gear_id}
+             GROUP BY
+                 b.gear_id;
         """)
     GearBoard getId(Integer gear_id);
 

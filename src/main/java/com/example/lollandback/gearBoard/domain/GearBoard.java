@@ -21,8 +21,13 @@ public class  GearBoard {
    private Integer countFile;
 
    private Integer countLike;
-
+        private  String member_name;
+        private  String  member_introduce;
     private String member_id;
+
+    private  String file_name;
+    private String file_url;
+
 
     private List<GearFile> files;
 
