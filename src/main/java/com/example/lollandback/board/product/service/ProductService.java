@@ -2,10 +2,7 @@ package com.example.lollandback.board.product.service;
 
 import com.example.lollandback.board.like.service.ProductLikeService;
 import com.example.lollandback.board.product.domain.*;
-import com.example.lollandback.board.product.dto.CategoryDto;
-import com.example.lollandback.board.product.dto.ProductDto;
-import com.example.lollandback.board.product.dto.ProductOptionsDto;
-import com.example.lollandback.board.product.dto.ProductUpdateDto;
+import com.example.lollandback.board.product.dto.*;
 import com.example.lollandback.board.product.mapper.*;
 import com.example.lollandback.board.review.mapper.ReviewMapper;
 import com.example.lollandback.member.domain.Member;
@@ -348,13 +345,32 @@ public class ProductService {
         return product;
     }
 
-    public List<Product> findProductsBySubCategory(Long subcategoryId) {
-        List<Product> product = mainImgMapper.selectNamesBySubCategoryId(subcategoryId);
+    public List<Product> findProductsBySubCategory(Long category_id, Long subcategory_id) {
+        List<Product> product = productMapper.findByCategoryIdAndSubcategoryId(category_id, subcategory_id);
         product.forEach(productListImg -> {
             List<ProductImg> productsImg = mainImgMapper.selectNamesByCategoryId(productListImg.getProduct_id());
             productsImg.forEach(img -> img.setMain_img_uri(urlPrefix + "lolland/product/productMainImg/" + productListImg.getProduct_id() + "/" + img.getMain_img_uri()));
             productListImg.setMainImgs(productsImg);
         });
         return product;
+    }
+
+    public CategoryDetailDto getCategoryDetails(Long categoryId) {
+        Category category = productMapper.getCategoryById(categoryId);
+        List<SubCategoryDto> subcategories = productMapper.getSubcategoryById(categoryId);
+        CategoryDetailDto dto = new CategoryDetailDto(category, subcategories);
+        return dto;
+    }
+
+    public SubcategoryNavDto getSubcategoryNav(Long categoryId, Long subcategoryId) {
+        // 전체 카테고리 가져오기
+        List<Category> categories = productMapper.getAllCategories();
+        // 해당 카테고리 > 서브 카테고리 상품들의 distinct company 전부 가져오기
+        List<Company> companies = productMapper.getAllCompanies(categoryId, subcategoryId);
+        // 현재 카테고리 이름, 현재 서브 카테고리 이름 가져오기
+        String category_name = productMapper.categoryById(categoryId);
+        String subcategory_name = productMapper.subCategoryById(subcategoryId);
+
+        return new SubcategoryNavDto(categories, companies, category_name, subcategory_name);
     }
 }

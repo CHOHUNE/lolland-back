@@ -24,10 +24,24 @@ public class ProductController {
 
     private final ProductService productService;
 
-    // --------------------------- 상품 등록 시 카테고리 보여주는 로직 ---------------------------
-    @GetMapping("/write")
+    // --------------------------- 상품 등록 & 네브 바에 카테고리, 서브 카테고리 불러오는 로직 ---------------------------
+    @GetMapping("/category")
     public List<CategoryDto> getCategories() {
         return productService.getAllCategories();
+    }
+
+    // --------------------------- 카테고리와 해당 카테고리의 서브카테고리 리턴하는 로직 ---------------------------
+
+    @GetMapping("/category/detail/{category_id}")
+    public CategoryDetailDto getCategoryInfo(@PathVariable Long category_id) {
+        return productService.getCategoryDetails(category_id);
+    }
+
+    // --------------------------- 서브 카테고리 페이지 사이드 바에 필요한 정보 리턴 ---------------------------
+
+    @GetMapping("/subcategory/detail/{category_id}/{subcategory_id}")
+    public SubcategoryNavDto getSubcategoryNav(@PathVariable Long category_id, @PathVariable Long subcategory_id) {
+        return productService.getSubcategoryNav(category_id, subcategory_id);
     }
 
     // --------------------------- 상품 등록 로직 ---------------------------
@@ -106,11 +120,13 @@ public class ProductController {
 
 
     @GetMapping("/category/{category_id}/{subcategory_id}")
-    public ResponseEntity<List<Product>> getSubCategoryById(@PathVariable Long subcategory_id) {
-        List<Product> subproducts = productService.findProductsBySubCategory(subcategory_id);
+    public ResponseEntity<List<Product>> getSubCategoryById(@PathVariable Long category_id, @PathVariable Long subcategory_id) {
+        List<Product> subproducts = productService.findProductsBySubCategory(category_id, subcategory_id);
         if (subproducts == null || subproducts.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(subproducts);
+        //TODO: getSubCategoryById, getCategoryById의 상품 목록을 프론트로 리턴할 때 products로 통일해주세요 ex. map.put("products", products)
+
     }
 }
