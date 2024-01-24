@@ -24,7 +24,7 @@ public class ProductController {
 
     private final ProductService productService;
 
-    // --------------------------- 상품 등록 & 네브 바에 카테고리, 서브 카테고리 불러오는 로직 ---------------------------
+    // --------------------------- 상품 등록 & 네브 바에 카테고리 - 그에 해당하는 서브 카테고리 불러오는 로직 ---------------------------
     @GetMapping("/category")
     public List<CategoryDto> getCategories() {
         return productService.getAllCategories();
@@ -66,9 +66,15 @@ public class ProductController {
     public Map<String, Object> list(@RequestParam(value = "p", defaultValue = "1") Integer page,
                                     @RequestParam(value = "k", defaultValue = "") String keyword,
                                     @RequestParam(value = "c", defaultValue = "all") String category) {
-
-
         return productService.list(page, keyword, category);
+    }
+
+    @GetMapping("company")
+    public Map<String, Object> list(@RequestParam(value = "p", defaultValue = "1") Integer page,
+                                    @RequestParam(value = "k", defaultValue = "") String keyword,
+                                    @RequestParam(value = "c", defaultValue = "all") String category,
+                                    @RequestParam(value = "company_id", defaultValue = "all") Long company_id) {
+        return productService.companyList(page, keyword, category, company_id);
     }
 
     // --------------------------- 상품 보기 로직 ---------------------------
