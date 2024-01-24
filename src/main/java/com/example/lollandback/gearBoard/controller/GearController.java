@@ -18,6 +18,17 @@ public class GearController {
 
 
     private final GearService service;
+// free
+    @GetMapping("best")
+    public List<GearBoard> listss(){
+        return service.listss();
+    }
+
+//today
+    @GetMapping("today")
+    public List<GearBoard> listto(){
+        return service.listto();
+    }
 
 
 @PostMapping("saves")

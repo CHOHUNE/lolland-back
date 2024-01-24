@@ -112,5 +112,65 @@ ORDER BY
 
         """)
     List<GearBoard> listAll();
+
+    @Select("""
+        SELECT
+    b.gear_id,
+    b.gear_title,
+    b.gear_content,
+    b.category,
+    b.gear_inserted,
+    b.gear_views,
+    COUNT(DISTINCT f.id) AS countFile,
+    COUNT(DISTINCT c.id) AS commentCount,
+    COUNT(DISTINCT l.id) AS countLike
+FROM
+    gearboard b
+        LEFT JOIN
+    lolland.gearfile f ON b.gear_id = f.gearboard_id
+        LEFT JOIN
+    lolland.gearcomment c ON b.gear_id = c.boardid
+        LEFT JOIN
+    lolland.gearlike l ON b.gear_id = l.gearboardId
+-- WHERE
+--         b.category = #{category}
+GROUP BY
+    b.gear_id
+ORDER BY
+    countLike desc 
+LIMIT 5;
+        """)
+    List<GearBoard> listss();
+
+
+    @Select("""
+        SELECT
+    b.gear_id,
+    b.gear_title,
+    b.gear_content,
+    b.category,
+    b.gear_inserted,
+    b.gear_views,
+    COUNT(DISTINCT f.id) AS countFile,
+    COUNT(DISTINCT c.id) AS commentCount,
+    COUNT(DISTINCT l.id) AS countLike
+FROM
+    gearboard b
+        LEFT JOIN
+    lolland.gearfile f ON b.gear_id = f.gearboard_id
+        LEFT JOIN
+    lolland.gearcomment c ON b.gear_id = c.boardid
+        LEFT JOIN
+    lolland.gearlike l ON b.gear_id = l.gearboardId
+-- WHERE
+--         b.category = #{category}
+GROUP BY
+    b.gear_id
+ORDER BY
+    b.gear_inserted desc
+LIMIT 5;
+
+        """)
+    List<GearBoard> listto();
 }
 

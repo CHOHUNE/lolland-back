@@ -165,4 +165,12 @@ public class GearService {
     public List<GearBoard> listAll() {
       return   mapper.listAll();
     }
+
+    public List<GearBoard> listss() {
+        return  mapper.listss();
+    }
+
+    public List<GearBoard> listto() {
+        return  mapper.listto();
+    }
 }
