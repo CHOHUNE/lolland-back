@@ -195,15 +195,17 @@ public class MemberService {
     }
 
     // 회원의 게임 게시글 좋아요 한 것 한개 삭제
-    public boolean deleteGameBoardLike(String memberLoginId, Integer gameBoardId) {
+    public boolean deleteGameBoardLike(String memberLoginId, List<Integer> gameBoardId) {
         Like like = new Like();
 
         like.setMember_id(memberLoginId);
-        like.setGame_board_id(gameBoardId);
-        if (gameBoardLikeMapper.delete(like)==1) {
+        if (gameBoardId.size() > 0) {
+            for (int i = 0; i < gameBoardId.size(); i++) {
+                like.setGame_board_id(gameBoardId.get(i));
+                gameBoardLikeMapper.delete(like);
+            }
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 }

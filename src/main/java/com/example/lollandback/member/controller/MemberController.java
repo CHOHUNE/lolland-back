@@ -175,7 +175,7 @@ public class MemberController {
     // 회원의 게임 게시글 좋아요 한 것 한개 삭제
     @DeleteMapping("deleteGameBoardLike")
     public ResponseEntity deleteGameBoardLike(@SessionAttribute("login")Member login,
-                                    @RequestParam Integer gameBoardId ) {
+                                    @RequestBody List<Integer> gameBoardId ) {
         if(service.deleteGameBoardLike(login.getMember_login_id(), gameBoardId)){
             return ResponseEntity.ok().build();
         } else {
