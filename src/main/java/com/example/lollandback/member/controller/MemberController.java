@@ -1,5 +1,7 @@
 package com.example.lollandback.member.controller;
 
+import com.example.lollandback.gameBoard.domain.GameBoard;
+import com.example.lollandback.gameBoard.domain.Like;
 import com.example.lollandback.member.domain.EditMemberAndAddress;
 import com.example.lollandback.member.domain.Member;
 import com.example.lollandback.member.domain.MemberAndAddress;
@@ -160,6 +162,23 @@ public class MemberController {
 
             return ResponseEntity.ok().build();
         }else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    // 회원이 좋아요 한 게임 게시글 목록 갖고 오기
+    @GetMapping("getGameBoardLike")
+    public List<GameBoard> getGameBoardLike(@SessionAttribute("login") Member login) {
+        return service.getGameBoardLike(login);
+    }
+
+    // 회원의 게임 게시글 좋아요 한 것 한개 삭제
+    @DeleteMapping("deleteGameBoardLike")
+    public ResponseEntity deleteGameBoardLike(@SessionAttribute("login")Member login,
+                                    @RequestBody List<Integer> gameBoardId ) {
+        if(service.deleteGameBoardLike(login.getMember_login_id(), gameBoardId)){
+            return ResponseEntity.ok().build();
+        } else {
             return ResponseEntity.badRequest().build();
         }
     }

@@ -32,4 +32,6 @@ public class Member {
     private String member_email;
     private String member_type;
     private String member_introduce;
+
+
 }

@@ -1,5 +1,8 @@
 package com.example.lollandback.member.service;
 
+import com.example.lollandback.gameBoard.domain.GameBoard;
+import com.example.lollandback.gameBoard.domain.Like;
+import com.example.lollandback.gameBoard.mapper.LikeMapper;
 import com.example.lollandback.member.domain.EditMemberAndAddress;
 import com.example.lollandback.member.domain.Member;
 import com.example.lollandback.member.domain.MemberAddress;
@@ -18,6 +21,7 @@ import org.springframework.web.context.request.WebRequest;
 import software.amazon.awssdk.services.s3.S3Client;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -26,6 +30,7 @@ public class MemberService {
     private final MemberMapper mapper;
     private final MemberAddressMapper memberAddressMapper;
     private final MemberImageMapper memberImageMapper;
+    private final LikeMapper gameBoardLikeMapper;
 
     private final S3Client s3;
 
@@ -185,4 +190,22 @@ public class MemberService {
     }
 
 
+    public List<GameBoard> getGameBoardLike(Member login) {
+        return mapper.getGameBoardLikeByLoginId(login.getMember_login_id());
+    }
+
+    // 회원의 게임 게시글 좋아요 한 것 한개 삭제
+    public boolean deleteGameBoardLike(String memberLoginId, List<Integer> gameBoardId) {
+        Like like = new Like();
+
+        like.setMember_id(memberLoginId);
+        if (gameBoardId.size() > 0) {
+            for (int i = 0; i < gameBoardId.size(); i++) {
+                like.setGame_board_id(gameBoardId.get(i));
+                gameBoardLikeMapper.delete(like);
+            }
+            return true;
+        }
+        return false;
+    }
 }
