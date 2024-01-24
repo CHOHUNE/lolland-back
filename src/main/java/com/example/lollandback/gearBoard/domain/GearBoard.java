@@ -1,6 +1,5 @@
 package com.example.lollandback.gearBoard.domain;
 
-import com.example.lollandback.gameBoard.domain.GameBoardFile;
 import lombok.Data;
 
 import java.time.LocalDateTime;
