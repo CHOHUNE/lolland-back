@@ -140,13 +140,18 @@ public class GameBoardService {
             addCookie("board_"+id,"viewed");
         }
 
-
 //      게시물, 파일 조회 부분
         GameBoard gameBoard = mapper.selectById(id);
         List<GameBoardFile> boardFiles = fileMapper.selectNamesBygameboardId(id);
         gameBoard.setFiles(boardFiles);
 
         return gameBoard;
+    }
+
+    public GameBoard getOnlyGameBoard(Integer id) {
+        GameBoard gameBoard = mapper.selectById(id);
+        return gameBoard;
+
     }
 
     public String getCookieValue(String cookieName) {

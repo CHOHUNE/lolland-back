@@ -17,7 +17,7 @@ import java.util.Base64;
 @Slf4j
 @RestController
 @RequestMapping("/api/gameboard")
-public class NaverNewController {
+public class NaverNews {
 
     @Value("${naver.client.id}")
     private String naverClientId;

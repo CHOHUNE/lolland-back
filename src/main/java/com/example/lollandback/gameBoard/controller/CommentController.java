@@ -3,6 +3,7 @@ package com.example.lollandback.gameBoard.controller;
 
 import com.example.lollandback.gameBoard.domain.Comment;
 import com.example.lollandback.gameBoard.service.CommentService;
+import com.example.lollandback.gameBoard.service.NotificationService;
 import com.example.lollandback.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,15 +18,19 @@ import java.util.List;
 public class
 CommentController {
     private final CommentService commentService;
+    private final NotificationService notificationService;
 
-    @PostMapping("add")
-    public ResponseEntity add(@RequestBody Comment comment,@SessionAttribute(value="login",required = false) Member login) {
+    @PostMapping("add/{postId}")
+    public ResponseEntity add(@RequestBody Comment comment,
+                              @SessionAttribute(value="login",required = false) Member login,
+                              @PathVariable Integer postId) {
 
         if (login == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         if (commentService.validate(comment)) {
             if (commentService.add(comment,login)) {
+                notificationService.notifyComment(postId);
                 return ResponseEntity.ok().build();
             } else {
                 return ResponseEntity.internalServerError().build();
