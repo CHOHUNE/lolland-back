@@ -161,4 +161,11 @@ public interface MemberMapper {
         LIMIT #{from}, 10
     """)
     List<GameBoard> getGameBoardLikeByLoginId(String memberLoginId, Integer from);
+
+    @Select("""
+        SELECT COUNT(*) 
+        FROM gameboardlike 
+        WHERE member_id = #{memberLoginId}
+    """)
+    int countAllGameBoardLikeByLoginId(String memberLoginId);
 }
