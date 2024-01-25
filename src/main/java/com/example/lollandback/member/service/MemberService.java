@@ -209,8 +209,19 @@ public class MemberService {
         int endPageNumber = startPageNumber + 4;
         endPageNumber = Math.min(endPageNumber, lastPageNumber);
 
+        // 이전 버튼
+        int prevPageNumber = (startPageNumber - 10);
+        // 다음 버튼
+        int nextPageNumber = endPageNumber + 1;
+
         pageInfo.put("startPageNumber", startPageNumber);
         pageInfo.put("endPageNumber", endPageNumber);
+        if(prevPageNumber > 0) {
+            pageInfo.put("prevPageNumber", prevPageNumber);
+        }
+        if(nextPageNumber <= lastPageNumber) {
+            pageInfo.put("nextPageNumber", nextPageNumber);
+        }
 
         map.put("gameBoardLikeList",mapper.getGameBoardLikeByLoginId(login.getMember_login_id(), from));
         map.put("pageInfo", pageInfo);
