@@ -1,6 +1,5 @@
 package com.example.lollandback.member.service;
 
-import com.example.lollandback.gameBoard.domain.GameBoard;
 import com.example.lollandback.gameBoard.domain.Like;
 import com.example.lollandback.gameBoard.mapper.LikeMapper;
 import com.example.lollandback.member.domain.EditMemberAndAddress;
@@ -190,7 +189,7 @@ public class MemberService {
     }
 
 
-    public Map<String, Object> getGameBoardLike(Member login, Integer page) {
+    public Map<String, Object> getGameBoardLike(Member login, Integer page, String categoryType) {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> pageInfo = new HashMap<>();
 
@@ -198,7 +197,7 @@ public class MemberService {
         int from = (page -1) * 10;
 
         // 좋아요 한 게임 게시글 갯수
-        int countAll = mapper.countAllGameBoardLikeByLoginId(login.getMember_login_id());
+        int countAll = mapper.countAllGameBoardLikeByLoginId(login.getMember_login_id(), categoryType);
 
         // 좋아요 한 게시글의 최종 마지막 페이지 번호
         int lastPageNumber = (countAll - 1 ) / 10 + 1;
@@ -223,7 +222,7 @@ public class MemberService {
             pageInfo.put("nextPageNumber", nextPageNumber);
         }
 
-        map.put("gameBoardLikeList",mapper.getGameBoardLikeByLoginId(login.getMember_login_id(), from));
+        map.put("gameBoardLikeList",mapper.getGameBoardLikeByLoginId(login.getMember_login_id(), from, categoryType));
         map.put("pageInfo", pageInfo);
 
         return map;

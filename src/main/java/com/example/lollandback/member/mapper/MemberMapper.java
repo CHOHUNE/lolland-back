@@ -153,19 +153,31 @@ public interface MemberMapper {
     int checkUserEmail(String memberEmail);
 
     @Select("""
-        SELECT g.id, g.category, g.title, g.board_content
+        <script>
+            SELECT g.id, g.category, g.title, g.board_content
+            FROM gameboard  g 
+            JOIN gameboardlike gl 
+            ON g.id = gl.game_board_id 
+            WHERE gl.member_id = #{memberLoginId} 
+            <if test='categoryType != \"전체\"'>
+                AND g.category = #{categoryType}
+            </if>
+            LIMIT #{from}, 10
+        </script>
+    """)
+    List<GameBoard> getGameBoardLikeByLoginId(String memberLoginId, Integer from, String categoryType);
+
+    @Select("""
+        <script>
+        SELECT COUNT(*) 
         FROM gameboard  g 
         JOIN gameboardlike gl 
         ON g.id = gl.game_board_id 
         WHERE gl.member_id = #{memberLoginId}
-        LIMIT #{from}, 10
+        <if test='categoryType != \"전체\"'> 
+            AND g.category = #{categoryType}
+        </if>
+        </script>
     """)
-    List<GameBoard> getGameBoardLikeByLoginId(String memberLoginId, Integer from);
-
-    @Select("""
-        SELECT COUNT(*) 
-        FROM gameboardlike 
-        WHERE member_id = #{memberLoginId}
-    """)
-    int countAllGameBoardLikeByLoginId(String memberLoginId);
+    int countAllGameBoardLikeByLoginId(String memberLoginId, String categoryType);
 }
