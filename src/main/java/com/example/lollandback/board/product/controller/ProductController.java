@@ -44,6 +44,13 @@ public class ProductController {
         return productService.getSubcategoryNav(category_id, subcategory_id);
     }
 
+    // --------------------------- 회사별 페이지 사이드 바에 필요한 정보 리턴 ---------------------------
+
+    @GetMapping("/company/detail/{company_id}")
+    public CompanyNavDto getCompanyNav(@PathVariable Long company_id) {
+        return productService.getCompanyNav(company_id);
+    }
+
     // --------------------------- 상품 등록 로직 ---------------------------
     @PostMapping("add")
     public ResponseEntity add(Product product, Company company,

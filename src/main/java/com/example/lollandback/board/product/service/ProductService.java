@@ -1,6 +1,7 @@
 package com.example.lollandback.board.product.service;
 
 import com.example.lollandback.board.like.service.ProductLikeService;
+import com.example.lollandback.board.product.controller.CompanyNavDto;
 import com.example.lollandback.board.product.domain.*;
 import com.example.lollandback.board.product.dto.*;
 import com.example.lollandback.board.product.mapper.*;
@@ -18,6 +19,7 @@ import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +70,7 @@ public class ProductService {
             companyId = companyMapper.getCompanyIdByName(company.getCompany_name());
         }
 
-        // 제조사 정보 저장
+        // 제조사 Id 저장
         product.setCompany_id(companyId);
         if (optionList != null) {
             for (ProductOptionsDto productOptionsDto : optionList) {
@@ -418,5 +420,26 @@ public class ProductService {
         map.put("product", product);
         map.put("pageInfo", pageInfo);
         return map;
+    }
+
+    public CompanyNavDto getCompanyNav(Long companyId) {
+        // 회사명
+        String companyName = companyMapper.selectById(companyId).getCompany_name();
+        // 회사 상품의 평균 평점
+        Double avgRate = productMapper.getAvgRateOfCompany(companyId);
+        // 회사 상품의 총 리뷰
+        Integer totalReview = companyMapper.getTotalReview(companyId);
+        // 회사가 파는 대분류
+        List<Category> categories = companyMapper.getCompanyCategory(companyId);
+        // CategoryDto 저장할 리스트 생성
+        List<CategoryDto> categoryDtoList = new ArrayList<>();
+        // 해당 대분류의 소분류
+        for(Category category : categories) {
+            List<SubCategoryDto> subcategory = companyMapper.getSubCategoryByCompany(companyId);
+            CategoryDto categoryDto = new CategoryDto(category, subcategory);
+            categoryDtoList.add(categoryDto);
+        }
+
+        return new CompanyNavDto(companyName, avgRate, totalReview, categoryDtoList);
     }
 }

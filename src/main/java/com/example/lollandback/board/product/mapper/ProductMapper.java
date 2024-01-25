@@ -214,8 +214,8 @@ public interface ProductMapper {
         <if test="category == 'all'">
             AND (p.product_name LIKE #{keyword} OR co.company_name LIKE #{keyword})
         </if>
-        <if test="category == 'product_name'">
-            AND p.product_name LIKE #{keyword}
+        <if test="category == 'subcategory'">
+            AND p.subcategory_id LIKE #{keyword}
         </if>
         <if test="category == 'company_name'">
             AND co.company_name LIKE #{keyword}
@@ -240,4 +240,11 @@ public interface ProductMapper {
         </script>
         """)
     int countAllCompany(String keyword, String category, Long companyId);
+
+    @Select("""
+        SELECT AVG(average_rate)
+        FROM product
+        WHERE company_id = #{companyId}
+    """)
+    Double getAvgRateOfCompany(Long companyId);
 }
