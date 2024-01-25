@@ -335,11 +335,11 @@ public class ProductService {
     }
 
     // --------------------------- 대분류 카테고리 리스트 & 페이징 ---------------------------!!
-    public Map<String, Object> findProductsByCategoryId(Long categoryId, Integer page, Category category) {
+    public Map<String, Object> findProductsByCategoryId(Long categoryId, Integer page) {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> pageInfo = new HashMap<>();
 
-        int countAll = productMapper.countCategoryProductAll(category);
+        int countAll = productMapper.countCategoryProductAll(categoryId);
         int lastPageNumber = (countAll - 1) / 3 + 1;
         int startPageNumber = (page - 1) / 3 * 3 + 1;
         int endPageNumber = startPageNumber + 2;
@@ -363,11 +363,11 @@ public class ProductService {
     }
 
     // --------------------------- 소분류 서브카테고리 리스트 & 페이징 ---------------------------
-    public List<Product> findProductsBySubCategory(Long category_id, Long subcategory_id, Integer page) {
+    public Map<String, Object> findProductsBySubCategory(Long category_id, Long subcategory_id, Integer page) {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> pageInfo = new HashMap<>();
 
-        int countAll = productMapper.countSubCategoryProductAll();
+        int countAll = productMapper.countSubCategoryProductAll(category_id, subcategory_id);
 
         int lastPageNumber = (countAll - 1) / 3 + 1;
         int startPageNumber = (page - 1) / 3 * 3 + 1;
@@ -379,13 +379,17 @@ public class ProductService {
 
         int from = (page - 1) * 3;
 
-        List<Product> product = productMapper.findByCategoryIdAndSubcategoryId(category_id, subcategory_id, from);
-        product.forEach(productListImg -> {
+        List<Product> products = productMapper.findByCategoryIdAndSubcategoryId(category_id, subcategory_id, from);
+        products.forEach(productListImg -> {
             List<ProductImg> productsImg = mainImgMapper.selectNamesByCategoryId(productListImg.getProduct_id());
             productsImg.forEach(img -> img.setMain_img_uri(urlPrefix + "lolland/product/productMainImg/" + productListImg.getProduct_id() + "/" + img.getMain_img_uri()));
             productListImg.setMainImgs(productsImg);
         });
-        return product;
+
+        map.put("products", products);
+        map.put("pageInfo", pageInfo);
+
+        return map;
     }
 
     public CategoryDetailDto getCategoryDetails(Long categoryId) {

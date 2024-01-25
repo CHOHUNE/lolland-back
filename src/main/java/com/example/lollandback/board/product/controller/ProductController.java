@@ -3,6 +3,7 @@ package com.example.lollandback.board.product.controller;
 import com.example.lollandback.board.product.domain.Category;
 import com.example.lollandback.board.product.domain.Company;
 import com.example.lollandback.board.product.domain.Product;
+import com.example.lollandback.board.product.domain.SubCategory;
 import com.example.lollandback.board.product.dto.*;
 import com.example.lollandback.board.product.service.ProductService;
 import com.example.lollandback.member.domain.Member;
@@ -112,15 +113,15 @@ public class ProductController {
     // ------------------------------- 대분류 카테고리 상품 리스트 로직 -------------------------------
     @GetMapping("/category/{category_id}")
     public Map<String, Object> getCategoryById(@PathVariable Long category_id,
-                                                         @RequestParam(value = "p", defaultValue = "1") Integer page, Category category) {
+                                                         @RequestParam(value = "p", defaultValue = "1") Integer page) {
 
-        return productService.findProductsByCategoryId(category_id, page, category);
+        return productService.findProductsByCategoryId(category_id, page);
     }
 
     // ------------------------------- 소분류 서브카테고리 상품 리스트 로직 -------------------------------
     @GetMapping("/category/{category_id}/{subcategory_id}")
     public Map<String, Object> getSubCategoryById(@PathVariable Long category_id, @PathVariable Long subcategory_id,
-                                                            @RequestParam(value = "p", defaultValue = "1") Integer page) {
+                                                  @RequestParam(value = "p", defaultValue = "1") Integer page) {
         return productService.findProductsBySubCategory(category_id, subcategory_id, page);
         //TODO: getSubCategoryById, getCategoryById의 상품 목록을 프론트로 리턴할 때 products로 통일해주세요 ex. map.put("products", products)
     }

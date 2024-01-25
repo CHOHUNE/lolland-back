@@ -3,6 +3,7 @@ package com.example.lollandback.board.product.mapper;
 import com.example.lollandback.board.product.domain.Category;
 import com.example.lollandback.board.product.domain.Company;
 import com.example.lollandback.board.product.domain.Product;
+import com.example.lollandback.board.product.domain.SubCategory;
 import com.example.lollandback.board.product.dto.CategoryDto;
 import com.example.lollandback.board.product.dto.ProductUpdateDto;
 import com.example.lollandback.board.product.dto.SubCategoryDto;
@@ -199,7 +200,7 @@ public interface ProductMapper {
                 SELECT COUNT(*) FROM category c LEFT JOIN product p ON c.category_id = p.category_id
                 WHERE c.category_id = #{category_id} AND p.product_status = 'none';
             """)
-    int countCategoryProductAll(Category category);
+    int countCategoryProductAll(Long category_id);
 
     @Select("""
             SELECT COUNT(*) FROM category c
@@ -207,6 +208,6 @@ public interface ProductMapper {
                  LEFT JOIN product p ON sub.subcategory_id = p.subcategory_id
             WHERE c.category_id = #{category_id} AND sub.subcategory_id = #{subcategory_id};
             """)
-    int countSubCategoryProductAll();
+    int countSubCategoryProductAll(Long category_id, Long subcategory_id);
 
 }
