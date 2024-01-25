@@ -23,6 +23,7 @@ public interface FileMapper {
     List<GameBoardFile> selectNamesBygameboardId(Integer gameboard_id);
 
 
+
     @Delete("""
             DELETE FROM gameboardfile WHERE gameboard_id=#{boardId} 
             """)

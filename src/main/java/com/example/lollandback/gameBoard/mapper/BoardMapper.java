@@ -27,6 +27,7 @@ VALUES (#{title},#{board_content},#{category},#{member_id})
         gb.board_count,
         gb.reg_time,
         gb.member_id,
+        gf.file_url,
         COUNT(DISTINCT gl.id) as count_like,
         COUNT(DISTINCT gc.id) as count_comment,
         COUNT(DISTINCT gf.id) as countFile
