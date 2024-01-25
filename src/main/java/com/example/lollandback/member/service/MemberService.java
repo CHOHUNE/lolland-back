@@ -201,7 +201,7 @@ public class MemberService {
         int countAll = mapper.countAllGameBoardLikeByLoginId(login.getMember_login_id());
 
         // 좋아요 한 게시글의 최종 마지막 페이지 번호
-        int lastPageNumber = (countAll - 1 ) / 5 + 1;
+        int lastPageNumber = (countAll - 1 ) / 10 + 1;
 
         // 시작 번호 (버튼 범위에 보여질 시작 번호)
         int startPageNumber = (page - 1) / 5 * 5 + 1;
