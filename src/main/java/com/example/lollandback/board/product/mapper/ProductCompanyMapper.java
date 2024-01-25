@@ -14,6 +14,14 @@ public interface ProductCompanyMapper {
     int insert(Company company);
 
     @Select("""
+        SELECT company_id
+        FROM company
+        WHERE company_name = #{company_name}
+    """)
+    Long getCompanyIdByName(String company_name);
+
+
+    @Select("""
             SELECT company_name
             FROM company
             WHERE company_id = #{company_id}

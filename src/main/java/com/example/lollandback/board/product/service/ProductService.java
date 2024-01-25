@@ -55,11 +55,21 @@ public class ProductService {
 //            return false;
 //        }
         Long total_stock = 0L;
-        // 제조사 정보 저장
-        if (companyMapper.insert(company) != 1) {
-            return false;
+
+        // 제조사 기존에 존재하는지 확인
+        Long companyId = companyMapper.getCompanyIdByName(company.getCompany_name());
+
+        // 존재하지 않는다면 새로 생성
+        if(companyId == null) {
+            if (companyMapper.insert(company) != 1) {
+                return false;
+            }
+            // 새로 생성된 제조사의 아이디 가져와 재저장
+            companyId = companyMapper.getCompanyIdByName(company.getCompany_name());
         }
-        product.setCompany_id(company.getCompany_id());
+
+        // 제조사 정보 저장
+        product.setCompany_id(companyId);
         if (optionList != null) {
             for (ProductOptionsDto productOptionsDto : optionList) {
                 total_stock += productOptionsDto.getStock();
