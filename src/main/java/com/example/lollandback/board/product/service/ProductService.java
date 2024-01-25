@@ -121,12 +121,11 @@ public class ProductService {
         s3.putObject(objectRequest, RequestBody.fromInputStream(mainImg.getInputStream(), mainImg.getSize()));
     }
 
-    // --------------------------- 상품 리스트 / 페이징 / 검색 로직 ---------------------------
+    // --------------------------- 상품 리스트 / 페이징 / 검색 로직 ---------------------------@@
     public Map<String, Object> list(Integer page, String keyword, String category) {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> pageInfo = new HashMap<>();
 
-//        int countAll = productMapper.countAll();
         int countAll = productMapper.countAll("%" + keyword + "%", category);
         int lastPageNumber = (countAll - 1) / 10 + 1;
         int startPageNumber = (page - 1) / 10 * 10 + 1;
@@ -335,18 +334,52 @@ public class ProductService {
         }
     }
 
-    public List<Product> findProductsByCategoryId(Long categoryId) {
-        List<Product> product = productMapper.findByCategoryId(categoryId);
-        product.forEach(productListImg -> {
+    // --------------------------- 대분류 카테고리 리스트 & 페이징 ---------------------------!!
+    public Map<String, Object> findProductsByCategoryId(Long categoryId, Integer page, Category category) {
+        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> pageInfo = new HashMap<>();
+
+        int countAll = productMapper.countCategoryProductAll(category);
+        int lastPageNumber = (countAll - 1) / 3 + 1;
+        int startPageNumber = (page - 1) / 3 * 3 + 1;
+        int endPageNumber = startPageNumber + 2;
+        endPageNumber = Math.min(endPageNumber, lastPageNumber);
+
+        pageInfo.put("startPageNumber", startPageNumber);
+        pageInfo.put("lastPageNumber", lastPageNumber);
+
+        int from = (page - 1) * 3;
+        List<Product> products = productMapper.findByCategoryId(categoryId, from);
+        products.forEach(productListImg -> {
             List<ProductImg> productsImg = mainImgMapper.selectNamesByCategoryId(productListImg.getProduct_id());
             productsImg.forEach(img -> img.setMain_img_uri(urlPrefix + "lolland/product/productMainImg/" + productListImg.getProduct_id() + "/" + img.getMain_img_uri()));
             productListImg.setMainImgs(productsImg);
         });
-        return product;
+
+        map.put("products", products);
+        map.put("pageInfo", pageInfo);
+
+        return map;
     }
 
-    public List<Product> findProductsBySubCategory(Long category_id, Long subcategory_id) {
-        List<Product> product = productMapper.findByCategoryIdAndSubcategoryId(category_id, subcategory_id);
+    // --------------------------- 소분류 서브카테고리 리스트 & 페이징 ---------------------------
+    public List<Product> findProductsBySubCategory(Long category_id, Long subcategory_id, Integer page) {
+        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> pageInfo = new HashMap<>();
+
+        int countAll = productMapper.countSubCategoryProductAll();
+
+        int lastPageNumber = (countAll - 1) / 3 + 1;
+        int startPageNumber = (page - 1) / 3 * 3 + 1;
+        int endPageNumber = startPageNumber + 2;
+        endPageNumber = Math.min(endPageNumber, lastPageNumber);
+
+        pageInfo.put("startPageNumber", startPageNumber);
+        pageInfo.put("lastPageNumber", lastPageNumber);
+
+        int from = (page - 1) * 3;
+
+        List<Product> product = productMapper.findByCategoryIdAndSubcategoryId(category_id, subcategory_id, from);
         product.forEach(productListImg -> {
             List<ProductImg> productsImg = mainImgMapper.selectNamesByCategoryId(productListImg.getProduct_id());
             productsImg.forEach(img -> img.setMain_img_uri(urlPrefix + "lolland/product/productMainImg/" + productListImg.getProduct_id() + "/" + img.getMain_img_uri()));
@@ -372,5 +405,9 @@ public class ProductService {
         String subcategory_name = productMapper.subCategoryById(subcategoryId);
 
         return new SubcategoryNavDto(categories, companies, category_name, subcategory_name);
+    }
+
+    public List<Category> getCategoryById() {
+        return productMapper.getAllCategories();
     }
 }
