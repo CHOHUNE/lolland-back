@@ -22,55 +22,66 @@ VALUES (#{comment_content},#{game_board_id},#{parent_id},#{member_id})
 
     @Select("""
 
-            WITH RECURSIVE CommentHierarchy AS (
-                   SELECT
-                       id,
-                       comment_content,
-                       reg_time,
-                       parent_id,
-                       game_board_id,
-                       member_id,
-                       CAST(id AS CHAR) AS path,
-                       1 AS depth
-                   FROM
-                       gameboardcomment
-                   WHERE
-                   parent_id IS NULL
-                   AND game_board_id = #{game_board_id} -- 추가된 부분
-               
-                   UNION ALL
 
-                   SELECT
-                       c.id,
-                       c.comment_content,
-                       c.reg_time,
-                       c.parent_id,
-                       c.game_board_id,
-                       c.member_id,
-                       CONCAT(ch.path, ',', c.id),
-                       ch.depth + 1 AS depth
-                   FROM
-                       gameboardcomment c
-                   JOIN
-                       CommentHierarchy ch ON c.parent_id = ch.id
-                         WHERE
-                       c.game_board_id = #{game_board_id} -- 추가된 부분
-               )
-               
-               SELECT
-                   id,
-                   comment_content,
-                   reg_time,
-                   parent_id,
-                   game_board_id,
-                   member_id,
-                   depth
-               FROM
-                   CommentHierarchy
-            
-               ORDER BY
-                   path;
-            
+            WITH RECURSIVE CommentHierarchy AS (
+                           SELECT
+                               gc.id,
+                               gc.comment_content,
+                               gc.reg_time,
+                               gc.parent_id,
+                               gc.game_board_id,
+                               gc.member_id,
+                               mi.file_url,
+                               CAST(gc.id AS CHAR) AS path,
+                               1 AS depth
+                           FROM
+                               gameboardcomment gc
+                           LEFT JOIN
+                               member m ON gc.member_id = m.member_login_id
+                           LEFT JOIN
+                               memberimage mi ON m.id = mi.member_id
+                           WHERE
+                               gc.parent_id IS NULL
+                               AND gc.game_board_id = #{game_board_id}
+                               
+                           UNION ALL
+                          
+                           SELECT
+                               c.id,
+                               c.comment_content,
+                               c.reg_time,
+                               c.parent_id,
+                               c.game_board_id,
+                               c.member_id,
+                               mi.file_url,
+                               CONCAT(ch.path, ',', c.id),
+                               ch.depth + 1 AS depth
+                           FROM
+                               gameboardcomment c
+                           JOIN
+                               CommentHierarchy ch ON c.parent_id = ch.id
+                           LEFT JOIN
+                               member m ON c.member_id = m.member_login_id
+                           LEFT JOIN
+                               memberimage mi ON m.id = mi.member_id
+                           WHERE
+                               c.game_board_id = #{game_board_id}
+                       )
+                       
+                       SELECT
+                           id,
+                           comment_content,
+                           reg_time,
+                           parent_id,
+                           game_board_id,
+                           member_id,
+                           file_url,
+                           depth
+                       FROM
+                           CommentHierarchy
+                       
+                       ORDER BY
+                           path;            
 """)
     List<Comment> selectByBoardId(Integer game_board_id);
 

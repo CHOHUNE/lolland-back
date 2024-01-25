@@ -34,17 +34,16 @@ VALUES (#{title},#{board_content},#{category},#{member_id})
     LEFT JOIN lolland.gameboardlike gl ON gb.id = gl.game_board_id
     LEFT JOIN lolland.gameboardcomment gc ON gb.id = gc.game_board_id
     LEFT JOIN lolland.gameboardfile gf ON gb.id = gf.gameboard_id
-    WHERE 
-        gb.category != '공지' AND
-                (<trim prefixOverrides="OR">
-                        <if test="category == 'all' or category == 'title'">
-                            OR gb.title LIKE #{keyword}
-                        </if>
-                        <if test="category == 'all' or category == 'content'">
-                            OR gb.board_content LIKE #{keyword}
-                        </if>
-                    </trim>)
-                    OR gb.category LIKE #{keyword}
+            WHERE
+    (<trim prefixOverrides="OR">
+        <if test="category == 'all' or category == 'title'">
+            OR (gb.title LIKE #{keyword} AND gb.category != '공지')
+        </if>
+        <if test="category == 'all' or category == 'content'">
+            OR (gb.board_content LIKE #{keyword} AND gb.category != '공지')
+        </if>
+    </trim>)
+    OR (gb.category LIKE #{keyword} AND gb.category != '공지')
     GROUP BY gb.id
 
     ORDER BY
