@@ -16,6 +16,8 @@ public class Comment {
     private  Integer id;
     private  LocalDateTime reg_time;
     private  String comment_content;
+    private String file_url;
+
     private Integer depth;
 
     public String getAgo() {
