@@ -117,13 +117,13 @@ SELECT *,
              LEFT JOIN lolland.gameboardcomment gc on gb.id = gc.game_board_id
 WHERE gb.id=#{id}
 """)
-    GameBoard selectById(Integer id);
+    GameBoard selectById(Long id);
 
     @Delete("""
          DELETE FROM gameboard
          WHERE id=#{id}
             """)
-    int deleteById(Integer bgId);
+    int deleteById(Long bgId);
 
     @Update("""
 UPDATE gameboard
@@ -133,7 +133,7 @@ WHERE id= #{id}
     int update(GameBoard gameBoard);
 
     @Update("UPDATE gameboard SET board_count = board_count + 0.5 WHERE id = #{id}")
-    void boardCount(Integer id);
+    void boardCount(Long id);
 
     @Select("""
             <script>

@@ -105,7 +105,7 @@ DELETE FROM gameboardcomment WHERE id=#{id} OR parent_id=#{id}
     @Delete("""
             DELETE FROM gameboardcomment WHERE game_board_id=#{id}
             """)
-    void deleteByBoardId(Integer id);
+    void deleteByBoardId(Long id);
 
 
     @Update("""

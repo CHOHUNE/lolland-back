@@ -40,7 +40,7 @@ SELECT * FROM gameboardlike WHERE game_board_id=#{game_board_id} AND member_id=#
     @Delete("""
 DELETE FROM gameboardlike WHERE game_board_id=#{id}
 """)
-    int deleteByBoardId(Integer id);
+    int deleteByBoardId(Long id);
 
 
     @Select("""
