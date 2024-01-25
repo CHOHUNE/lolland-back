@@ -12,8 +12,10 @@ import java.util.List;
 public interface ReviewMapper {
 
     @Select("""
-        SELECT r.review_id, r.product_id, r.member_id, r.review_content, r.rate, r.review_reg_time, m.member_login_id
-            FROM review r JOIN member m ON r.member_id = m.id
+        SELECT r.review_id, r.product_id, r.member_id, r.review_content, r.rate, r.review_reg_time, m.member_login_id, img.file_url
+            FROM review r 
+            JOIN member m ON r.member_id = m.id
+            JOIN memberimage img ON img.member_id = m.id
             WHERE r.product_id = #{product_id}
             ORDER BY r.review_id DESC
             LIMIT #{pageSize} OFFSET #{offset}
