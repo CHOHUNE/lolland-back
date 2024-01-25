@@ -168,8 +168,9 @@ public class MemberController {
 
     // 회원이 좋아요 한 게임 게시글 목록 갖고 오기
     @GetMapping("getGameBoardLike")
-    public List<GameBoard> getGameBoardLike(@SessionAttribute("login") Member login) {
-        return service.getGameBoardLike(login);
+    public List<GameBoard> getGameBoardLike(@SessionAttribute("login") Member login,
+                                            @RequestParam(value = "page", defaultValue = "1")Integer page) {
+        return service.getGameBoardLike(login,page);
     }
 
     // 회원의 게임 게시글 좋아요 한 것 한개 삭제

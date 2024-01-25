@@ -157,7 +157,8 @@ public interface MemberMapper {
         FROM gameboard  g 
         JOIN gameboardlike gl 
         ON g.id = gl.game_board_id 
-        WHERE gl.member_id = #{memberLoginId};
+        WHERE gl.member_id = #{memberLoginId}
+        LIMIT #{from}, 10
     """)
-    List<GameBoard> getGameBoardLikeByLoginId(String memberLoginId);
+    List<GameBoard> getGameBoardLikeByLoginId(String memberLoginId, Integer from);
 }

@@ -190,8 +190,12 @@ public class MemberService {
     }
 
 
-    public List<GameBoard> getGameBoardLike(Member login) {
-        return mapper.getGameBoardLikeByLoginId(login.getMember_login_id());
+    public List<GameBoard> getGameBoardLike(Member login, Integer page) {
+
+        // 페이지당 보여줄 컬럼의 시작
+        int from = (page -1) * 10;
+
+        return mapper.getGameBoardLikeByLoginId(login.getMember_login_id(), from);
     }
 
     // 회원의 게임 게시글 좋아요 한 것 한개 삭제
