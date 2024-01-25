@@ -126,13 +126,22 @@ public class GameBoardService {
         }
 
         int from = (page - 1) * 10;
-        map.put("gameBoardList", mapper.selectAll(from, "%" + keyword + "%",category,sortBy));
+//        map.put("gameBoardList", mapper.selectAll(from, "%" + keyword + "%",category,sortBy));
+
+//        메인에서 이미지 끌고 오기 위해 리스트 -> 이미지 set -> 다시 map
+        List<GameBoard> gameBoardList = mapper.selectAll(from, "%" + keyword + "%", category, sortBy);
+        for (GameBoard gameBoard : gameBoardList) {
+            List<GameBoardFile> boardFiles = fileMapper.selectNamesBygameboardId(gameBoard.getId());
+            gameBoard.setFiles(boardFiles);
+        }
+
+        map.put("gameBoardList", gameBoardList);
         map.put("pageInfo", pageInfo);
 
         return map;
     }
 
-    public GameBoard get(Integer id) {
+    public GameBoard get(Long id) {
 
         String cookieValue = getCookieValue("board_" + id);
         if (cookieValue == null) {
@@ -148,7 +157,7 @@ public class GameBoardService {
         return gameBoard;
     }
 
-    public GameBoard getOnlyGameBoard(Integer id) {
+    public GameBoard getOnlyGameBoard(Long id) {
         GameBoard gameBoard = mapper.selectById(id);
         return gameBoard;
 
@@ -176,7 +185,7 @@ public class GameBoardService {
 
 
 
-    public void boardCount(Integer id) {
+    public void boardCount(Long id) {
         mapper.boardCount(id);
 
     }
@@ -206,7 +215,7 @@ public class GameBoardService {
         return mapper.update(gameBoard) == 1;
     }
 
-    public boolean delete(Integer id) {
+    public boolean delete(Long id) {
 
         commentMapper.deleteByBoardId(id);
         likeMapper.deleteByBoardId(id);
@@ -216,7 +225,7 @@ public class GameBoardService {
         return mapper.deleteById(id) == 1;
     }
 
-    private void deleteFile(Integer id) {
+    private void deleteFile(Long id) {
         List<GameBoardFile> boardFiles = fileMapper.selectNamesBygameboardId(id);
 
         for (GameBoardFile file : boardFiles) {
@@ -239,7 +248,15 @@ public class GameBoardService {
     }
 
     public List<GameBoard> top() {
-        return mapper.selectTop();
+
+        List <GameBoard> gameBoardList = mapper.selectTop();
+
+        for (GameBoard gameBoard : gameBoardList) {
+            List<GameBoardFile> boardFiles = fileMapper.selectNamesBygameboardId(gameBoard.getId());
+            gameBoard.setFiles(boardFiles);
+        }
+
+        return gameBoardList;
     }
 
     public List<GameBoard> today(){

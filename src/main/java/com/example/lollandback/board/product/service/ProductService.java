@@ -1,6 +1,7 @@
 package com.example.lollandback.board.product.service;
 
 import com.example.lollandback.board.like.service.ProductLikeService;
+import com.example.lollandback.board.product.controller.CompanyNavDto;
 import com.example.lollandback.board.product.domain.*;
 import com.example.lollandback.board.product.dto.*;
 import com.example.lollandback.board.product.mapper.*;
@@ -18,6 +19,7 @@ import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,11 +57,21 @@ public class ProductService {
 //            return false;
 //        }
         Long total_stock = 0L;
-        // 제조사 정보 저장
-        if (companyMapper.insert(company) != 1) {
-            return false;
+
+        // 제조사 기존에 존재하는지 확인
+        Long companyId = companyMapper.getCompanyIdByName(company.getCompany_name());
+
+        // 존재하지 않는다면 새로 생성
+        if(companyId == null) {
+            if (companyMapper.insert(company) != 1) {
+                return false;
+            }
+            // 새로 생성된 제조사의 아이디 가져와 재저장
+            companyId = companyMapper.getCompanyIdByName(company.getCompany_name());
         }
-        product.setCompany_id(company.getCompany_id());
+
+        // 제조사 Id 저장
+        product.setCompany_id(companyId);
         if (optionList != null) {
             for (ProductOptionsDto productOptionsDto : optionList) {
                 total_stock += productOptionsDto.getStock();
@@ -409,6 +421,63 @@ public class ProductService {
         String subcategory_name = productMapper.subCategoryById(subcategoryId);
 
         return new SubcategoryNavDto(categories, companies, category_name, subcategory_name);
+    }
+
+    public Map<String, Object> companyList(Integer page, String keyword, String category, Long companyId) {
+        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> pageInfo = new HashMap<>();
+
+        int countAll = productMapper.countAllCompany("%" + keyword + "%", category, companyId);
+        int lastPageNumber = (countAll - 1) / 10 + 1;
+        int startPageNumber = (page - 1) / 10 * 10 + 1;
+        int endPageNumber = startPageNumber + 9;
+        endPageNumber = Math.min(endPageNumber, lastPageNumber);
+        int prevPageNumber = startPageNumber - 10;
+        int nextPageNumber = endPageNumber + 1;
+
+        pageInfo.put("currentPageNumber", page);
+        pageInfo.put("startPageNumber", startPageNumber);
+        pageInfo.put("endPageNumber", endPageNumber);
+        if (prevPageNumber > 0) {
+            pageInfo.put("prevPageNumber", prevPageNumber);
+        }
+        if (nextPageNumber <= lastPageNumber) {
+            pageInfo.put("nextPageNumber", nextPageNumber);
+        }
+
+        int from = (page - 1) * 10;
+
+        List<Product> product = productMapper.companyList(from, "%" + keyword + "%", category, companyId);
+        product.forEach(productListImg -> {
+            List<ProductImg> productsImg = mainImgMapper.selectNamesByProductId(productListImg.getProduct_id());
+            productsImg.forEach(img -> img.setMain_img_uri(urlPrefix + "lolland/product/productMainImg/" + productListImg.getProduct_id() + "/" + img.getMain_img_uri()));
+            productListImg.setMainImgs(productsImg);
+        });
+
+        map.put("product", product);
+        map.put("pageInfo", pageInfo);
+        return map;
+    }
+
+    public CompanyNavDto getCompanyNav(Long companyId) {
+        // 회사명
+        String companyName = companyMapper.selectById(companyId).getCompany_name();
+        // 회사 상품의 평균 평점
+        Double avgRate = productMapper.getAvgRateOfCompany(companyId);
+        // 회사 상품의 총 리뷰
+        Integer totalReview = companyMapper.getTotalReview(companyId);
+        // 회사가 파는 대분류
+        List<Category> categories = companyMapper.getCompanyCategory(companyId);
+        // CategoryDto 저장할 리스트 생성
+        List<CategoryDto> categoryDtoList = new ArrayList<>();
+        // 해당 대분류의 소분류
+        for(Category category : categories) {
+            List<SubCategoryDto> subcategory = companyMapper.getSubCategoryByCompany(companyId);
+            CategoryDto categoryDto = new CategoryDto(category, subcategory);
+            categoryDtoList.add(categoryDto);
+        }
+
+        return new CompanyNavDto(companyName, avgRate, totalReview, categoryDtoList);
     }
 
     public List<Category> getCategoryById() {

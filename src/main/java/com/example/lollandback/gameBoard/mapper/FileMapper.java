@@ -20,13 +20,15 @@ public interface FileMapper {
     @Select("""
             SELECT * FROM gameboardfile WHERE gameboard_id=#{gameboard_id}
             """)
-    List<GameBoardFile> selectNamesBygameboardId(Integer gameboard_id);
+    List<GameBoardFile>
+    selectNamesBygameboardId(Long gameboard_id);
+
 
 
     @Delete("""
             DELETE FROM gameboardfile WHERE gameboard_id=#{boardId} 
             """)
-    int deleteByBoard(Integer boardId);
+    int deleteByBoard(Long boardId);
 
     @Select("""
             SELECT * FROM gameboardfile WHERE id=#{id}

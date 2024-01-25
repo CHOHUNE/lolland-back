@@ -197,6 +197,61 @@ public interface ProductMapper {
     List<Company> getAllCompanies(Long categoryId, Long subcategoryId);
 
     @Select("""
+        <script>
+        SELECT 
+            p.product_id,
+            p.product_name,
+            p.product_content,
+            p.product_price,
+            p.total_stock,
+            p.average_rate,
+            p.product_reg_time,
+            p.category_id,
+            p.subcategory_id,
+            p.company_id,
+            p.member_id,
+            co.company_name
+        FROM product p JOIN company co 
+        ON p.company_id = co.company_id
+        WHERE p.product_status = 'none' AND co.company_id = #{companyId}
+        <if test="category == 'all'">
+            AND (p.product_name LIKE #{keyword} OR co.company_name LIKE #{keyword})
+        </if>
+        <if test="category == 'subcategory'">
+            AND p.subcategory_id LIKE #{keyword}
+        </if>
+        <if test="category == 'company_name'">
+            AND co.company_name LIKE #{keyword}
+        </if>
+        ORDER BY p.product_reg_time DESC
+        LIMIT #{from}, 16
+        </script>
+        """)
+    List<Product> companyList(int from, String keyword, String category, Long companyId);
+
+    @Select("""
+        <script>
+        SELECT COUNT(*)
+        FROM product p JOIN company co 
+        ON p.company_id = co.company_id
+        WHERE p.product_status = 'none' AND co.company_id = #{companyId}
+            <trim prefix="AND (" suffix=")" prefixOverrides="OR">
+                <if test="category == 'all' or category == 'product_name'">
+                    OR p.product_name LIKE #{keyword}
+                </if>
+            </trim>
+        </script>
+        """)
+    int countAllCompany(String keyword, String category, Long companyId);
+
+    @Select("""
+        SELECT AVG(average_rate)
+        FROM product
+        WHERE company_id = #{companyId}
+    """)
+    Double getAvgRateOfCompany(Long companyId);
+
+    @Select("""
                 SELECT COUNT(*) FROM category c LEFT JOIN product p ON c.category_id = p.category_id
                 WHERE c.category_id = #{category_id} AND p.product_status = 'none';
             """)

@@ -23,7 +23,7 @@ public class NotificationService {
 
 
 //    작성자에게 댓글 알림
-    public void notifyComment(Integer postId) {
+    public void notifyComment(Long postId) {
         GameBoard gameBoard = gameBoardService.getOnlyGameBoard(postId);
 
         String userId = gameBoard.getMember_id(); // 수정된 부분
