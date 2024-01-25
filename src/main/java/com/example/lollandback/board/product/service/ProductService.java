@@ -352,13 +352,22 @@ public class ProductService {
         Map<String, Object> pageInfo = new HashMap<>();
 
         int countAll = productMapper.countCategoryProductAll(categoryId);
-        int lastPageNumber = (countAll - 1) / 3 + 1;
-        int startPageNumber = (page - 1) / 3 * 3 + 1;
-        int endPageNumber = startPageNumber + 2;
+        int lastPageNumber = (countAll - 1) / 10 + 1;
+        int startPageNumber = (page - 1) / 10 * 10 + 1;
+        int endPageNumber = startPageNumber + 9;
         endPageNumber = Math.min(endPageNumber, lastPageNumber);
+        int prevPageNumber = startPageNumber - 10;
+        int nextPageNumber = endPageNumber + 1;
 
+        pageInfo.put("currentPageNumber", page);
         pageInfo.put("startPageNumber", startPageNumber);
-        pageInfo.put("lastPageNumber", lastPageNumber);
+        pageInfo.put("endPageNumber", endPageNumber);
+        if (prevPageNumber > 0) {
+            pageInfo.put("prevPageNumber", prevPageNumber);
+        }
+        if (nextPageNumber <= lastPageNumber) {
+            pageInfo.put("nextPageNumber", nextPageNumber);
+        }
 
         int from = (page - 1) * 3;
         List<Product> products = productMapper.findByCategoryId(categoryId, from);
@@ -381,13 +390,22 @@ public class ProductService {
 
         int countAll = productMapper.countSubCategoryProductAll(category_id, subcategory_id);
 
-        int lastPageNumber = (countAll - 1) / 3 + 1;
-        int startPageNumber = (page - 1) / 3 * 3 + 1;
-        int endPageNumber = startPageNumber + 2;
+        int lastPageNumber = (countAll - 1) / 10 + 1;
+        int startPageNumber = (page - 1) / 10 * 10 + 1;
+        int endPageNumber = startPageNumber + 9;
         endPageNumber = Math.min(endPageNumber, lastPageNumber);
+        int prevPageNumber = startPageNumber - 10;
+        int nextPageNumber = endPageNumber + 1;
 
+        pageInfo.put("currentPageNumber", page);
         pageInfo.put("startPageNumber", startPageNumber);
-        pageInfo.put("lastPageNumber", lastPageNumber);
+        pageInfo.put("endPageNumber", endPageNumber);
+        if (prevPageNumber > 0) {
+            pageInfo.put("prevPageNumber", prevPageNumber);
+        }
+        if (nextPageNumber <= lastPageNumber) {
+            pageInfo.put("nextPageNumber", nextPageNumber);
+        }
 
         int from = (page - 1) * 3;
 

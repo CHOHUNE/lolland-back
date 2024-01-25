@@ -123,7 +123,7 @@ public class ProductController {
         }
     }
 
-    // ------------------------------- 대분류 카테고리 상품 리스트 로직 -------------------------------
+    // ------------------------------- 대분류 카테고리 상품 리스트 페이징 로직 -------------------------------
     @GetMapping("/category/{category_id}")
     public Map<String, Object> getCategoryById(@PathVariable Long category_id,
                                                          @RequestParam(value = "p", defaultValue = "1") Integer page) {
@@ -131,7 +131,7 @@ public class ProductController {
         return productService.findProductsByCategoryId(category_id, page);
     }
 
-    // ------------------------------- 소분류 서브카테고리 상품 리스트 로직 -------------------------------
+    // ------------------------------- 소분류 서브카테고리 상품 리스트 페이징 로직 -------------------------------
     @GetMapping("/category/{category_id}/{subcategory_id}")
     public Map<String, Object> getSubCategoryById(@PathVariable Long category_id, @PathVariable Long subcategory_id,
                                                   @RequestParam(value = "p", defaultValue = "1") Integer page) {

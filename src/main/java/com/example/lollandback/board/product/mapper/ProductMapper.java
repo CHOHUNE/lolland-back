@@ -149,8 +149,9 @@ public interface ProductMapper {
     @Select("""
             SELECT *
             FROM product p JOIN category c ON p.category_id = c.category_id
+            JOIN company com ON p.company_id = com.company_id
             WHERE p.category_id = #{category_id} AND p.product_status = 'none'
-            LIMIT #{from}, 3
+            LIMIT #{from}, 16
             """)
     List<Product> findByCategoryId(Long category_id, Integer from);
 
@@ -159,10 +160,11 @@ public interface ProductMapper {
                 FROM product p
                 JOIN category c ON p.category_id = c.category_id
                 JOIN subcategory sub ON p.subcategory_id = sub.subcategory_id
+                JOIN company com ON p.company_id = com.company_id
                 WHERE p.category_id = #{category_id} 
                 AND p.subcategory_id = #{subcategory_id}
                 AND p.product_status = 'none'
-                LIMIT #{from}, 3
+                LIMIT #{from}, 16
             """)
     List<Product> findByCategoryIdAndSubcategoryId(Long category_id, Long subcategory_id, Integer from);
 
@@ -261,7 +263,7 @@ public interface ProductMapper {
             SELECT COUNT(*) FROM category c
                  LEFT JOIN subcategory sub ON c.category_id = sub.category_id
                  LEFT JOIN product p ON sub.subcategory_id = p.subcategory_id
-            WHERE c.category_id = #{category_id} AND sub.subcategory_id = #{subcategory_id};
+            WHERE c.category_id = #{category_id} AND sub.subcategory_id = #{subcategory_id} AND p.product_status = 'none';
             """)
     int countSubCategoryProductAll(Long category_id, Long subcategory_id);
 
