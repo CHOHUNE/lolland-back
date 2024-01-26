@@ -140,8 +140,16 @@ public class ProductController {
     }
 
 
+    // ------------------------------- 메인페이지 카테고리 가져오는 로직 -------------------------------
     @GetMapping("/mainCategory")
     public List<Category> getCategory() {
         return productService.getCategoryById();
+    }
+
+    // --------------------------- 메인페이지 리뷰 많은 상품 3개 가져오는 로직 ---------------------------
+    @GetMapping("/most-reviewed")
+    public ResponseEntity<List<MainProductDto>> getMostReviewedProducts() {
+        List<MainProductDto> products = productService.getMostReviewedProducts();
+        return ResponseEntity.ok(products);
     }
 }

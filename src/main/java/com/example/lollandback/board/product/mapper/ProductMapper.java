@@ -4,9 +4,7 @@ import com.example.lollandback.board.product.domain.Category;
 import com.example.lollandback.board.product.domain.Company;
 import com.example.lollandback.board.product.domain.Product;
 import com.example.lollandback.board.product.domain.SubCategory;
-import com.example.lollandback.board.product.dto.CategoryDto;
-import com.example.lollandback.board.product.dto.ProductUpdateDto;
-import com.example.lollandback.board.product.dto.SubCategoryDto;
+import com.example.lollandback.board.product.dto.*;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -267,4 +265,16 @@ public interface ProductMapper {
             """)
     int countSubCategoryProductAll(Long category_id, Long subcategory_id);
 
+
+//   ------------------------- 리뷰가 가장 많은 3개의 상품 보여주기 --------------------------
+    @Select("""
+            SELECT p.product_id, p.product_name, c.company_name, p.product_price, p.product_content, COUNT(r.review_id) AS review_count
+            FROM product p
+            JOIN review r ON p.product_id = r.product_id
+            JOIN company c ON p.company_id = c.company_id
+            GROUP BY P.product_id
+            ORDER BY review_count DESC
+            LIMIT 3;
+            """)
+    List<MainProductDto> mostReviewProduct();
 }
