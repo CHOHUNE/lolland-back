@@ -190,8 +190,43 @@ public class MemberService {
     }
 
 
-    public List<GameBoard> getGameBoardLike(Member login) {
-        return mapper.getGameBoardLikeByLoginId(login.getMember_login_id());
+    public Map<String, Object> getGameBoardLike(Member login, Integer page) {
+        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> pageInfo = new HashMap<>();
+
+        // 페이지당 보여줄 컬럼의 시작
+        int from = (page -1) * 10;
+
+        // 좋아요 한 게임 게시글 갯수
+        int countAll = mapper.countAllGameBoardLikeByLoginId(login.getMember_login_id());
+
+        // 좋아요 한 게시글의 최종 마지막 페이지 번호
+        int lastPageNumber = (countAll - 1 ) / 10 + 1;
+
+        // 시작 번호 (버튼 범위에 보여질 시작 번호)
+        int startPageNumber = (page - 1) / 5 * 5 + 1;
+        // 끝 번호 (버튼 범위에 보여질 마지막)
+        int endPageNumber = startPageNumber + 4;
+        endPageNumber = Math.min(endPageNumber, lastPageNumber);
+
+        // 이전 버튼
+        int prevPageNumber = (startPageNumber - 10);
+        // 다음 버튼
+        int nextPageNumber = endPageNumber + 1;
+
+        pageInfo.put("startPageNumber", startPageNumber);
+        pageInfo.put("endPageNumber", endPageNumber);
+        if(prevPageNumber > 0) {
+            pageInfo.put("prevPageNumber", prevPageNumber);
+        }
+        if(nextPageNumber <= lastPageNumber) {
+            pageInfo.put("nextPageNumber", nextPageNumber);
+        }
+
+        map.put("gameBoardLikeList",mapper.getGameBoardLikeByLoginId(login.getMember_login_id(), from));
+        map.put("pageInfo", pageInfo);
+
+        return map;
     }
 
     // 회원의 게임 게시글 좋아요 한 것 한개 삭제

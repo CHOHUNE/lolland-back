@@ -26,7 +26,6 @@ public class GameBoard {
     private Double board_count;
     private Long countFile;
     private String member_id;
-
     private List<GameBoardFile> files;
 
     public String getAgo() {

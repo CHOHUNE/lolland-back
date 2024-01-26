@@ -3,21 +3,16 @@ package com.example.lollandback.gameBoard.controller;
 
 import com.example.lollandback.gameBoard.domain.BoardWriter;
 import com.example.lollandback.gameBoard.service.GameBoardService;
-import com.example.lollandback.gameBoard.service.NotificationService;
 import com.example.lollandback.member.domain.Member;
-import com.example.lollandback.member.service.MemberService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.lollandback.gameBoard.domain.GameBoard;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @RequiredArgsConstructor
 @RestController
@@ -80,13 +75,13 @@ public class GameBoardController {
 
 
     @GetMapping("/id/{id}")
-    public GameBoard get(@PathVariable Integer id) {
+    public GameBoard get(@PathVariable Long id) {
 
         return gameboardService.get(id);
     }
 
     @DeleteMapping("/remove/{id}")
-    public ResponseEntity delete(@PathVariable Integer id) {
+    public ResponseEntity delete(@PathVariable Long id) {
         if (gameboardService.delete(id)) {
             return ResponseEntity.ok().build();
         } else {

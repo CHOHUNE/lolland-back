@@ -1,8 +1,9 @@
 package com.example.lollandback.board.product.controller;
 
+import com.example.lollandback.board.product.domain.Category;
 import com.example.lollandback.board.product.domain.Company;
 import com.example.lollandback.board.product.domain.Product;
-import com.example.lollandback.board.product.domain.ProductOptions;
+import com.example.lollandback.board.product.domain.SubCategory;
 import com.example.lollandback.board.product.dto.*;
 import com.example.lollandback.board.product.service.ProductService;
 import com.example.lollandback.member.domain.Member;
@@ -24,7 +25,7 @@ public class ProductController {
 
     private final ProductService productService;
 
-    // --------------------------- 상품 등록 & 네브 바에 카테고리, 서브 카테고리 불러오는 로직 ---------------------------
+    // --------------------------- 상품 등록 & 네브 바에 카테고리 - 그에 해당하는 서브 카테고리 불러오는 로직 ---------------------------
     @GetMapping("/category")
     public List<CategoryDto> getCategories() {
         return productService.getAllCategories();
@@ -44,6 +45,13 @@ public class ProductController {
         return productService.getSubcategoryNav(category_id, subcategory_id);
     }
 
+    // --------------------------- 회사별 페이지 사이드 바에 필요한 정보 리턴 ---------------------------
+
+    @GetMapping("/company/detail/{company_id}")
+    public CompanyNavDto getCompanyNav(@PathVariable Long company_id) {
+        return productService.getCompanyNav(company_id);
+    }
+
     // --------------------------- 상품 등록 로직 ---------------------------
     @PostMapping("add")
     public ResponseEntity add(Product product, Company company,
@@ -61,14 +69,20 @@ public class ProductController {
         }
     }
 
-    // --------------------------- 상품 리스트 로직 ---------------------------
+    // --------------------------- 전체 상품 리스트 로직 ---------------------------
     @GetMapping("list")
     public Map<String, Object> list(@RequestParam(value = "p", defaultValue = "1") Integer page,
                                     @RequestParam(value = "k", defaultValue = "") String keyword,
                                     @RequestParam(value = "c", defaultValue = "all") String category) {
-
-
         return productService.list(page, keyword, category);
+    }
+
+    @GetMapping("company")
+    public Map<String, Object> list(@RequestParam(value = "p", defaultValue = "1") Integer page,
+                                    @RequestParam(value = "k", defaultValue = "") String keyword,
+                                    @RequestParam(value = "c", defaultValue = "all") String category,
+                                    @RequestParam(value = "company_id", defaultValue = "all") Long company_id) {
+        return productService.companyList(page, keyword, category, company_id);
     }
 
     // --------------------------- 상품 보기 로직 ---------------------------
@@ -109,24 +123,25 @@ public class ProductController {
         }
     }
 
+    // ------------------------------- 대분류 카테고리 상품 리스트 로직 -------------------------------
     @GetMapping("/category/{category_id}")
-    public ResponseEntity<List<Product>> getCategoryById(@PathVariable Long category_id) {
-        List<Product> products = productService.findProductsByCategoryId(category_id);
-        if (products == null || products.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(products);
+    public Map<String, Object> getCategoryById(@PathVariable Long category_id,
+                                                         @RequestParam(value = "p", defaultValue = "1") Integer page) {
+
+        return productService.findProductsByCategoryId(category_id, page);
+    }
+
+    // ------------------------------- 소분류 서브카테고리 상품 리스트 로직 -------------------------------
+    @GetMapping("/category/{category_id}/{subcategory_id}")
+    public Map<String, Object> getSubCategoryById(@PathVariable Long category_id, @PathVariable Long subcategory_id,
+                                                  @RequestParam(value = "p", defaultValue = "1") Integer page) {
+        return productService.findProductsBySubCategory(category_id, subcategory_id, page);
+        //TODO: getSubCategoryById, getCategoryById의 상품 목록을 프론트로 리턴할 때 products로 통일해주세요 ex. map.put("products", products)
     }
 
 
-    @GetMapping("/category/{category_id}/{subcategory_id}")
-    public ResponseEntity<List<Product>> getSubCategoryById(@PathVariable Long category_id, @PathVariable Long subcategory_id) {
-        List<Product> subproducts = productService.findProductsBySubCategory(category_id, subcategory_id);
-        if (subproducts == null || subproducts.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(subproducts);
-        //TODO: getSubCategoryById, getCategoryById의 상품 목록을 프론트로 리턴할 때 products로 통일해주세요 ex. map.put("products", products)
-
+    @GetMapping("/mainCategory")
+    public List<Category> getCategory() {
+        return productService.getCategoryById();
     }
 }

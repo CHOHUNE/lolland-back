@@ -27,6 +27,7 @@ VALUES (#{title},#{board_content},#{category},#{member_id})
         gb.board_count,
         gb.reg_time,
         gb.member_id,
+        gf.file_url,
         COUNT(DISTINCT gl.id) as count_like,
         COUNT(DISTINCT gc.id) as count_comment,
         COUNT(DISTINCT gf.id) as countFile
@@ -34,17 +35,16 @@ VALUES (#{title},#{board_content},#{category},#{member_id})
     LEFT JOIN lolland.gameboardlike gl ON gb.id = gl.game_board_id
     LEFT JOIN lolland.gameboardcomment gc ON gb.id = gc.game_board_id
     LEFT JOIN lolland.gameboardfile gf ON gb.id = gf.gameboard_id
-    WHERE 
-        gb.category != '공지' AND
-                (<trim prefixOverrides="OR">
-                        <if test="category == 'all' or category == 'title'">
-                            OR gb.title LIKE #{keyword}
-                        </if>
-                        <if test="category == 'all' or category == 'content'">
-                            OR gb.board_content LIKE #{keyword}
-                        </if>
-                    </trim>)
-                    OR gb.category LIKE #{keyword}
+            WHERE
+    (<trim prefixOverrides="OR">
+        <if test="category == 'all' or category == 'title'">
+            OR (gb.title LIKE #{keyword} AND gb.category != '공지')
+        </if>
+        <if test="category == 'all' or category == 'content'">
+            OR (gb.board_content LIKE #{keyword} AND gb.category != '공지')
+        </if>
+    </trim>)
+    OR (gb.category LIKE #{keyword} AND gb.category != '공지')
     GROUP BY gb.id
 
     ORDER BY
@@ -117,13 +117,13 @@ SELECT *,
              LEFT JOIN lolland.gameboardcomment gc on gb.id = gc.game_board_id
 WHERE gb.id=#{id}
 """)
-    GameBoard selectById(Integer id);
+    GameBoard selectById(Long id);
 
     @Delete("""
          DELETE FROM gameboard
          WHERE id=#{id}
             """)
-    int deleteById(Integer bgId);
+    int deleteById(Long bgId);
 
     @Update("""
 UPDATE gameboard
@@ -133,7 +133,7 @@ WHERE id= #{id}
     int update(GameBoard gameBoard);
 
     @Update("UPDATE gameboard SET board_count = board_count + 0.5 WHERE id = #{id}")
-    void boardCount(Integer id);
+    void boardCount(Long id);
 
     @Select("""
             <script>

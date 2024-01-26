@@ -23,7 +23,7 @@ CommentController {
     @PostMapping("add/{postId}")
     public ResponseEntity add(@RequestBody Comment comment,
                               @SessionAttribute(value="login",required = false) Member login,
-                              @PathVariable Integer postId) {
+                              @PathVariable Long postId) {
 
         if (login == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
