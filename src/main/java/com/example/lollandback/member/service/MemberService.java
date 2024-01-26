@@ -80,6 +80,13 @@ public class MemberService {
     public boolean deleteMember(Member login) {
         try {
             // 삭제 되는 유저의 티입을 deleted 로 변경 ---------------------------------------
+            // 이메일, 핸드폰 번호, 비밀번호 다 탈퇴유저라고 처리 --------------------------------
+            // TODO : 탈퇴 유저 난수로 비밀번호 저장
+//            // 난수 생성 후 36진수 문자열로 변환
+//            String randomString = Long.toString((long) (Math.random() * Long.MAX_VALUE), 36);
+//            // 문자열에서 처음 9자리를 추출
+//            randomString = randomString.substring(0, Math.min(9, randomString.length()));
+//
             mapper.deleteMemberInfoEditById(login.getId());
 
             // 삭제 되는 유저의 sub 주소들 삭제 ---------------------------------------------
@@ -158,6 +165,11 @@ public class MemberService {
     }
 
     public ResponseEntity findIdByNameAndEmail(String memberName, String memberEmail) {
+        // TODO : 탈퇴한 회원이라면 아이디 찾지 못하게 하기
+//        if(mapper.findDeletedMemberByNameAndEmail(memberName,memberEmail) == 1){
+//            return ResponseEntity.badRequest().body("탈퇴한 회원 입니다.");
+//        }
+
         String member_login_id = mapper.findIdByNameAndEmail(memberName,memberEmail);
         if ( member_login_id == null) {
             return ResponseEntity.badRequest().body("일치하는 정보가 없습니다.");
