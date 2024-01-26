@@ -57,12 +57,7 @@ public class MemberController {
     // 회원 로그인
     @PostMapping("login")
     public ResponseEntity login(@RequestBody Member member, WebRequest request){
-
-        if (service.loginUser(member, request)){
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+        return service.loginUser(member, request);
     }
 
     // 회원 로그아웃

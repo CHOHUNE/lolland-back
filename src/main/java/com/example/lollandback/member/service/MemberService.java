@@ -57,7 +57,12 @@ public class MemberService {
         memberImageMapper.insertDefaultImage(member.getId(), fileUrl);
     }
 
-    public boolean loginUser(Member member, WebRequest request) {
+    public ResponseEntity loginUser(Member member, WebRequest request) {
+        // 탈퇴 된 회원은 해당 아이디로 로그인 불가능
+        if(mapper.findDeletedMember(member.getMember_login_id()) == 1){
+            return ResponseEntity.badRequest().body("탈퇴한 회원 입니다.");
+        }
+        // 아이디가 존재 하면
         Member dbMember = mapper.selectById(member.getMember_login_id());
         if (dbMember != null ) {
             if(dbMember.getMember_password().equals(member.getMember_password())){
@@ -65,10 +70,10 @@ public class MemberService {
                 dbMember.setMember_password("");
                 // 세션에 쿠키를 넣어 클라이언트에 저장 시킴 @SessionAttribute의 login객체에 저장 시킴
                 request.setAttribute("login", dbMember, RequestAttributes.SCOPE_SESSION);
-                return true;
+                return ResponseEntity.ok().build();
             }
         }
-        return false;
+        return ResponseEntity.badRequest().body("아이디와 비밀번호가 일치하는지 확인해 주세요.");
     }
 
     // 유저 삭제 로직

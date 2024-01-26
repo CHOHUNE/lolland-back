@@ -188,4 +188,13 @@ public interface MemberMapper {
         WHERE id = #{id}
     """)
     void deleteMemberInfoEditById(Long id);
+
+    // 탈퇴한 유저인지 회원 로그인 id로 찾기
+    @Select("""
+        SELECT COUNT(*) FROM member
+        WHERE member_login_id = #{memberLoginId}
+        AND member_type = 'deleted'
+    """)
+    int findDeletedMember(String memberLoginId);
+
 }
