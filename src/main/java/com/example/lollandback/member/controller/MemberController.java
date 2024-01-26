@@ -143,8 +143,6 @@ public class MemberController {
     public Map<String, Object> getAllMember(@RequestParam(value = "page", defaultValue = "1") Integer page,
                                             @RequestParam(value = "id",required = false)String loginId,
                                             @RequestParam(value = "name", required = false)String name) {
-
-
         return service.getAllMember(page, loginId, name);
     }
 
