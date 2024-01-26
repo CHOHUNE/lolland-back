@@ -85,6 +85,22 @@ public class ProductController {
         return productService.companyList(page, keyword, category, company_id);
     }
 
+    // ------------------------------- 대분류 카테고리 상품 리스트 페이징 로직 -------------------------------
+    @GetMapping("/category/{category_id}")
+    public Map<String, Object> getCategoryById(@PathVariable Long category_id,
+                                               @RequestParam(value = "p", defaultValue = "1") Integer page) {
+
+        return productService.findProductsByCategoryId(category_id, page);
+    }
+
+    // ------------------------------- 소분류 서브카테고리 상품 리스트 페이징 로직 -------------------------------
+    @GetMapping("/category/{category_id}/{subcategory_id}")
+    public Map<String, Object> getSubCategoryById(@PathVariable Long category_id, @PathVariable Long subcategory_id,
+                                                  @RequestParam(value = "p", defaultValue = "1") Integer page) {
+        return productService.findProductsBySubCategory(category_id, subcategory_id, page);
+        //TODO: getSubCategoryById, getCategoryById의 상품 목록을 프론트로 리턴할 때 products로 통일해주세요 ex. map.put("products", products)
+    }
+
     // --------------------------- 상품 보기 로직 ---------------------------
     @GetMapping("product_id/{product_id}")
     public ProductDto get(@PathVariable Integer product_id) {
@@ -123,21 +139,7 @@ public class ProductController {
         }
     }
 
-    // ------------------------------- 대분류 카테고리 상품 리스트 페이징 로직 -------------------------------
-    @GetMapping("/category/{category_id}")
-    public Map<String, Object> getCategoryById(@PathVariable Long category_id,
-                                                         @RequestParam(value = "p", defaultValue = "1") Integer page) {
 
-        return productService.findProductsByCategoryId(category_id, page);
-    }
-
-    // ------------------------------- 소분류 서브카테고리 상품 리스트 페이징 로직 -------------------------------
-    @GetMapping("/category/{category_id}/{subcategory_id}")
-    public Map<String, Object> getSubCategoryById(@PathVariable Long category_id, @PathVariable Long subcategory_id,
-                                                  @RequestParam(value = "p", defaultValue = "1") Integer page) {
-        return productService.findProductsBySubCategory(category_id, subcategory_id, page);
-        //TODO: getSubCategoryById, getCategoryById의 상품 목록을 프론트로 리턴할 때 products로 통일해주세요 ex. map.put("products", products)
-    }
 
 
     // ------------------------------- 메인페이지 카테고리 가져오는 로직 -------------------------------
