@@ -116,4 +116,12 @@ public interface MemberAddressMapper {
         WHERE member_id =#{memberId}
     """)
     void deleteByMemberId(Long memberId);
+
+    // 삭제 되는 유저의 sub 주소들 삭제
+    @Delete("""
+        DELETE FROM memberaddress 
+        WHERE member_id = #{id} 
+        AND member_address_type = 'sub'
+    """)
+    void deleteSubAddressByMemberId(Long id);
 }
