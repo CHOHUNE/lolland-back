@@ -180,4 +180,12 @@ public interface MemberMapper {
         </script>
     """)
     int countAllGameBoardLikeByLoginId(String memberLoginId, String categoryType);
+
+    // 삭제 되는 유저의 티입으 deleted 로 변경
+    @Update("""
+        UPDATE member
+        SET member_type = 'deleted'
+        WHERE id = #{id}
+    """)
+    void deleteMemberInfoEditById(Long id);
 }

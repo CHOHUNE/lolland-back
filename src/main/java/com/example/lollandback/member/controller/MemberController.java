@@ -135,7 +135,7 @@ public class MemberController {
         }
 
         // 회원 탈퇴 성공시 ok 값 던지기
-        if(service.deleteMember(login.getId())) {
+        if(service.deleteMember(login)) {
             return ResponseEntity.ok().build();
         }
 

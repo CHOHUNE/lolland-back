@@ -1,5 +1,6 @@
 package com.example.lollandback.member.service;
 
+import com.example.lollandback.board.cart.mapper.CartMapper;
 import com.example.lollandback.gameBoard.domain.Like;
 import com.example.lollandback.gameBoard.mapper.LikeMapper;
 import com.example.lollandback.member.domain.EditMemberAndAddress;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.WebRequest;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +32,7 @@ public class MemberService {
     private final MemberAddressMapper memberAddressMapper;
     private final MemberImageMapper memberImageMapper;
     private final LikeMapper gameBoardLikeMapper;
+    private final CartMapper cartMapper;
 
     private final S3Client s3;
 
@@ -68,8 +71,48 @@ public class MemberService {
         return false;
     }
 
-    public boolean deleteMember(Long id) {
-        return mapper.deleteById(id) == 1;
+    // 유저 삭제 로직
+    public boolean deleteMember(Member login) {
+        try {
+            // 삭제 되는 유저의 티입을 deleted 로 변경 ---------------------------------------
+            mapper.deleteMemberInfoEditById(login.getId());
+
+            // 삭제 되는 유저의 sub 주소들 삭제 ---------------------------------------------
+            memberAddressMapper.deleteSubAddressByMemberId(login.getId());
+
+            // 삭제 되는 유저의 s3 이미지 삭제 ----------------------------------------------
+            // 이미지가 변경된다면 일단 기존 파일 이름을 갖고 온다
+            String prevFileName = memberImageMapper.getPrevFileName(login.getId());
+
+            // 기존 이미지가 S3의 경로에 존재하면 삭제하기
+            String deleteKey = "lolland/user/" + login.getId() + "/" + prevFileName;
+            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(deleteKey)
+                    .build();
+            // S3 기존 이미지 파일 삭제
+            s3.deleteObject(deleteObjectRequest);
+
+            // 탈퇴 유저 이미지 DB에 삭제된 유저 이미지로 변경 -----------------------------------
+            // 탈퇴 이미지 경로 설정
+            String fileUrl = urlPrefix + "lolland/user/default/deletedImage.png";
+            memberImageMapper.deletedMemberImage(login.getId(),fileUrl);
+
+            // 탈퇴 유저의 게임 게시글 좋아요 삭제 ---------------------------------------------
+            // TODO: 머지하면 추가될 예정
+            // TODO: gameBoardLikeMapper.deleteByMemberId(login.getMember_login_id);
+
+
+            // 탈퇴 유저의 장바구니 삭제 -----------------------------------------------------
+            cartMapper.deleteAllByMember(login.getId());
+
+            // 모든 작업이 성공시 true 리턴
+            return true;
+        } catch (Exception e) {
+            // 작업중 실패했다면 false 리턴
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public MemberDto getMember(Member login) {
