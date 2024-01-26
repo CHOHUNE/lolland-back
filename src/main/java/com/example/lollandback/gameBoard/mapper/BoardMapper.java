@@ -80,7 +80,7 @@ SELECT *,COUNT(DISTINCT gl.id)count_like,
                
  GROUP BY gb.id,gb.board_count
  ORDER BY count_like DESC,count_comment DESC,gb.board_count DESC
- LIMIT 5
+ LIMIT 6
 """)
     List<GameBoard> selectTop();
 
