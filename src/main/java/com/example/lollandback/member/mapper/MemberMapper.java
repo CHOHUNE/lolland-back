@@ -182,9 +182,14 @@ public interface MemberMapper {
     int countAllGameBoardLikeByLoginId(String memberLoginId, String categoryType);
 
     // 삭제 되는 유저의 티입으 deleted 로 변경
+    // 이메일, 핸드폰 번호, 탈퇴 유저 처리
     @Update("""
         UPDATE member
-        SET member_type = 'deleted'
+        SET
+        member_type = 'deleted',
+        member_email = '***@***',
+        member_phone_number = '***-****-****',
+        member_introduce = '탈퇴한 회원 입니다.'
         WHERE id = #{id}
     """)
     void deleteMemberInfoEditById(Long id);

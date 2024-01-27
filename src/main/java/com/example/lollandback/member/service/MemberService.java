@@ -80,13 +80,7 @@ public class MemberService {
     public boolean deleteMember(Member login) {
         try {
             // 삭제 되는 유저의 티입을 deleted 로 변경 ---------------------------------------
-            // 이메일, 핸드폰 번호, 비밀번호 다 탈퇴유저라고 처리 --------------------------------
-            // TODO : 탈퇴 유저 난수로 비밀번호 저장
-//            // 난수 생성 후 36진수 문자열로 변환
-//            String randomString = Long.toString((long) (Math.random() * Long.MAX_VALUE), 36);
-//            // 문자열에서 처음 9자리를 추출
-//            randomString = randomString.substring(0, Math.min(9, randomString.length()));
-//
+            // 이메일, 핸드폰 번호, 탈퇴 유저 처리
             mapper.deleteMemberInfoEditById(login.getId());
 
             // 삭제 되는 유저의 sub 주소들 삭제 ---------------------------------------------
@@ -111,12 +105,15 @@ public class MemberService {
             memberImageMapper.deletedMemberImage(login.getId(),fileUrl);
 
             // 탈퇴 유저의 게임 게시글 좋아요 삭제 ---------------------------------------------
-            // TODO: 머지하면 추가될 예정
-            // TODO: gameBoardLikeMapper.deleteByMemberId(login.getMember_login_id);
-
+            gameBoardLikeMapper.deleteByMemberId(login.getMember_login_id());
 
             // 탈퇴 유저의 장바구니 삭제 -----------------------------------------------------
             cartMapper.deleteAllByMember(login.getId());
+
+            // 탈퇴 유저의 상품 찜 목록 삭제 -------------------------------------------------
+            // TODO : 삭제된 유저의 id 로 해당유저의 찜 목록 삭제 기능 추가하기
+            // TODO : productLikeMapper.deleteLikeByMemberId(login.getId());
+            // 이렇게 사용할 예정
 
             // 모든 작업이 성공시 true 리턴
             return true;
@@ -165,11 +162,6 @@ public class MemberService {
     }
 
     public ResponseEntity findIdByNameAndEmail(String memberName, String memberEmail) {
-        // TODO : 탈퇴한 회원이라면 아이디 찾지 못하게 하기
-//        if(mapper.findDeletedMemberByNameAndEmail(memberName,memberEmail) == 1){
-//            return ResponseEntity.badRequest().body("탈퇴한 회원 입니다.");
-//        }
-
         String member_login_id = mapper.findIdByNameAndEmail(memberName,memberEmail);
         if ( member_login_id == null) {
             return ResponseEntity.badRequest().body("일치하는 정보가 없습니다.");
@@ -179,11 +171,16 @@ public class MemberService {
     }
 
     public ResponseEntity findUserByIdAndEmail(String memberLoginId, String memberEmail) {
+        // 탈퇴 된 회원은 해당 아이디로 로그인 불가능
+        if(mapper.findDeletedMember(memberLoginId) == 1){
+            return ResponseEntity.badRequest().body("탈퇴한 회원 입니다.");
+        }
+
         Integer existUser = mapper.findUserByIdAndEmail(memberLoginId, memberEmail);
         if(existUser == 1) {
             return ResponseEntity.ok().build();
         } else {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body("일치하는 회원 정보가 없습니다.");
         }
 
     }
