@@ -89,7 +89,6 @@ public class ProductController {
     @GetMapping("/category/{category_id}")
     public Map<String, Object> getCategoryById(@PathVariable Long category_id,
                                                @RequestParam(value = "p", defaultValue = "1") Integer page) {
-
         return productService.findProductsByCategoryId(category_id, page);
     }
 

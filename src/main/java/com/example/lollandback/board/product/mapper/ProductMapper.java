@@ -70,6 +70,9 @@ public interface ProductMapper {
             <if test="category == 'company_name'">
                 AND co.company_name LIKE #{keyword}
             </if>
+            <if test="category != 'all'">
+              AND p.category_id = #{category}
+            </if>
             ORDER BY p.product_reg_time DESC
             LIMIT #{from}, 16
             </script>
