@@ -110,7 +110,8 @@ public class GearService {
             for (MultipartFile file : uploadFiles){
                 upload(gearBoard.getGear_id(), file);
             //db 에 추가하기
-            gearFileMapper.insert(gearBoard.getGear_id(),file.getOriginalFilename());
+                String file_url= urlPrefix+upload(gearBoard.getGear_id(), file);
+            gearFileMapper.insert(gearBoard.getGear_id(),file.getOriginalFilename(),file_url);
             }
         }
 
@@ -130,25 +131,38 @@ public class GearService {
      return true;
     }
 
+//    public boolean saves(GearBoard gearBoard, MultipartFile[] files, Member login) throws IOException {
+//            gearBoard.setMember_id(login.getMember_login_id());
+//        int cnt =  mapper.insert(gearBoard);
+//
+//                    // gearboardfile 테이블에 files !! 정보 저장 !!
+//        if (files!=null){
+//            for (int i = 0; i < files.length ; i++) {
+//                    gearFileMapper.insert(gearBoard.getGear_id(), files[i].getOriginalFilename());
+//                    // gearboardId, name ,id (pk) 정보만 저장
+//                   //파일 을 버켓에 업로드 한다.
+//                    upload(gearBoard.getGear_id(), files[i]);
+//            }
+//        }
+//            return cnt==1;
+//    }
     public boolean saves(GearBoard gearBoard, MultipartFile[] files, Member login) throws IOException {
+        gearBoard.setMember_id(login.getMember_login_id());
+        int cnt =  mapper.insert(gearBoard);
 
-            gearBoard.setMember_id(login.getMember_login_id());
-                   int cnt =  mapper.insert(gearBoard);
-
-                    // gearboardfile 테이블에 files !! 정보 저장 !!
+        // gearboardfile 테이블에 files !! 정보 저장 !!
         if (files!=null){
             for (int i = 0; i < files.length ; i++) {
-                    gearFileMapper.insert(gearBoard.getGear_id(), files[i].getOriginalFilename());
-                    // gearboardId, name ,id (pk) 정보만 저장
-                   //파일 을 버켓에 업로드 한다.
-                    upload(gearBoard.getGear_id(), files[i]);
+                String filel_url= urlPrefix + upload(gearBoard.getGear_id(), files[i]);
+                gearFileMapper.insert(gearBoard.getGear_id(), files[i].getOriginalFilename(),filel_url);
             }
         }
-            return cnt==1;
+        return cnt==1;
     }
 
+    private String upload(Integer gear_id,MultipartFile file) throws IOException {
 
-    private void upload(Integer gear_id,MultipartFile file) throws IOException {
+
         String key = "lolland/gearboard/" + gear_id + "/" + file.getOriginalFilename();
 
         PutObjectRequest objectRequest = PutObjectRequest.builder()
@@ -159,7 +173,26 @@ public class GearService {
 
         s3.putObject(objectRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
 
+        return key;
+
     }
+
+
+//
+//    private void upload(Integer gear_id,MultipartFile file) throws IOException {
+//
+//
+//        String key = "lolland/gearboard/" + gear_id + "/" + file.getOriginalFilename();
+//
+//        PutObjectRequest objectRequest = PutObjectRequest.builder()
+//                .bucket(bucket)
+//                .key(key)
+//                .acl(ObjectCannedACL.PUBLIC_READ)
+//                .build();
+//
+//        s3.putObject(objectRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+//
+//    }
 
 
     public List<GearBoard> listAll() {

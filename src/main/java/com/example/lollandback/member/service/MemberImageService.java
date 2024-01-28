@@ -56,7 +56,7 @@ public class MemberImageService {
 
 
             // 새로운 이미지 S3에 저장
-            String putKey = "lolland/user/" + login.getId() + "/" + file.getOriginalFilename();
+            String putKey =  "lolland/user/" + login.getId() + "/" + file.getOriginalFilename();
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucket)
                     .key(putKey)

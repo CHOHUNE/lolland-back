@@ -203,7 +203,8 @@ LIMIT 5;
     b.gear_views,
     COUNT(DISTINCT f.id) AS countFile,
     COUNT(DISTINCT c.id) AS commnetcount,
-    COUNT(DISTINCT l.id) AS countLike
+    COUNT(DISTINCT l.id) AS countLike,
+    f.file_url as mainfile
 FROM
     gearboard b
         LEFT JOIN

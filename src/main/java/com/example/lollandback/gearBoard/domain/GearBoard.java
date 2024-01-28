@@ -27,7 +27,7 @@ public class  GearBoard {
     private  String file_name;
     private String file_url;
 
-
+    private  String mainfile;
     private List<GearFile> files;
 
 
