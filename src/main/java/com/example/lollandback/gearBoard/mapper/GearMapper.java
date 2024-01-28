@@ -158,10 +158,10 @@ FROM
 GROUP BY
     b.gear_id
 ORDER BY
-    b.gear_inserted desc ;
-
-        """)
-    List<GearBoard> listAll();
+    b.gear_inserted desc 
+    limit  #{from},10
+            """)
+    List<GearBoard> listAll(Integer from);
 
     @Select("""
         SELECT

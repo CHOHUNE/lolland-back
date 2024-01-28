@@ -195,8 +195,9 @@ public class GearService {
 //    }
 
 
-    public List<GearBoard> listAll() {
-      return   mapper.listAll();
+    public List<GearBoard> listAll(Integer page) {
+        int from = (page-1)*10;
+      return   mapper.listAll(from);
     }
 
     public List<GearBoard> listss() {

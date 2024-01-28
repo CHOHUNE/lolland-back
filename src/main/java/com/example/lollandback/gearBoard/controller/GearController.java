@@ -62,8 +62,8 @@ public ResponseEntity saves(  GearBoard gearBoard,
     }
 
     @GetMapping("listAll")
-    public List<GearBoard> list(){
-    return service.listAll();
+    public List<GearBoard> list(@RequestParam(value = "p",defaultValue = "1")Integer page){
+    return service.listAll(page);
     }
 
 
