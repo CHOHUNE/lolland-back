@@ -60,4 +60,10 @@ public interface ProductLikeMapper {
             WHERE product_id = #{product_id}
             """)
     void deleteByProductId(Long product_id);
+
+    @Delete("""
+            DELETE FROM productlike
+            WHERE member_id = #{member_id}
+            """)
+    void deleteLikeByMemberId(Long member_id);
 }
