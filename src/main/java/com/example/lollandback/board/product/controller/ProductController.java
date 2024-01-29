@@ -70,14 +70,14 @@ public class ProductController {
     }
 
     // --------------------------- 전체 상품 리스트 로직 ---------------------------
-    @GetMapping("list")
+    @GetMapping("list") //전체상품
     public Map<String, Object> list(@RequestParam(value = "p", defaultValue = "1") Integer page,
                                     @RequestParam(value = "k", defaultValue = "") String keyword,
                                     @RequestParam(value = "c", defaultValue = "all") String category) {
         return productService.list(page, keyword, category);
     }
 
-    @GetMapping("company")
+    @GetMapping("company") // 회사
     public Map<String, Object> list(@RequestParam(value = "p", defaultValue = "1") Integer page,
                                     @RequestParam(value = "k", defaultValue = "") String keyword,
                                     @RequestParam(value = "c", defaultValue = "all") String category,
