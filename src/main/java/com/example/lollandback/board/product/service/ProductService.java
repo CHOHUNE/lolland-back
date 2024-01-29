@@ -20,7 +20,6 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -345,11 +344,11 @@ public class ProductService {
     }
 
     // --------------------------- 대분류 카테고리 리스트 & 페이징 ---------------------------!!
-    public Map<String, Object> findProductsByCategoryId(Long categoryId, Integer page) {
+    public Map<String, Object> findProductsByCategoryId(Long categoryId, Integer page, String keyword, String category) {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> pageInfo = new HashMap<>();
 
-        int countAll = productMapper.countCategoryProductAll(categoryId);
+        int countAll = productMapper.countCategoryProductAll(categoryId, "%" + keyword + "%", category);
         int lastPageNumber = (countAll - 1) / 10 + 1;
         int startPageNumber = (page - 1) / 10 * 10 + 1;
         int endPageNumber = startPageNumber + 9;
@@ -368,7 +367,7 @@ public class ProductService {
         }
 
         int from = (page - 1) * 3;
-        List<Product> products = productMapper.findByCategoryId(categoryId, from);
+        List<Product> products = productMapper.findByCategoryId(categoryId, from, "%" + keyword + "%", category);
         products.forEach(productListImg -> {
             List<ProductImg> productsImg = mainImgMapper.selectNamesByCategoryId(productListImg.getProduct_id());
             productsImg.forEach(img -> img.setMain_img_uri(urlPrefix + "lolland/product/productMainImg/" + productListImg.getProduct_id() + "/" + img.getMain_img_uri()));
@@ -382,11 +381,11 @@ public class ProductService {
     }
 
     // --------------------------- 소분류 서브카테고리 리스트 & 페이징 ---------------------------
-    public Map<String, Object> findProductsBySubCategory(Long category_id, Long subcategory_id, Integer page) {
+    public Map<String, Object> findProductsBySubCategory(Long category_id, Long subcategory_id, Integer page, String keyword, String category) {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> pageInfo = new HashMap<>();
 
-        int countAll = productMapper.countSubCategoryProductAll(category_id, subcategory_id);
+        int countAll = productMapper.countSubCategoryProductAll(category_id, subcategory_id, "%" + keyword + "%", category);
 
         int lastPageNumber = (countAll - 1) / 10 + 1;
         int startPageNumber = (page - 1) / 10 * 10 + 1;
@@ -407,7 +406,7 @@ public class ProductService {
 
         int from = (page - 1) * 3;
 
-        List<Product> products = productMapper.findByCategoryIdAndSubcategoryId(category_id, subcategory_id, from);
+        List<Product> products = productMapper.findByCategoryIdAndSubcategoryId(category_id, subcategory_id, from, "%" + keyword + "%", category);
         products.forEach(productListImg -> {
             List<ProductImg> productsImg = mainImgMapper.selectNamesByCategoryId(productListImg.getProduct_id());
             productsImg.forEach(img -> img.setMain_img_uri(urlPrefix + "lolland/product/productMainImg/" + productListImg.getProduct_id() + "/" + img.getMain_img_uri()));

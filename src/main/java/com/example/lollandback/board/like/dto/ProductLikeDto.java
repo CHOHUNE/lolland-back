@@ -10,4 +10,5 @@ public class ProductLikeDto {
     private String product_name;
     private Double product_price;
     private String main_img_uri;
+    private String company_name;
 }
