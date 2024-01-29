@@ -159,7 +159,7 @@ GROUP BY
     b.gear_id
 ORDER BY
     b.gear_inserted desc 
-    limit  #{from},10
+    limit  #{from},5
             """)
     List<GearBoard> listAll(Integer from);
 
@@ -223,5 +223,14 @@ LIMIT 5;
 
         """)
     List<GearBoard> listto();
+
+
+
+
+    @Select("""
+select count(*)
+from gearboard;
+            """)
+    int countAll();
 }
 
