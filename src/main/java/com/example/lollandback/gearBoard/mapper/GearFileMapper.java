@@ -22,9 +22,9 @@ public interface GearFileMapper {
 //    int insert(Integer gearId, String originalFilename);
 
     @Insert("""
-            insert into gearfile (gearboard_id,name) values (#{gear_id},#{originalFilename});
+            insert into gearfile (gearboard_id,name,file_url) values (#{gear_id},#{originalFilename},#{file_url});
             """)
-    int insert(Integer gear_id, String originalFilename);
+    int  insert(Integer gear_id, String originalFilename, String file_url);
 
     @Select("""
                 select id, name from gearfile where gearboard_id =#{gear_id};

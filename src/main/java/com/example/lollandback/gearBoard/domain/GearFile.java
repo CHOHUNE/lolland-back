@@ -7,6 +7,7 @@ public class GearFile {
     private  String name;
     private  Integer id;
     private  String url;
+    private  String file_url;
 
 
 }
