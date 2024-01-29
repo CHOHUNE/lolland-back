@@ -4,9 +4,7 @@ import com.example.lollandback.board.product.domain.Category;
 import com.example.lollandback.board.product.domain.Company;
 import com.example.lollandback.board.product.domain.Product;
 import com.example.lollandback.board.product.domain.SubCategory;
-import com.example.lollandback.board.product.dto.CategoryDto;
-import com.example.lollandback.board.product.dto.ProductUpdateDto;
-import com.example.lollandback.board.product.dto.SubCategoryDto;
+import com.example.lollandback.board.product.dto.*;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -71,6 +69,9 @@ public interface ProductMapper {
             </if>
             <if test="category == 'company_name'">
                 AND co.company_name LIKE #{keyword}
+            </if>
+            <if test="category != 'all'">
+              AND p.category_id = #{category}
             </if>
             ORDER BY p.product_reg_time DESC
             LIMIT #{from}, 16
@@ -149,8 +150,9 @@ public interface ProductMapper {
     @Select("""
             SELECT *
             FROM product p JOIN category c ON p.category_id = c.category_id
+            JOIN company com ON p.company_id = com.company_id
             WHERE p.category_id = #{category_id} AND p.product_status = 'none'
-            LIMIT #{from}, 3
+            LIMIT #{from}, 16
             """)
     List<Product> findByCategoryId(Long category_id, Integer from);
 
@@ -159,10 +161,11 @@ public interface ProductMapper {
                 FROM product p
                 JOIN category c ON p.category_id = c.category_id
                 JOIN subcategory sub ON p.subcategory_id = sub.subcategory_id
+                JOIN company com ON p.company_id = com.company_id
                 WHERE p.category_id = #{category_id} 
                 AND p.subcategory_id = #{subcategory_id}
                 AND p.product_status = 'none'
-                LIMIT #{from}, 3
+                LIMIT #{from}, 16
             """)
     List<Product> findByCategoryIdAndSubcategoryId(Long category_id, Long subcategory_id, Integer from);
 
@@ -261,8 +264,20 @@ public interface ProductMapper {
             SELECT COUNT(*) FROM category c
                  LEFT JOIN subcategory sub ON c.category_id = sub.category_id
                  LEFT JOIN product p ON sub.subcategory_id = p.subcategory_id
-            WHERE c.category_id = #{category_id} AND sub.subcategory_id = #{subcategory_id};
+            WHERE c.category_id = #{category_id} AND sub.subcategory_id = #{subcategory_id} AND p.product_status = 'none';
             """)
     int countSubCategoryProductAll(Long category_id, Long subcategory_id);
 
+
+//   ------------------------- 리뷰가 가장 많은 3개의 상품 보여주기 --------------------------
+    @Select("""
+            SELECT p.product_id, p.product_name, c.company_name, p.product_price, p.product_content, COUNT(r.review_id) AS review_count
+            FROM product p
+            JOIN review r ON p.product_id = r.product_id
+            JOIN company c ON p.company_id = c.company_id
+            GROUP BY P.product_id
+            ORDER BY review_count DESC
+            LIMIT 3;
+            """)
+    List<MainProductDto> mostReviewProduct();
 }

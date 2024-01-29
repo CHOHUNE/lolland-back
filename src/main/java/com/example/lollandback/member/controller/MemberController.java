@@ -57,12 +57,7 @@ public class MemberController {
     // 회원 로그인
     @PostMapping("login")
     public ResponseEntity login(@RequestBody Member member, WebRequest request){
-
-        if (service.loginUser(member, request)){
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+        return service.loginUser(member, request);
     }
 
     // 회원 로그아웃
@@ -135,7 +130,7 @@ public class MemberController {
         }
 
         // 회원 탈퇴 성공시 ok 값 던지기
-        if(service.deleteMember(login.getId())) {
+        if(service.deleteMember(login)) {
             return ResponseEntity.ok().build();
         }
 
@@ -148,8 +143,6 @@ public class MemberController {
     public Map<String, Object> getAllMember(@RequestParam(value = "page", defaultValue = "1") Integer page,
                                             @RequestParam(value = "id",required = false)String loginId,
                                             @RequestParam(value = "name", required = false)String name) {
-
-
         return service.getAllMember(page, loginId, name);
     }
 
@@ -169,8 +162,9 @@ public class MemberController {
     // 회원이 좋아요 한 게임 게시글 목록 갖고 오기
     @GetMapping("getGameBoardLike")
     public Map<String,Object> getGameBoardLike(@SessionAttribute("login") Member login,
-                                            @RequestParam(value = "page", defaultValue = "1")Integer page) {
-        return service.getGameBoardLike(login,page);
+                                               @RequestParam(value = "page", defaultValue = "1")Integer page,
+                                               @RequestParam(value = "categoryType", defaultValue = "전체")String categoryType) {
+        return service.getGameBoardLike(login, page, categoryType);
     }
 
     // 회원의 게임 게시글 좋아요 한 것 한개 삭제

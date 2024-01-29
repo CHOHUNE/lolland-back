@@ -61,4 +61,15 @@ public interface MemberImageMapper {
         WHERE member_id = #{userId}
     """)
     String getPrevFileName(Long userId);
+
+    // 삭제된 유저 기본 이미지 설정
+    @Update("""
+    UPDATE memberimage 
+        SET 
+        file_name =  'deletedImage.png',
+        file_url = #{fileUrl}, 
+        image_type = 'deleted'
+        WHERE member_id = #{id}
+    """)
+    void deletedMemberImage(Long id, String fileUrl);
 }
