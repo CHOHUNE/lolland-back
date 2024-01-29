@@ -85,19 +85,20 @@ public class ProductController {
         return productService.companyList(page, keyword, category, company_id);
     }
 
-    // ------------------------------- 대분류 카테고리 상품 리스트 페이징 로직 -------------------------------
-    @GetMapping("/category/{category_id}")
+    @GetMapping("/category/{category_id}") // 카테고리(대분류)
     public Map<String, Object> getCategoryById(@PathVariable Long category_id,
-                                               @RequestParam(value = "p", defaultValue = "1") Integer page) {
-        return productService.findProductsByCategoryId(category_id, page);
+                                               @RequestParam(value = "p", defaultValue = "1") Integer page,
+                                               @RequestParam(value = "k", defaultValue = "") String keyword,
+                                               @RequestParam(value = "c", defaultValue = "all") String category) {
+        return productService.findProductsByCategoryId(category_id, page, keyword, category);
     }
 
-    // ------------------------------- 소분류 서브카테고리 상품 리스트 페이징 로직 -------------------------------
-    @GetMapping("/category/{category_id}/{subcategory_id}")
+    @GetMapping("/category/{category_id}/{subcategory_id}") // 서브카테고리(소분류)
     public Map<String, Object> getSubCategoryById(@PathVariable Long category_id, @PathVariable Long subcategory_id,
-                                                  @RequestParam(value = "p", defaultValue = "1") Integer page) {
-        return productService.findProductsBySubCategory(category_id, subcategory_id, page);
-        //TODO: getSubCategoryById, getCategoryById의 상품 목록을 프론트로 리턴할 때 products로 통일해주세요 ex. map.put("products", products)
+                                                  @RequestParam(value = "p", defaultValue = "1") Integer page,
+                                                  @RequestParam(value = "k", defaultValue = "") String keyword,
+                                                  @RequestParam(value = "c", defaultValue = "all") String category) {
+        return productService.findProductsBySubCategory(category_id, subcategory_id, page, keyword, category);
     }
 
     // --------------------------- 상품 보기 로직 ---------------------------
