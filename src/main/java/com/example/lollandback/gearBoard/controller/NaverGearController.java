@@ -68,7 +68,7 @@ public class NaverGearController {
         URI uri = UriComponentsBuilder.fromUriString("https://openapi.naver.com/")
                 .path("v1/search/news.json")
                 .queryParam("query", "컴퓨터장비")
-                .queryParam("display", 6)
+                .queryParam("display", 15)
                 .queryParam("start", 1)
                 .queryParam("sort", "date")
                 .encode()
