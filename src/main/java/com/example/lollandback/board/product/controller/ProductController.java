@@ -87,14 +87,18 @@ public class ProductController {
 
     @GetMapping("/category/{category_id}") // 카테고리(대분류)
     public Map<String, Object> getCategoryById(@PathVariable Long category_id,
-                                               @RequestParam(value = "p", defaultValue = "1") Integer page) {
-        return productService.findProductsByCategoryId(category_id, page);
+                                               @RequestParam(value = "p", defaultValue = "1") Integer page,
+                                               @RequestParam(value = "k", defaultValue = "") String keyword,
+                                               @RequestParam(value = "c", defaultValue = "all") String category) {
+        return productService.findProductsByCategoryId(category_id, page, keyword, category);
     }
 
     @GetMapping("/category/{category_id}/{subcategory_id}") // 서브카테고리(소분류)
     public Map<String, Object> getSubCategoryById(@PathVariable Long category_id, @PathVariable Long subcategory_id,
-                                                  @RequestParam(value = "p", defaultValue = "1") Integer page) {
-        return productService.findProductsBySubCategory(category_id, subcategory_id, page);
+                                                  @RequestParam(value = "p", defaultValue = "1") Integer page,
+                                                  @RequestParam(value = "k", defaultValue = "") String keyword,
+                                                  @RequestParam(value = "c", defaultValue = "all") String category) {
+        return productService.findProductsBySubCategory(category_id, subcategory_id, page, keyword, category);
     }
 
     // --------------------------- 상품 보기 로직 ---------------------------
