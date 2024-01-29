@@ -143,16 +143,20 @@ public class GameBoardService {
 
     public GameBoard get(Long id) {
 
-        String cookieValue = getCookieValue("board_" + id);
-        if (cookieValue == null) {
-            boardCount(id);
-            addCookie("board_"+id,"viewed");
-        }
+
 
 //      게시물, 파일 조회 부분
         GameBoard gameBoard = mapper.selectById(id);
         List<GameBoardFile> boardFiles = fileMapper.selectNamesBygameboardId(id);
         gameBoard.setFiles(boardFiles);
+
+        String cookieValue = getCookieValue("board_" + id);
+
+            if (gameBoard != null && cookieValue==null) {
+                addCookie("board_"+id,"viewed");
+
+                boardCount(id);
+            }
 
         return gameBoard;
     }

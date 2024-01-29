@@ -25,10 +25,10 @@ public class NaverNews {
     @Value("${naver.client.ps}")
     private String naverClientSecret;
 
-    @GetMapping("naver")
+    @GetMapping("pc")
     public String naver() {
 
-        String query = "뉴스";
+        String query = "pc 게임";
         String encode = Base64.getEncoder().encodeToString(query.getBytes(StandardCharsets.UTF_8));
 
         URI uri = UriComponentsBuilder.fromUriString("https://openapi.naver.com/")
@@ -53,4 +53,62 @@ public class NaverNews {
         ResponseEntity<String> result = restTemplate.exchange(req, String.class);
         return result.getBody();
     }
+
+    @GetMapping("console")
+    public String console() {
+
+        String query = "콘솔 게임";
+        String encode = Base64.getEncoder().encodeToString(query.getBytes(StandardCharsets.UTF_8));
+
+        URI uri = UriComponentsBuilder.fromUriString("https://openapi.naver.com/")
+                .path("v1/search/news.json")
+                .queryParam("query", "ps5,xbox,스위치")
+                .queryParam("display", 8)
+                .queryParam("start", 1)
+                .queryParam("sort", "date")
+                .encode()
+                .build()
+                .toUri();
+
+        log.info("uri : {}", uri);
+        RestTemplate restTemplate = new RestTemplate();
+
+        RequestEntity<Void> req = RequestEntity
+                .get(uri)
+                .header("X-Naver-Client-Id", naverClientId)
+                .header("X-Naver-Client-Secret", naverClientSecret)
+                .build();
+
+        ResponseEntity<String> result = restTemplate.exchange(req, String.class);
+        return result.getBody();
+    }
+    @GetMapping("mobile")
+    public String mobile() {
+
+        String query = "모바일 게임";
+        String encode = Base64.getEncoder().encodeToString(query.getBytes(StandardCharsets.UTF_8));
+
+        URI uri = UriComponentsBuilder.fromUriString("https://openapi.naver.com/")
+                .path("v1/search/news.json")
+                .queryParam("query", "모바일 게임")
+                .queryParam("display", 8)
+                .queryParam("start", 1)
+                .queryParam("sort", "date")
+                .encode()
+                .build()
+                .toUri();
+
+        log.info("uri : {}", uri);
+        RestTemplate restTemplate = new RestTemplate();
+
+        RequestEntity<Void> req = RequestEntity
+                .get(uri)
+                .header("X-Naver-Client-Id", naverClientId)
+                .header("X-Naver-Client-Secret", naverClientSecret)
+                .build();
+
+        ResponseEntity<String> result = restTemplate.exchange(req, String.class);
+        return result.getBody();
+    }
+
 }

@@ -68,7 +68,7 @@ VALUES (#{title},#{board_content},#{category},#{member_id})
 
 
     @Select("""
-SELECT *,COUNT(DISTINCT gl.id)count_like,
+SELECT gb.*,COUNT(DISTINCT gl.id)count_like,
  COUNT(DISTINCT gc.id)count_comment,
                    COUNT(DISTINCT gf.id)countFile
                
@@ -76,7 +76,7 @@ SELECT *,COUNT(DISTINCT gl.id)count_like,
  LEFT JOIN lolland.gameboardlike gl on gb.id = gl.game_board_id
  LEFT JOIN lolland.gameboardcomment gc on gb.id = gc.game_board_id
                LEFT JOIN lolland.gameboardfile gf on gb.id = gf.gameboard_id
-               WHERE gb.category !='공지'
+            WHERE gb.category != '공지' AND gf.id IS NOT NULL
                
  GROUP BY gb.id,gb.board_count
  ORDER BY count_like DESC,count_comment DESC,gb.board_count DESC
@@ -104,7 +104,7 @@ SELECT *,COUNT(DISTINCT gl.id)count_like,
         SELECT title,id FROM gameboard
  WHERE DATE(reg_time) = CURRENT_DATE
  ORDER BY board_count DESC
- LIMIT 5;
+ LIMIT 10;
   
 
 """)
