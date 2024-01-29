@@ -1,6 +1,7 @@
 package com.example.lollandback.member.service;
 
 import com.example.lollandback.board.cart.mapper.CartMapper;
+import com.example.lollandback.board.like.mapper.ProductLikeMapper;
 import com.example.lollandback.gameBoard.domain.Like;
 import com.example.lollandback.gameBoard.mapper.LikeMapper;
 import com.example.lollandback.member.domain.EditMemberAndAddress;
@@ -33,6 +34,7 @@ public class MemberService {
     private final MemberImageMapper memberImageMapper;
     private final LikeMapper gameBoardLikeMapper;
     private final CartMapper cartMapper;
+    private final ProductLikeMapper productLikeMapper;
 
     private final S3Client s3;
 
@@ -112,7 +114,7 @@ public class MemberService {
 
             // 탈퇴 유저의 상품 찜 목록 삭제 -------------------------------------------------
             // TODO : 삭제된 유저의 id 로 해당유저의 찜 목록 삭제 기능 추가하기
-            // TODO : productLikeMapper.deleteLikeByMemberId(login.getId());
+            productLikeMapper.deleteLikeByMemberId(login.getId());
             // 이렇게 사용할 예정
 
             // 모든 작업이 성공시 true 리턴

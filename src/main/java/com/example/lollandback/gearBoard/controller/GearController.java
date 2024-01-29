@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
@@ -62,8 +63,8 @@ public ResponseEntity saves(  GearBoard gearBoard,
     }
 
     @GetMapping("listAll")
-    public List<GearBoard> list(){
-    return service.listAll();
+    public Map<String, Object> list(@RequestParam(value = "p",defaultValue = "1")Integer page){
+    return service.listAll(page);
     }
 
 

@@ -3,10 +3,7 @@ package com.example.lollandback.board.product.mapper;
 import com.example.lollandback.board.product.domain.Category;
 import com.example.lollandback.board.product.domain.Company;
 import com.example.lollandback.board.product.domain.Product;
-import com.example.lollandback.board.product.domain.SubCategory;
-import com.example.lollandback.board.product.dto.CategoryDto;
-import com.example.lollandback.board.product.dto.ProductUpdateDto;
-import com.example.lollandback.board.product.dto.SubCategoryDto;
+import com.example.lollandback.board.product.dto.*;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -71,6 +68,9 @@ public interface ProductMapper {
             </if>
             <if test="category == 'company_name'">
                 AND co.company_name LIKE #{keyword}
+            </if>
+            <if test="category != 'all'">
+              AND p.category_id = #{category}
             </if>
             ORDER BY p.product_reg_time DESC
             LIMIT #{from}, 16
@@ -147,24 +147,52 @@ public interface ProductMapper {
     int deleteById(Long product_id);
 
     @Select("""
-            SELECT *
-            FROM product p JOIN category c ON p.category_id = c.category_id
-            WHERE p.category_id = #{category_id} AND p.product_status = 'none'
-            LIMIT #{from}, 3
-            """)
-    List<Product> findByCategoryId(Long category_id, Integer from);
+        <script>
+        SELECT 
+            p.product_id,
+            p.product_name,
+            p.product_content,
+            p.product_price,
+            p.total_stock,
+            p.average_rate,
+            p.product_reg_time,
+            p.category_id,
+            p.subcategory_id,
+            p.company_id,
+            p.member_id,
+            co.company_name
+        FROM product p 
+        JOIN company co ON p.company_id = co.company_id
+        WHERE p.product_status = 'none' AND p.category_id = #{category_id}
+        <if test="category == 'all'">
+            AND (p.product_name LIKE #{keyword} OR co.company_name LIKE #{keyword})
+        </if>
+        <if test="category == 'product_name'">
+            AND p.product_name LIKE #{keyword}
+        </if>
+        <if test="category == 'company_name'">
+            AND co.company_name LIKE #{keyword}
+        </if>
+        ORDER BY p.product_reg_time DESC
+        LIMIT #{from}, 16
+        </script>
+""")
+    List<Product> findByCategoryId(Long category_id, Integer from, String keyword, String category);
+
 
     @Select("""
                 SELECT *
                 FROM product p
                 JOIN category c ON p.category_id = c.category_id
                 JOIN subcategory sub ON p.subcategory_id = sub.subcategory_id
+                JOIN company com ON p.company_id = com.company_id
                 WHERE p.category_id = #{category_id} 
                 AND p.subcategory_id = #{subcategory_id}
                 AND p.product_status = 'none'
-                LIMIT #{from}, 3
+                AND p.product_name LIKE #{keyword}
+                LIMIT #{from}, 16
             """)
-    List<Product> findByCategoryIdAndSubcategoryId(Long category_id, Long subcategory_id, Integer from);
+    List<Product> findByCategoryIdAndSubcategoryId(Long category_id, Long subcategory_id, Integer from, String keyword, String category);
 
 
     @Select("""
@@ -252,17 +280,47 @@ public interface ProductMapper {
     Double getAvgRateOfCompany(Long companyId);
 
     @Select("""
-                SELECT COUNT(*) FROM category c LEFT JOIN product p ON c.category_id = p.category_id
-                WHERE c.category_id = #{category_id} AND p.product_status = 'none';
+                <script>
+                             SELECT COUNT(*)
+                             FROM category c
+                             LEFT JOIN product p ON c.category_id = p.category_id
+                             JOIN company co ON p.company_id = co.company_id
+                             WHERE c.category_id = #{category_id} AND p.product_status = 'none'
+                             <if test="category == 'all'">
+                                 AND (p.product_name LIKE #{keyword} OR co.company_name LIKE #{keyword})
+                             </if>
+                             <if test="category == 'product_name'">
+                                 AND p.product_name LIKE #{keyword}
+                             </if>
+                             <if test="category == 'company_name'">
+                                 AND co.company_name LIKE #{keyword}
+                             </if>
+                         </script>
+                         
             """)
-    int countCategoryProductAll(Long category_id);
+    int countCategoryProductAll(Long category_id, String keyword, String category);
 
     @Select("""
-            SELECT COUNT(*) FROM category c
-                 LEFT JOIN subcategory sub ON c.category_id = sub.category_id
-                 LEFT JOIN product p ON sub.subcategory_id = p.subcategory_id
-            WHERE c.category_id = #{category_id} AND sub.subcategory_id = #{subcategory_id};
+           
+              SELECT COUNT(*)
+              FROM category c
+              LEFT JOIN subcategory sub ON c.category_id = sub.category_id
+              LEFT JOIN product p ON sub.subcategory_id = p.subcategory_id
+              WHERE c.category_id = #{category_id} AND sub.subcategory_id = #{subcategory_id} AND p.product_status = 'none'
+              AND p.product_name LIKE #{keyword}
             """)
-    int countSubCategoryProductAll(Long category_id, Long subcategory_id);
+    int countSubCategoryProductAll(Long category_id, Long subcategory_id, String keyword, String category);
 
+
+//   ------------------------- 리뷰가 가장 많은 3개의 상품 보여주기 --------------------------
+    @Select("""
+            SELECT p.product_id, p.product_name, c.company_name, p.product_price, p.product_content, COUNT(r.review_id) AS review_count
+            FROM product p
+            JOIN review r ON p.product_id = r.product_id
+            JOIN company c ON p.company_id = c.company_id
+            GROUP BY P.product_id
+            ORDER BY review_count DESC
+            LIMIT 3;
+            """)
+    List<MainProductDto> mostReviewProduct();
 }

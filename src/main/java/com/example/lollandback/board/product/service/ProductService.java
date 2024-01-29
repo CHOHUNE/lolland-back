@@ -19,10 +19,7 @@ import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -62,7 +59,7 @@ public class ProductService {
         Long companyId = companyMapper.getCompanyIdByName(company.getCompany_name());
 
         // 존재하지 않는다면 새로 생성
-        if(companyId == null) {
+        if (companyId == null) {
             if (companyMapper.insert(company) != 1) {
                 return false;
             }
@@ -347,21 +344,30 @@ public class ProductService {
     }
 
     // --------------------------- 대분류 카테고리 리스트 & 페이징 ---------------------------!!
-    public Map<String, Object> findProductsByCategoryId(Long categoryId, Integer page) {
+    public Map<String, Object> findProductsByCategoryId(Long categoryId, Integer page, String keyword, String category) {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> pageInfo = new HashMap<>();
 
-        int countAll = productMapper.countCategoryProductAll(categoryId);
-        int lastPageNumber = (countAll - 1) / 3 + 1;
-        int startPageNumber = (page - 1) / 3 * 3 + 1;
-        int endPageNumber = startPageNumber + 2;
+        int countAll = productMapper.countCategoryProductAll(categoryId, "%" + keyword + "%", category);
+        int lastPageNumber = (countAll - 1) / 10 + 1;
+        int startPageNumber = (page - 1) / 10 * 10 + 1;
+        int endPageNumber = startPageNumber + 9;
         endPageNumber = Math.min(endPageNumber, lastPageNumber);
+        int prevPageNumber = startPageNumber - 10;
+        int nextPageNumber = endPageNumber + 1;
 
+        pageInfo.put("currentPageNumber", page);
         pageInfo.put("startPageNumber", startPageNumber);
-        pageInfo.put("lastPageNumber", lastPageNumber);
+        pageInfo.put("endPageNumber", endPageNumber);
+        if (prevPageNumber > 0) {
+            pageInfo.put("prevPageNumber", prevPageNumber);
+        }
+        if (nextPageNumber <= lastPageNumber) {
+            pageInfo.put("nextPageNumber", nextPageNumber);
+        }
 
         int from = (page - 1) * 3;
-        List<Product> products = productMapper.findByCategoryId(categoryId, from);
+        List<Product> products = productMapper.findByCategoryId(categoryId, from, "%" + keyword + "%", category);
         products.forEach(productListImg -> {
             List<ProductImg> productsImg = mainImgMapper.selectNamesByCategoryId(productListImg.getProduct_id());
             productsImg.forEach(img -> img.setMain_img_uri(urlPrefix + "lolland/product/productMainImg/" + productListImg.getProduct_id() + "/" + img.getMain_img_uri()));
@@ -375,23 +381,32 @@ public class ProductService {
     }
 
     // --------------------------- 소분류 서브카테고리 리스트 & 페이징 ---------------------------
-    public Map<String, Object> findProductsBySubCategory(Long category_id, Long subcategory_id, Integer page) {
+    public Map<String, Object> findProductsBySubCategory(Long category_id, Long subcategory_id, Integer page, String keyword, String category) {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> pageInfo = new HashMap<>();
 
-        int countAll = productMapper.countSubCategoryProductAll(category_id, subcategory_id);
+        int countAll = productMapper.countSubCategoryProductAll(category_id, subcategory_id, "%" + keyword + "%", category);
 
-        int lastPageNumber = (countAll - 1) / 3 + 1;
-        int startPageNumber = (page - 1) / 3 * 3 + 1;
-        int endPageNumber = startPageNumber + 2;
+        int lastPageNumber = (countAll - 1) / 10 + 1;
+        int startPageNumber = (page - 1) / 10 * 10 + 1;
+        int endPageNumber = startPageNumber + 9;
         endPageNumber = Math.min(endPageNumber, lastPageNumber);
+        int prevPageNumber = startPageNumber - 10;
+        int nextPageNumber = endPageNumber + 1;
 
+        pageInfo.put("currentPageNumber", page);
         pageInfo.put("startPageNumber", startPageNumber);
-        pageInfo.put("lastPageNumber", lastPageNumber);
+        pageInfo.put("endPageNumber", endPageNumber);
+        if (prevPageNumber > 0) {
+            pageInfo.put("prevPageNumber", prevPageNumber);
+        }
+        if (nextPageNumber <= lastPageNumber) {
+            pageInfo.put("nextPageNumber", nextPageNumber);
+        }
 
         int from = (page - 1) * 3;
 
-        List<Product> products = productMapper.findByCategoryIdAndSubcategoryId(category_id, subcategory_id, from);
+        List<Product> products = productMapper.findByCategoryIdAndSubcategoryId(category_id, subcategory_id, from, "%" + keyword + "%", category);
         products.forEach(productListImg -> {
             List<ProductImg> productsImg = mainImgMapper.selectNamesByCategoryId(productListImg.getProduct_id());
             productsImg.forEach(img -> img.setMain_img_uri(urlPrefix + "lolland/product/productMainImg/" + productListImg.getProduct_id() + "/" + img.getMain_img_uri()));
@@ -471,7 +486,7 @@ public class ProductService {
         // CategoryDto 저장할 리스트 생성
         List<CategoryDto> categoryDtoList = new ArrayList<>();
         // 해당 대분류의 소분류
-        for(Category category : categories) {
+        for (Category category : categories) {
             List<SubCategoryDto> subcategory = companyMapper.getSubCategoryByCompany(companyId);
             CategoryDto categoryDto = new CategoryDto(category, subcategory);
             categoryDtoList.add(categoryDto);
@@ -480,7 +495,21 @@ public class ProductService {
         return new CompanyNavDto(companyName, avgRate, totalReview, categoryDtoList);
     }
 
+    // ------------------------------- 메인페이지 카테고리 가져오는 로직 -------------------------------
     public List<Category> getCategoryById() {
         return productMapper.getAllCategories();
+    }
+
+    // --------------------------- 메인페이지 리뷰 많은 상품 3개 가져오는 로직 ---------------------------
+    public List<MainProductDto> getMostReviewedProducts() {
+
+        List<MainProductDto> product = productMapper.mostReviewProduct();
+
+        product.forEach(productListImg -> {
+            List<ProductImg> productsImg = mainImgMapper.selectNamesByProductId(productListImg.getProduct_id());
+            productsImg.forEach(img -> img.setMain_img_uri(urlPrefix + "lolland/product/productMainImg/" + productListImg.getProduct_id() + "/" + img.getMain_img_uri()));
+            productListImg.setProductImgs(productsImg);
+        });
+        return product;
     }
 }
