@@ -27,6 +27,15 @@ AND member_id=#{member_id}
 """) int delete(Like like);
 
 
+//    만들어 놓은 것 ------------------------------
+    @Delete("""
+
+DELETE FROM gameboardlike 
+WHERE member_id=#{member_id}
+""") int deleteByMemberId(String member_id);
+
+//    -------------------------------------------
+
     @Select("""
 SELECT COUNT(id) FROM gameboardlike WHERE game_board_id=#{game_board_id}
 """)

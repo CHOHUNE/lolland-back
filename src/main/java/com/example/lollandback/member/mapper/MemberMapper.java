@@ -153,19 +153,53 @@ public interface MemberMapper {
     int checkUserEmail(String memberEmail);
 
     @Select("""
-        SELECT g.id, g.category, g.title, g.board_content
+        <script>
+            SELECT g.id, g.category, g.title, g.board_content
+            FROM gameboard  g 
+            JOIN gameboardlike gl 
+            ON g.id = gl.game_board_id 
+            WHERE gl.member_id = #{memberLoginId} 
+            <if test='categoryType != \"전체\"'>
+                AND g.category = #{categoryType}
+            </if>
+            LIMIT #{from}, 10
+        </script>
+    """)
+    List<GameBoard> getGameBoardLikeByLoginId(String memberLoginId, Integer from, String categoryType);
+
+    @Select("""
+        <script>
+        SELECT COUNT(*) 
         FROM gameboard  g 
         JOIN gameboardlike gl 
         ON g.id = gl.game_board_id 
         WHERE gl.member_id = #{memberLoginId}
-        LIMIT #{from}, 10
+        <if test='categoryType != \"전체\"'> 
+            AND g.category = #{categoryType}
+        </if>
+        </script>
     """)
-    List<GameBoard> getGameBoardLikeByLoginId(String memberLoginId, Integer from);
+    int countAllGameBoardLikeByLoginId(String memberLoginId, String categoryType);
 
-    @Select("""
-        SELECT COUNT(*) 
-        FROM gameboardlike 
-        WHERE member_id = #{memberLoginId}
+    // 삭제 되는 유저의 티입으 deleted 로 변경
+    // 이메일, 핸드폰 번호, 탈퇴 유저 처리
+    @Update("""
+        UPDATE member
+        SET
+        member_type = 'deleted',
+        member_email = '***@***',
+        member_phone_number = '***-****-****',
+        member_introduce = '탈퇴한 회원 입니다.'
+        WHERE id = #{id}
     """)
-    int countAllGameBoardLikeByLoginId(String memberLoginId);
+    void deleteMemberInfoEditById(Long id);
+
+    // 탈퇴한 유저인지 회원 로그인 id로 찾기
+    @Select("""
+        SELECT COUNT(*) FROM member
+        WHERE member_login_id = #{memberLoginId}
+        AND member_type = 'deleted'
+    """)
+    int findDeletedMember(String memberLoginId);
+
 }

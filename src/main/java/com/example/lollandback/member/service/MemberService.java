@@ -1,6 +1,6 @@
 package com.example.lollandback.member.service;
 
-import com.example.lollandback.gameBoard.domain.GameBoard;
+import com.example.lollandback.board.cart.mapper.CartMapper;
 import com.example.lollandback.gameBoard.domain.Like;
 import com.example.lollandback.gameBoard.mapper.LikeMapper;
 import com.example.lollandback.member.domain.EditMemberAndAddress;
@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.WebRequest;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +32,7 @@ public class MemberService {
     private final MemberAddressMapper memberAddressMapper;
     private final MemberImageMapper memberImageMapper;
     private final LikeMapper gameBoardLikeMapper;
+    private final CartMapper cartMapper;
 
     private final S3Client s3;
 
@@ -55,7 +57,12 @@ public class MemberService {
         memberImageMapper.insertDefaultImage(member.getId(), fileUrl);
     }
 
-    public boolean loginUser(Member member, WebRequest request) {
+    public ResponseEntity loginUser(Member member, WebRequest request) {
+        // 탈퇴 된 회원은 해당 아이디로 로그인 불가능
+        if(mapper.findDeletedMember(member.getMember_login_id()) == 1){
+            return ResponseEntity.badRequest().body("탈퇴한 회원 입니다.");
+        }
+        // 아이디가 존재 하면
         Member dbMember = mapper.selectById(member.getMember_login_id());
         if (dbMember != null ) {
             if(dbMember.getMember_password().equals(member.getMember_password())){
@@ -63,14 +70,58 @@ public class MemberService {
                 dbMember.setMember_password("");
                 // 세션에 쿠키를 넣어 클라이언트에 저장 시킴 @SessionAttribute의 login객체에 저장 시킴
                 request.setAttribute("login", dbMember, RequestAttributes.SCOPE_SESSION);
-                return true;
+                return ResponseEntity.ok().build();
             }
         }
-        return false;
+        return ResponseEntity.badRequest().body("아이디와 비밀번호가 일치하는지 확인해 주세요.");
     }
 
-    public boolean deleteMember(Long id) {
-        return mapper.deleteById(id) == 1;
+    // 유저 삭제 로직
+    public boolean deleteMember(Member login) {
+        try {
+            // 삭제 되는 유저의 티입을 deleted 로 변경 ---------------------------------------
+            // 이메일, 핸드폰 번호, 탈퇴 유저 처리
+            mapper.deleteMemberInfoEditById(login.getId());
+
+            // 삭제 되는 유저의 sub 주소들 삭제 ---------------------------------------------
+            memberAddressMapper.deleteSubAddressByMemberId(login.getId());
+
+            // 삭제 되는 유저의 s3 이미지 삭제 ----------------------------------------------
+            // 이미지가 변경된다면 일단 기존 파일 이름을 갖고 온다
+            String prevFileName = memberImageMapper.getPrevFileName(login.getId());
+
+            // 기존 이미지가 S3의 경로에 존재하면 삭제하기
+            String deleteKey = "lolland/user/" + login.getId() + "/" + prevFileName;
+            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(deleteKey)
+                    .build();
+            // S3 기존 이미지 파일 삭제
+            s3.deleteObject(deleteObjectRequest);
+
+            // 탈퇴 유저 이미지 DB에 삭제된 유저 이미지로 변경 -----------------------------------
+            // 탈퇴 이미지 경로 설정
+            String fileUrl = urlPrefix + "lolland/user/default/deletedImage.png";
+            memberImageMapper.deletedMemberImage(login.getId(),fileUrl);
+
+            // 탈퇴 유저의 게임 게시글 좋아요 삭제 ---------------------------------------------
+            gameBoardLikeMapper.deleteByMemberId(login.getMember_login_id());
+
+            // 탈퇴 유저의 장바구니 삭제 -----------------------------------------------------
+            cartMapper.deleteAllByMember(login.getId());
+
+            // 탈퇴 유저의 상품 찜 목록 삭제 -------------------------------------------------
+            // TODO : 삭제된 유저의 id 로 해당유저의 찜 목록 삭제 기능 추가하기
+            // TODO : productLikeMapper.deleteLikeByMemberId(login.getId());
+            // 이렇게 사용할 예정
+
+            // 모든 작업이 성공시 true 리턴
+            return true;
+        } catch (Exception e) {
+            // 작업중 실패했다면 false 리턴
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public MemberDto getMember(Member login) {
@@ -120,11 +171,16 @@ public class MemberService {
     }
 
     public ResponseEntity findUserByIdAndEmail(String memberLoginId, String memberEmail) {
+        // 탈퇴 된 회원은 해당 아이디로 로그인 불가능
+        if(mapper.findDeletedMember(memberLoginId) == 1){
+            return ResponseEntity.badRequest().body("탈퇴한 회원 입니다.");
+        }
+
         Integer existUser = mapper.findUserByIdAndEmail(memberLoginId, memberEmail);
         if(existUser == 1) {
             return ResponseEntity.ok().build();
         } else {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body("일치하는 회원 정보가 없습니다.");
         }
 
     }
@@ -190,7 +246,7 @@ public class MemberService {
     }
 
 
-    public Map<String, Object> getGameBoardLike(Member login, Integer page) {
+    public Map<String, Object> getGameBoardLike(Member login, Integer page, String categoryType) {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> pageInfo = new HashMap<>();
 
@@ -198,7 +254,7 @@ public class MemberService {
         int from = (page -1) * 10;
 
         // 좋아요 한 게임 게시글 갯수
-        int countAll = mapper.countAllGameBoardLikeByLoginId(login.getMember_login_id());
+        int countAll = mapper.countAllGameBoardLikeByLoginId(login.getMember_login_id(), categoryType);
 
         // 좋아요 한 게시글의 최종 마지막 페이지 번호
         int lastPageNumber = (countAll - 1 ) / 10 + 1;
@@ -223,7 +279,7 @@ public class MemberService {
             pageInfo.put("nextPageNumber", nextPageNumber);
         }
 
-        map.put("gameBoardLikeList",mapper.getGameBoardLikeByLoginId(login.getMember_login_id(), from));
+        map.put("gameBoardLikeList",mapper.getGameBoardLikeByLoginId(login.getMember_login_id(), from, categoryType));
         map.put("pageInfo", pageInfo);
 
         return map;

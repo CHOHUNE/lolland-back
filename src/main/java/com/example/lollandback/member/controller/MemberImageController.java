@@ -21,8 +21,6 @@ public class MemberImageController {
                                 @RequestParam(value = "file", required = false)MultipartFile file,
                                 @SessionAttribute("login")Member login
                                 ) throws IOException {
-        System.out.println("imageType = " + imageType);
-        System.out.println("file = " + file);
         service.editMemberImage(login, file, imageType);
     }
 
