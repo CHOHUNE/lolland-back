@@ -218,10 +218,19 @@ FROM
 GROUP BY
     b.gear_id
 ORDER BY
-    b.gear_inserted desc
-LIMIT 5;
+    b.gear_inserted desc    
+LIMIT 10;
 
         """)
     List<GearBoard> listto();
+
+
+
+
+    @Select("""
+select count(*)
+from gearboard;
+            """)
+    int countAll();
 }
 

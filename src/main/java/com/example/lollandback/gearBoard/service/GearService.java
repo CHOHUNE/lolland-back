@@ -19,7 +19,10 @@ import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 
 @Transactional(rollbackFor = Exception.class)
@@ -195,9 +198,32 @@ public class GearService {
 //    }
 
 
-    public List<GearBoard> listAll(Integer page) {
-        int from = (page-1)*10;
-      return   mapper.listAll(from);
+    public Map<String, Object> listAll(Integer page) {
+        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> pageInfo = new HashMap<>();
+
+        int countAll= mapper.countAll();
+        int lastPageNumber= (countAll-1)/5+1;
+        int startPageNumber=(page-1)/5*5+1;
+        int endPageNumber=startPageNumber+4;
+        endPageNumber=Math.min(endPageNumber,lastPageNumber);
+
+        int prevPageNumber= startPageNumber-5;
+        int nextPageNumber=endPageNumber+1;
+        pageInfo.put("currentPageNubmer",page);
+        pageInfo.put("startPageNumber",startPageNumber);
+        pageInfo.put("endPageNumber",endPageNumber);
+        if(prevPageNumber>=0){
+            pageInfo.put("prevPageNumber",prevPageNumber);}
+    if(nextPageNumber<= lastPageNumber){
+            pageInfo.put("nextPageNumber",nextPageNumber);}
+
+        int from = (page-1)*5;
+
+        map.put("gearboardList", mapper.listAll(from));
+        map.put("pageInfo",pageInfo);
+        return map;
+
     }
 
     public List<GearBoard> listss() {
