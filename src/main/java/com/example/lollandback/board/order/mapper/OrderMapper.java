@@ -3,10 +3,7 @@ package com.example.lollandback.board.order.mapper;
 import com.example.lollandback.board.order.domain.Order;
 import com.example.lollandback.board.order.domain.OrderCustomerDetails;
 import com.example.lollandback.board.order.domain.OrderProductDetails;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Options;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 import java.util.Map;
@@ -75,4 +72,18 @@ public interface OrderMapper {
     """)
     @Options(useGeneratedKeys = true, keyProperty = "id")
     void saveProductDetails(OrderProductDetails productDetails);
+
+    @Select("""
+        SELECT * 
+        FROM productorder
+        WHERE order_nano_id = #{orderId}
+    """)
+    Order getTotalPriceByOrderId(String orderId);
+
+    @Update("""
+        UPDATE productorder
+        SET order_status = #{order_status}
+        WHERE order_nano_id = #{order_nano_id}
+    """)
+    void updateOrderStatus(Order order);
 }

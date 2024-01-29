@@ -3,24 +3,37 @@ package com.example.lollandback.board.order.service;
 import com.example.lollandback.board.order.domain.Order;
 import com.example.lollandback.board.order.domain.OrderCustomerDetails;
 import com.example.lollandback.board.order.domain.OrderProductDetails;
+import com.example.lollandback.board.order.domain.OrderStatus;
 import com.example.lollandback.board.order.dto.OrderRequestDto;
 import com.example.lollandback.board.order.dto.OrderResDto;
+import com.example.lollandback.board.order.dto.PaymentSuccessDto;
 import com.example.lollandback.board.order.exception.CustomLogicException;
 import com.example.lollandback.board.order.exception.ExceptionCode;
 import com.example.lollandback.board.order.mapper.OrderMapper;
 import com.example.lollandback.board.product.dto.ProductAndOptionDto;
 import com.example.lollandback.board.product.mapper.ProductMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderMapper orderMapper;
-    private final ProductMapper productMapper;
+
+    @Value("${toss.pay.secretKey}")
+    private String testSecretKey;
 
     public OrderResDto createOrderInfo(Long member_id, OrderRequestDto dto) {
         System.out.println("OrderService.createOrderInfo");
@@ -80,8 +93,48 @@ public class OrderService {
         return null;
     }
 
-    public void tossPaymentSuccess(String paymentKey, String orderId, Long amount) {
+    public PaymentSuccessDto tossPaymentSuccess(String paymentKey, String orderId, Long amount) throws JsonProcessingException {
+        Order order = vertifyPayment(orderId, amount);
+        PaymentSuccessDto response = requestPayment(paymentKey, orderId, amount);
+        order.setOrder_status(OrderStatus.ORDERED);
+        orderMapper.updateOrderStatus(order); // 주문 상태 변경
+        return response;
+    }
 
+    private PaymentSuccessDto requestPayment(String paymentKey, String orderId, Long amount) {
+        RestTemplate restTemplate = new RestTemplate();
+        // 헤더 생성
+        HttpHeaders headers = new HttpHeaders();
+        String encodedAuthKey = new String(Base64.getEncoder().encode((testSecretKey + ":")
+                .getBytes(StandardCharsets.UTF_8)));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+
+        //Param 생성
+        Map<String, Object> params = Map.of("orderId", orderId, "amount", amount, "paymentKey", paymentKey);
+
+        //Response 받을 Dto 생성
+        PaymentSuccessDto response = null;
+        try {
+            // 요청 전송
+            response = restTemplate.postForObject("https://api.tosspayments.com/v1/payments/confirm",
+                    new HttpEntity<>(params, headers), PaymentSuccessDto.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new CustomLogicException(ExceptionCode.PAYMENT_DONE);
+        }
+        return response;
+    }
+
+    private Order vertifyPayment(String orderId, Long amount) {
+        Order order = orderMapper.getTotalPriceByOrderId(orderId);
+        if(order.equals(null)) {
+            throw new CustomLogicException(ExceptionCode.ORDER_NOT_FOUND);
+        }
+        if(!order.getTotal_price().equals(amount)) {
+            throw new CustomLogicException(ExceptionCode.PAYMENT_MISMATCH);
+        }
+        return order;
     }
 
 }
