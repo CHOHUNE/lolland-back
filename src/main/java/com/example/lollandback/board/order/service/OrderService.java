@@ -1,26 +1,22 @@
 package com.example.lollandback.board.order.service;
 
 import com.example.lollandback.board.order.domain.Order;
-import com.example.lollandback.board.order.domain.OrderCustomerDetails;
 import com.example.lollandback.board.order.domain.OrderProductDetails;
 import com.example.lollandback.board.order.domain.OrderStatus;
 import com.example.lollandback.board.order.dto.OrderRequestDto;
 import com.example.lollandback.board.order.dto.OrderResDto;
 import com.example.lollandback.board.order.dto.PaymentSuccessDto;
+import com.example.lollandback.board.order.dto.UpdateStockDto;
 import com.example.lollandback.board.order.exception.CustomLogicException;
 import com.example.lollandback.board.order.exception.ExceptionCode;
 import com.example.lollandback.board.order.mapper.OrderMapper;
 import com.example.lollandback.board.product.dto.ProductAndOptionDto;
-import com.example.lollandback.board.product.mapper.ProductMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -47,7 +43,7 @@ public class OrderService {
             if(!orderMapper.isStatusNone(product_id)) {
                 throw new CustomLogicException(ExceptionCode.NOT_FOR_SALE);
             }
-            // 재고를 초과하지 않았는지
+            // 재고를 초과하지 않는지
             Long option_id = optionDto.getOption_id();
             Integer quantityOrdered = optionDto.getQuantity();
             if(orderMapper.checkStock(option_id, quantityOrdered)) {
@@ -94,47 +90,65 @@ public class OrderService {
     }
 
     public PaymentSuccessDto tossPaymentSuccess(String paymentKey, String orderId, Long amount) throws JsonProcessingException {
-        Order order = vertifyPayment(orderId, amount);
+        System.out.println("OrderService.tossPaymentSuccess");
+        Order order = verifyPayment(orderId, amount);
         PaymentSuccessDto response = requestPayment(paymentKey, orderId, amount);
         order.setOrder_status(OrderStatus.ORDERED);
         orderMapper.updateOrderStatus(order); // 주문 상태 변경
+
+        // 옵션별로 재고 빼기
+        List<UpdateStockDto> updateDto = orderMapper.findAllProductOptionByOrderId(order.getId());
+        System.out.println("updateDto = " + updateDto);
+        for(UpdateStockDto dto : updateDto) {
+            System.out.println("dto = " + dto);
+            Long quantity = dto.getQuantity().longValue();
+            System.out.println("quantity = " + quantity);
+            int rows = orderMapper.subtractOptionStock(dto.getOption_id(), quantity);
+            System.out.println("rows = " + rows);
+            // 총 재고 빼기
+            orderMapper.subtractTotalStock(dto.getProduct_id(), dto.getQuantity());
+        }
         return response;
     }
 
     private PaymentSuccessDto requestPayment(String paymentKey, String orderId, Long amount) {
-        RestTemplate restTemplate = new RestTemplate();
-        // 헤더 생성
-        HttpHeaders headers = new HttpHeaders();
-        String encodedAuthKey = new String(Base64.getEncoder().encode((testSecretKey + ":")
-                .getBytes(StandardCharsets.UTF_8)));
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+            RestTemplate restTemplate = new RestTemplate();
+            // 헤더 생성
+            HttpHeaders headers = new HttpHeaders();
+            String encodedAuthKey = new String(Base64.getEncoder().encode((testSecretKey + ":")
+                    .getBytes(StandardCharsets.UTF_8)));
+            headers.setBasicAuth(encodedAuthKey);
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
-        //Param 생성
-        Map<String, Object> params = Map.of("orderId", orderId, "amount", amount, "paymentKey", paymentKey);
+            //Param 생성
+            Map<String, Object> params = Map.of("orderId", orderId, "amount", amount, "paymentKey", paymentKey);
 
-        //Response 받을 Dto 생성
-        PaymentSuccessDto response = null;
-        try {
+            //Response 받을 Dto 생성
+            PaymentSuccessDto response = null;
             // 요청 전송
             response = restTemplate.postForObject("https://api.tosspayments.com/v1/payments/confirm",
                     new HttpEntity<>(params, headers), PaymentSuccessDto.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new CustomLogicException(ExceptionCode.PAYMENT_DONE);
-        }
-        return response;
+            return response;
     }
 
-    private Order vertifyPayment(String orderId, Long amount) {
+    private Order verifyPayment(String orderId, Long amount) {
         Order order = orderMapper.getTotalPriceByOrderId(orderId);
         if(order.equals(null)) {
             throw new CustomLogicException(ExceptionCode.ORDER_NOT_FOUND);
         }
-        if(!order.getTotal_price().equals(amount)) {
+        if(order.getTotal_price().intValue() != amount.intValue()) {
             throw new CustomLogicException(ExceptionCode.PAYMENT_MISMATCH);
+        }
+        if(order.getOrder_status() == OrderStatus.CANCELED) {
+            throw new CustomLogicException(ExceptionCode.ORDER_CANCELED);
         }
         return order;
     }
 
+    public void cancelOrderStatus(String orderId) {
+        Order order = orderMapper.getOrderByNanoId(orderId);
+        order.setOrder_status(OrderStatus.CANCELED);
+        orderMapper.updateOrderStatus(order);
+    }
 }

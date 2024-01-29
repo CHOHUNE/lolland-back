@@ -46,19 +46,29 @@ public class OrderController {
 
     @PostMapping("/toss/success")
     public ResponseEntity tossPaymentSuccess(@RequestBody PaymentRequestDto dto) throws JsonProcessingException {
-        System.out.println("dto = " + dto);
         String paymentKey = dto.getPaymentKey();
-        System.out.println("paymentKey = " + paymentKey);
         String orderId = dto.getOrderId();
-        System.out.println("orderId = " + orderId);
         Long amount = dto.getAmount();
-        System.out.println("amount = " + amount);
         try {
             PaymentSuccessDto response = orderService.tossPaymentSuccess(paymentKey, orderId, amount);
             System.out.println("response = " + response);
             return ResponseEntity.ok(response);
         } catch (JsonProcessingException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/toss/cancel")
+    public ResponseEntity tossPaymentCancel(@RequestBody String orderId) {
+        try {
+            orderService.cancelOrderStatus(orderId);
+            return ResponseEntity.ok().build();
+        } catch (CustomLogicException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Collections.singletonMap("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

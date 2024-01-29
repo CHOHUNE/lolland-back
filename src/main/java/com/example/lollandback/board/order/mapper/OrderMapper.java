@@ -1,12 +1,11 @@
 package com.example.lollandback.board.order.mapper;
 
 import com.example.lollandback.board.order.domain.Order;
-import com.example.lollandback.board.order.domain.OrderCustomerDetails;
 import com.example.lollandback.board.order.domain.OrderProductDetails;
+import com.example.lollandback.board.order.dto.UpdateStockDto;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
-import java.util.Map;
 
 @Mapper
 public interface OrderMapper {
@@ -86,4 +85,53 @@ public interface OrderMapper {
         WHERE order_nano_id = #{order_nano_id}
     """)
     void updateOrderStatus(Order order);
+
+    @Select("""
+        SELECT *
+        FROM productorder
+        WHERE order_nano_id = #{orderId}
+    """)
+    Order getOrderByNanoId(String orderId);
+
+    @Select("""
+        SELECT option_id, quantity, product_id
+        FROM orderproductdetails
+        WHERE order_id = #{id}
+    """)
+    List<UpdateStockDto> findAllProductOptionByOrderId(Long id);
+
+    @Update("""
+        UPDATE productoptions
+        SET stock = stock - #{quantity}
+        WHERE option_id = #{option_id}
+    """)
+    int subtractOptionStock(Long option_id, Long quantity);
+
+    @Select("""
+        SELECT stock
+        FROM productoptions
+        WHERE option_id = #{optionId}
+    """)
+    Long getStockByOptionId(Long optionId);
+
+    @Update("""
+        UPDATE product
+        SET total_stock = total_stock - #{quantity} 
+        WHERE product_id = #{product_id}
+    """)
+    void subtractTotalStock(Long product_id, Integer quantity);
+
+    @Update("""
+        UPDATE productoptions
+        SET stock = stock + #{quantity}
+        WHERE option_id = #{option_id}
+    """)
+    void refillOptionStock(Long option_id, Long quantity);
+
+    @Update("""
+        UPDATE product
+        SET total_stock = total_stock + #{quantity} 
+        WHERE product_id = #{product_id}
+    """)
+    void refillTotalStock(Long product_id, Integer quantity);
 }

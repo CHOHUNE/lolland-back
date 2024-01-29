@@ -1,5 +1,8 @@
 package com.example.lollandback.board.order.dto;
 
+import lombok.Data;
+
+@Data
 public class PaymentSuccessCardDto {
     private String company;
     private String number;
