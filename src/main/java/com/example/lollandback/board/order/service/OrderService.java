@@ -54,19 +54,26 @@ public class OrderService {
         // 맞으면 order / orderProductDetails 나누어서 저장하기
         // order
         Order order = new Order(member_id, dto);
+        System.out.println("order = " + order);
         orderMapper.saveOrder(order);
         // order 생성 후 orderProductDetails
         Long id = orderMapper.getOrderIdByNanoId(dto.getOrderId());
+        System.out.println("id = " + id);
         if(id != null) {
+            System.out.println("id != null");
             for (ProductAndOptionDto optionDto : productAndOptionDto) {
                 Double price = orderMapper.getPrice(optionDto.getProduct_id());
+                System.out.println("price = " + price);
                 Double total_price = price * optionDto.getQuantity();
+                System.out.println("total_price = " + total_price);
                 OrderProductDetails productDetails = new OrderProductDetails(id, total_price, optionDto);
+                System.out.println("productDetails = " + productDetails);
                 orderMapper.saveProductDetails(productDetails);
             }
 
             // 저장 후 결제에 필요한 데이터 생성
             OrderResDto orderResDto = new OrderResDto(id, dto);
+            System.out.println("orderResDto = " + orderResDto);
             return orderResDto;
         }
 

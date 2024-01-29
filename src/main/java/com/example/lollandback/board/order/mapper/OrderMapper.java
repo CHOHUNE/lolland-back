@@ -37,13 +37,13 @@ public interface OrderMapper {
 
     @Select("""
         SELECT id
-        FROM order
+        FROM productorder
         WHERE order_nano_id = #{orderId}
     """)
     Long getOrderIdByNanoId(String orderId);
 
     @Insert("""
-        INSERT INTO order (
+        INSERT INTO productorder (
         order_nano_id, order_name, member_id, total_price, order_status, 
         receiver, email, phone, address, postalCode, requirement)
         VALUES (
@@ -67,7 +67,7 @@ public interface OrderMapper {
         INSERT INTO orderproductdetails (order_id, product_id, option_id, quantity, total_price)
         VALUES (
             #{order_id},
-            #{product_id}
+            #{product_id},
             #{option_id},
             #{quantity},
             #{total_price}

@@ -20,6 +20,6 @@ public class OrderProductDetails {
         this.product_id = dto.getProduct_id();
         this.option_id = dto.getOption_id();
         this.quantity = dto.getQuantity();
-
+        this.total_price = total_price;
     }
 }

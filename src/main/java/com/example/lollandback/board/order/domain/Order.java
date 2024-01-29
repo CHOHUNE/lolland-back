@@ -11,7 +11,7 @@ public class Order {
     private Long member_id;
     private Double total_price;
     private OrderStatus order_status;
-    private String recevier;
+    private String receiver;
     private String email;
     private String phone;
     private String address;
@@ -26,7 +26,7 @@ public class Order {
         this.total_price = dto.getTotalPrice();
         this.member_id = member_id;
         this.order_status = OrderStatus.ORDERING;
-        this.recevier = dto.getReceiver();
+        this.receiver = dto.getReceiver();
         this.email = dto.getCustomerEmail();
         this.phone = dto.getCustomerMobilePhone();
         this.address = dto.getAddress();
