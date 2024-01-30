@@ -1,5 +1,6 @@
 package com.example.lollandback.board.order.service;
 
+import com.example.lollandback.board.cart.mapper.CartMapper;
 import com.example.lollandback.board.order.domain.Order;
 import com.example.lollandback.board.order.domain.OrderProductDetails;
 import com.example.lollandback.board.order.domain.OrderStatus;
@@ -28,6 +29,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderMapper orderMapper;
+    private final CartMapper cartMapper;
 
     @Value("${toss.pay.secretKey}")
     private String testSecretKey;
@@ -73,6 +75,8 @@ public class OrderService {
                 Double total_price = price * optionDto.getQuantity();
                 OrderProductDetails productDetails = new OrderProductDetails(id, total_price, optionDto);
                 orderMapper.saveProductDetails(productDetails);
+                //주문된 상품 카트에서 삭제
+                cartMapper.deleteCartByMemberAndProductIds(member_id, optionDto.getProduct_id(), optionDto.getOption_id());
             }
 
             // 저장 후 결제에 필요한 데이터 생성
@@ -104,6 +108,7 @@ public class OrderService {
             // 총 재고 빼기
             orderMapper.subtractTotalStock(dto.getProduct_id(), dto.getQuantity());
         }
+
         return response;
     }
 
