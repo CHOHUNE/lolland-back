@@ -12,11 +12,16 @@ import org.springframework.web.bind.annotation.*;
 public class MemberEmailController {
     private final MemberEmailService service;
 
+
     // 회원 가입시 인증번호 발송 로직
     @PostMapping("sendCodeMail")
-    public void sendCodeMail(@RequestBody EmailSendCodeDto emailSendCodeDto) {
+    public ResponseEntity sendCodeMail(@RequestBody EmailSendCodeDto emailSendCodeDto) {
         // Gmail보내기
-        service.emailSendCode(emailSendCodeDto);
+        if(service.emailSendCode(emailSendCodeDto)){
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     // 회원 id찾기 메일 보내기
