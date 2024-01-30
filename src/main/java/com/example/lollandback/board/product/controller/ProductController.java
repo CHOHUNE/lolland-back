@@ -3,7 +3,6 @@ package com.example.lollandback.board.product.controller;
 import com.example.lollandback.board.product.domain.Category;
 import com.example.lollandback.board.product.domain.Company;
 import com.example.lollandback.board.product.domain.Product;
-import com.example.lollandback.board.product.domain.SubCategory;
 import com.example.lollandback.board.product.dto.*;
 import com.example.lollandback.board.product.service.ProductService;
 import com.example.lollandback.member.domain.Member;

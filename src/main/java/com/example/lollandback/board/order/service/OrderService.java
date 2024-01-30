@@ -160,15 +160,43 @@ public class OrderService {
         orderMapper.updateOrderStatus(order);
     }
 
-    public List<OrderInfoDto> fetchMyOrderInfo(Long member_id) {
-        List<OrderInfoDto> orderInfo = orderMapper.fetchMyOrderInfo(member_id);
+    public Map<String, Object> fetchMyOrderInfo(Long member_id, Integer page) {
+        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> pageInfo = new HashMap<>();
+
+        int countAll = orderMapper.countAllMyOrderInfo(member_id);
+
+        int lastPageNumber = (countAll - 1) / 10 + 1;
+        int startPageNumber = (page - 1) / 10 * 10 + 1;
+        int endPageNumber = startPageNumber + 9;
+        endPageNumber = Math.min(endPageNumber, lastPageNumber);
+        int prevPageNumber = startPageNumber - 10;
+        int nextPageNumber = endPageNumber + 1;
+
+        pageInfo.put("currentPageNumber", page);
+        pageInfo.put("startPageNumber", startPageNumber);
+        pageInfo.put("endPageNumber", endPageNumber);
+        if (prevPageNumber > 0) {
+            pageInfo.put("prevPageNumber", prevPageNumber);
+        }
+        if (nextPageNumber <= lastPageNumber) {
+            pageInfo.put("nextPageNumber", nextPageNumber);
+        }
+
+        int from = (page - 1) * 10;
+
+        List<OrderInfoDto> orderInfo = orderMapper.fetchMyOrderInfo(from, member_id);
+
         for(OrderInfoDto dto : orderInfo) {
             Long product_id = orderMapper.getFirstProductId(dto.getId());
             String imgUri = orderMapper.getImgUri(product_id, urlPrefix);
             dto.setMain_img_uri(imgUri);
         }
 
-        return orderInfo;
+        map.put("orderList", orderInfo);
+        map.put("pageInfo", pageInfo);
+
+        return map;
     }
 
     public OrderInfoDetailDto fetchOrderInfoDetail(Long orderId) {
