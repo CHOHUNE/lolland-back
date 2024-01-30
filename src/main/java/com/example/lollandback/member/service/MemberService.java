@@ -36,6 +36,8 @@ public class MemberService {
     private final CartMapper cartMapper;
     private final ProductLikeMapper productLikeMapper;
 
+    private final MemberEmailService memberEmailService;
+
     private final S3Client s3;
 
     @Value("${aws.s3.bucket.name}")
@@ -81,6 +83,9 @@ public class MemberService {
     // 유저 삭제 로직
     public boolean deleteMember(Member login) {
         try {
+            // 탈퇴 유저에게 메일 보내기 ---------------------------------------------------
+            memberEmailService.deletedMemberSendMail(login);
+
             // 삭제 되는 유저의 티입을 deleted 로 변경 ---------------------------------------
             // 이메일, 핸드폰 번호, 탈퇴 유저 처리
             mapper.deleteMemberInfoEditById(login.getId());
@@ -114,7 +119,6 @@ public class MemberService {
 
             // 탈퇴 유저의 상품 찜 목록 삭제 -------------------------------------------------
             productLikeMapper.deleteLikeByMemberId(login.getId());
-            // 이렇게 사용할 예정
 
             // 모든 작업이 성공시 true 리턴
             return true;
@@ -244,6 +248,11 @@ public class MemberService {
         try {
             // 회원 id번호로 로그인ID 불러오기
             String memberLoginId = mapper.getMemberLoginIdById(id);
+            // 회원 id번호로 이메일 불러오기
+            String memberEmail = mapper.getMemberEmailById(id);
+
+            // 관리자가 삭제한 유저에게 이메일 보내기
+            memberEmailService.deletedByAdminSendMail(memberEmail, memberLoginId);
 
             // 삭제 되는 유저의 티입을 deleted 로 변경 ---------------------------------------
             // 이메일, 핸드폰 번호, 탈퇴 유저 처리
@@ -278,7 +287,6 @@ public class MemberService {
 
             // 탈퇴 유저의 상품 찜 목록 삭제 -------------------------------------------------
             productLikeMapper.deleteLikeByMemberId(id);
-            // 이렇게 사용할 예정
 
             // 모든 작업이 성공시 true 리턴
             return true;

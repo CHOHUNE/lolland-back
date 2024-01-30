@@ -211,4 +211,12 @@ public interface MemberMapper {
         WHERE id = #{id}
     """)
     String getMemberLoginIdById(Long id);
+
+    // 회원 id번호로 이메일 불러오기
+    @Select("""
+        SELECT member_email 
+        FROM member
+        WHERE id = #{id}
+    """)
+    String getMemberEmailById(Long id);
 }

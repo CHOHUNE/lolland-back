@@ -1,5 +1,6 @@
 package com.example.lollandback.member.service;
 
+import com.example.lollandback.member.domain.Member;
 import com.example.lollandback.member.dto.EmailSendCodeDto;
 import com.example.lollandback.member.mapper.MemberMapper;
 import jakarta.mail.MessagingException;
@@ -136,4 +137,80 @@ public class MemberEmailService {
             return false;
         }
     }
+
+    // 탈퇴 유저에게 메일 발송 ---------------------------------------------------------------------------
+    public boolean deletedMemberSendMail(Member login) {
+        MimeMessage message = javaMailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+            helper.setTo(login.getMember_email());
+            helper.setSubject("[lolland] 에서 탈퇴 되셨습니다.");
+
+            String imageUrl = urlPrefix + "lolland/logo/lolland-logo.png";
+            String htmlContent =
+                    "<html>" +
+                        "<body style='text-align: center;'>" +
+                            "<div style='width: 350px; height: 200px; border: 5px solid gray; border-radius: 10px; padding: 20px; margin: auto;'>" +
+                                "<div style='text-align: center;'>" +
+                                    "<img src='" + imageUrl + "' alt='롤랜드 로고 이미지' style='display: block; margin-left: auto; margin-right: auto; width: 100px;'>" +
+                                "</div>" +
+                                "<h1 style='color: navy; text-align: center;'>회원 탈퇴가 완료 되었습니다.</h1>" +
+                                "<p style='font-size: 16px; color: black; text-align: center;'>" +
+                                    "<strong style='color: orange;'>" + login.getMember_login_id() + "</strong> " +
+                                    " 님 의 탈퇴가 완료 되었습니다." +
+                                "</p>" +
+                            "</div>" +
+                        "</body>" +
+                    "</html>";
+
+            helper.setText(htmlContent, true);
+        } catch (MessagingException e) {
+            return false;
+        }
+        javaMailSender.send(message);
+        return true;
+    }
+
+    // 관리자가 탈퇴시킨 유저에게 메일 발송 ---------------------------------------------------------------------------
+    public boolean deletedByAdminSendMail(String memberEmail, String memberLoginId) {
+        MimeMessage message = javaMailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+            helper.setTo(memberEmail);
+            helper.setSubject("[lolland] 부정 사용 의심으로 탈퇴 되셨습니다.");
+
+            String imageUrl = urlPrefix + "lolland/logo/lolland-logo.png";
+            String htmlContent =
+                    "<html>" +
+                        "<body style='text-align: center;'>" +
+                            "<div style='width: 350px; height: 200px; border: 5px solid gray; border-radius: 10px; padding: 20px; margin: auto;'>" +
+                                "<div style='text-align: center;'>" +
+                                    "<img src='" + imageUrl + "' alt='롤랜드 로고 이미지' style='display: block; margin-left: auto; margin-right: auto; width: 100px;'>" +
+                                "</div>" +
+                                "<h1 style='color: navy; text-align: center;'>탈퇴 처리 되었습니다.</h1>" +
+                                "<p style='font-size: 16px; color: black; text-align: center;'>" +
+                                    "<strong style='color: orange;'>" + memberLoginId + "</strong> " +
+                                    " 님 의 계정이 부정 사용" +
+                                "</p>" +
+                                "<p style='font-size: 16px; color: black; text-align: center;'>" +
+                                    "의심으로 탈퇴 처리가 되었습니다. " +
+                                "</p>" +
+                                "<p style='font-size: 16px; color: orange; text-align: center; margin-top: 5px;'>" +
+                                    "문의 사항이 있다면 해당 메일로 회신 부탁 드립니다." +
+                                "</p>" +
+                            "</div>" +
+                        "</body>" +
+                    "</html>";
+
+            helper.setText(htmlContent, true);
+        } catch (MessagingException e) {
+            return false;
+        }
+        javaMailSender.send(message);
+        return true;
+    }
+
+
 }
