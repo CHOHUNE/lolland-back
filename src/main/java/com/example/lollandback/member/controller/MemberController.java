@@ -149,12 +149,13 @@ public class MemberController {
     // 관리자가 탈퇴 회원 id 번호로 삭제하는 로직 (admin만 건드세요)
     @DeleteMapping("DeleteMember/{id}")
     public ResponseEntity deletedMemberByAdmin(@SessionAttribute("login") Member login,
-                                    @PathVariable Long id) {
-        if (login.getMember_type().equals("admin")) {
-            service.deletedMemberByAdmin(id);
-
+                                               @PathVariable Long id) {
+        // 로그인 한 사람이 관리자 이면서 탈퇴 처리 로직이 성공적으로 실행 된다면 ok리턴
+        if (login.getMember_type().equals("admin") && service.deletedMemberByAdmin(id)) {
             return ResponseEntity.ok().build();
+
         }else {
+        // 그 외 의 상황 이라면 다 bad 리턴 시키기
             return ResponseEntity.badRequest().build();
         }
     }

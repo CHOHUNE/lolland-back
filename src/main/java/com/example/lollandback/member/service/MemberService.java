@@ -36,6 +36,8 @@ public class MemberService {
     private final CartMapper cartMapper;
     private final ProductLikeMapper productLikeMapper;
 
+    private final MemberEmailService memberEmailService;
+
     private final S3Client s3;
 
     @Value("${aws.s3.bucket.name}")
@@ -81,6 +83,9 @@ public class MemberService {
     // 유저 삭제 로직
     public boolean deleteMember(Member login) {
         try {
+            // 탈퇴 유저에게 메일 보내기 ---------------------------------------------------
+            memberEmailService.deletedMemberSendMail(login);
+
             // 삭제 되는 유저의 티입을 deleted 로 변경 ---------------------------------------
             // 이메일, 핸드폰 번호, 탈퇴 유저 처리
             mapper.deleteMemberInfoEditById(login.getId());
@@ -113,9 +118,7 @@ public class MemberService {
             cartMapper.deleteAllByMember(login.getId());
 
             // 탈퇴 유저의 상품 찜 목록 삭제 -------------------------------------------------
-            // TODO : 삭제된 유저의 id 로 해당유저의 찜 목록 삭제 기능 추가하기
             productLikeMapper.deleteLikeByMemberId(login.getId());
-            // 이렇게 사용할 예정
 
             // 모든 작업이 성공시 true 리턴
             return true;
@@ -240,11 +243,60 @@ public class MemberService {
         return map;
     }
 
-    public void deletedMemberByAdmin(Long id) {
-        // 회원 탈퇴전 주소 삭제
-        memberAddressMapper.deleteByMemberId(id);
-        // 회원 탈퇴
-        mapper.deleteById(id);
+    // 관리자가 회원 탈퇴 시키는 로직
+    public boolean deletedMemberByAdmin(Long id) {
+        try {
+            // 회원 id번호로 로그인ID 불러오기
+            String memberLoginId = mapper.getMemberLoginIdById(id);
+            // 회원 id번호로 이메일 불러오기
+            String memberEmail = mapper.getMemberEmailById(id);
+
+            // 관리자가 삭제한 유저에게 이메일 보내기
+            memberEmailService.deletedByAdminSendMail(memberEmail, memberLoginId);
+
+            // 삭제 되는 유저의 티입을 deleted 로 변경 ---------------------------------------
+            // 이메일, 핸드폰 번호, 탈퇴 유저 처리
+            mapper.deleteMemberInfoEditById(id);
+
+            // 삭제 되는 유저의 sub 주소들 삭제 ---------------------------------------------
+            memberAddressMapper.deleteSubAddressByMemberId(id);
+
+            // 삭제 되는 유저의 s3 이미지 삭제 ----------------------------------------------
+            // 이미지가 변경된다면 일단 기존 파일 이름을 갖고 온다
+            String prevFileName = memberImageMapper.getPrevFileName(id);
+
+            // 기존 이미지가 S3의 경로에 존재하면 삭제하기
+            String deleteKey = "lolland/user/" + id + "/" + prevFileName;
+            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(deleteKey)
+                    .build();
+            // S3 기존 이미지 파일 삭제
+            s3.deleteObject(deleteObjectRequest);
+
+            // 탈퇴 유저 이미지 DB에 삭제된 유저 이미지로 변경 -----------------------------------
+            // 탈퇴 이미지 경로 설정
+            String fileUrl = urlPrefix + "lolland/user/default/deletedImage.png";
+            memberImageMapper.deletedMemberImage(id, fileUrl);
+
+            // 탈퇴 유저의 게임 게시글 좋아요 삭제 ---------------------------------------------
+            gameBoardLikeMapper.deleteByMemberId(memberLoginId);
+
+            // 탈퇴 유저의 장바구니 삭제 -----------------------------------------------------
+            cartMapper.deleteAllByMember(id);
+
+            // 탈퇴 유저의 상품 찜 목록 삭제 -------------------------------------------------
+            productLikeMapper.deleteLikeByMemberId(id);
+
+            // 모든 작업이 성공시 true 리턴
+            return true;
+        } catch (Exception e) {
+            // 작업중 실패했다면 false 리턴
+            e.printStackTrace();
+            return false;
+        }
+
+
     }
 
 

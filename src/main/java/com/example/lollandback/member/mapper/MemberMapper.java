@@ -120,15 +120,16 @@ public interface MemberMapper {
         <script>
         SELECT * FROM member WHERE member_type = 'user'
         <if test="loginId != null and loginId != ''">
-            AND member_login_id = #{loginId}
+            AND member_login_id LIKE CONCAT('%', #{loginId}, '%')
         </if>
         <if test="name != null and name != ''">
-            AND member_name = #{name}
+            AND member_name LIKE CONCAT('%', #{name}, '%')
         </if>
         LIMIT #{from}, 10;
         </script>
     """)
     List<MemberDto> getAllMember(Integer from, String loginId, String name);
+
 
     // user 인 회원 숫 알기
     @Select("""
@@ -202,4 +203,20 @@ public interface MemberMapper {
     """)
     int findDeletedMember(String memberLoginId);
 
+
+    // 회원 id번호로 로그인ID 불러오기
+    @Select("""
+        SELECT member_login_id 
+        FROM member
+        WHERE id = #{id}
+    """)
+    String getMemberLoginIdById(Long id);
+
+    // 회원 id번호로 이메일 불러오기
+    @Select("""
+        SELECT member_email 
+        FROM member
+        WHERE id = #{id}
+    """)
+    String getMemberEmailById(Long id);
 }
