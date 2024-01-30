@@ -38,9 +38,7 @@ public class CartService {
             Cart existingCart = cartMapper.getCartByProductAndOption(cart.getMember_id(), cart.getProduct_id(), cart.getOption_id());
             if (existingCart != null) {
                 int newQuantity = existingCart.getQuantity() + cart.getQuantity();
-                System.out.println("이미 존재하는 아이템 + 옵션이므로 " + existingCart.getQuantity() + "개에 " + cart.getQuantity() + "추가");
                 existingCart.setQuantity(newQuantity);
-                System.out.println("existingCart.getQuantity() = " + existingCart.getQuantity());
                 cartMapper.updateCartQuantity(existingCart);
             } else {
                 cartMapper.addProductToCart(cart);
