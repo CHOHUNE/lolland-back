@@ -23,6 +23,7 @@ public class MemberEmailService {
     @Value("${image.file.prefix}")
     private String urlPrefix;
 
+    // 회원 가입시 인증 번호 메일 ---------------------------------------------------------------------------
     public boolean emailSendCode(EmailSendCodeDto emailSendCodeDto) {
         MimeMessage message = javaMailSender.createMimeMessage();
         try {
@@ -35,8 +36,10 @@ public class MemberEmailService {
             String htmlContent =
                     "<html>" +
                         "<body style='text-align: center;'>" +
-                            "<div style='width: 350px; height: 250px; border: 5px solid gray; border-radius: 10px; padding: 20px; margin: auto;'>" +
-                                "<img src='" + imageUrl + "' alt='로고 이미지' style='width: 100px;'>" +
+                            "<div style='width: 350px; height: 200px; border: 5px solid gray; border-radius: 10px; padding: 20px; margin: auto;'>" +
+                                "<div style='text-align: center;'>" +
+                                    "<img src='" + imageUrl + "' alt='롤랜드 로고 이미지' style='display: block; margin-left: auto; margin-right: auto; width: 100px;'>" +
+                                "</div>" +
                                 "<h1 style='color: navy; text-align: center;'>회원 가입 인증 코드 </h1>" +
                                 "<p style='font-size: 16px; color: black; text-align: center;'>" +
                                     "회원님의 가입 번호는 : " +
@@ -55,20 +58,74 @@ public class MemberEmailService {
         return true;
     }
 
-    public void emailFindId(EmailSendCodeDto emailSendCodeDto) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(emailSendCodeDto.getMember_email());
-        message.setSubject("lolland에 가입 하신 ID 입니다.");
-        message.setText("회원님의 ID : " + emailSendCodeDto.getMessage() + " 입니다.");
+    // 회원 아이디 찾기 메일 ---------------------------------------------------------------------------
+    public boolean emailFindId(EmailSendCodeDto emailSendCodeDto) {
+        MimeMessage message = javaMailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+            helper.setTo(emailSendCodeDto.getMember_email());
+            helper.setSubject("lolland에 가입 하신 ID 입니다.");
+
+            String imageUrl = urlPrefix + "lolland/logo/lolland-logo.png";
+            String htmlContent =
+                    "<html>" +
+                        "<body style='text-align: center;'>" +
+                            "<div style='width: 350px; height: 200px; border: 5px solid gray; border-radius: 10px; padding: 20px; margin: auto;'>" +
+                                "<div style='text-align: center;'>" +
+                                    "<img src='" + imageUrl + "' alt='롤랜드 로고 이미지' style='display: block; margin-left: auto; margin-right: auto; width: 100px;'>" +
+                                "</div>" +
+                                "<h1 style='color: navy; text-align: center;'>가입 하신 ID 입니다.</h1>" +
+                                "<p style='font-size: 16px; color: black; text-align: center;'>" +
+                                    "회원님의 ID : " +
+                                    "<strong style='color: orange;'>" + emailSendCodeDto.getMessage() + "</strong> " +
+                                    "입니다." +
+                                "</p>" +
+                            "</div>" +
+                        "</body>" +
+                    "</html>";
+
+            helper.setText(htmlContent, true);
+        } catch (MessagingException e) {
+            return false;
+        }
         javaMailSender.send(message);
+        return true;
     }
 
-    public void sendPasswordMail(EmailSendCodeDto emailSendCodeDto) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(emailSendCodeDto.getMember_email());
-        message.setSubject("[lolland] 임시 비밀번호가 발급 되었습니다.");
-        message.setText("회원님의 비밀 번호는 : " + emailSendCodeDto.getMessage() + " 입니다.");
+    // 임시 비밀번호 발송 ---------------------------------------------------------------------------
+    public boolean sendPasswordMail(EmailSendCodeDto emailSendCodeDto) {
+        MimeMessage message = javaMailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+            helper.setTo(emailSendCodeDto.getMember_email());
+            helper.setSubject("[lolland] 임시 비밀번호가 발급 되었습니다.");
+
+            String imageUrl = urlPrefix + "lolland/logo/lolland-logo.png";
+            String htmlContent =
+                    "<html>" +
+                        "<body style='text-align: center;'>" +
+                            "<div style='width: 350px; height: 200px; border: 5px solid gray; border-radius: 10px; padding: 20px; margin: auto;'>" +
+                                "<div style='text-align: center;'>" +
+                                    "<img src='" + imageUrl + "' alt='롤랜드 로고 이미지' style='display: block; margin-left: auto; margin-right: auto; width: 100px;'>" +
+                                "</div>" +
+                                "<h1 style='color: navy; text-align: center;'>가입 하신 ID 입니다.</h1>" +
+                                "<p style='font-size: 16px; color: black; text-align: center;'>" +
+                                    "회원님의 비밀 번호는 : " +
+                                    "<strong style='color: orange;'>" + emailSendCodeDto.getMessage() + "</strong> " +
+                                    "입니다." +
+                                "</p>" +
+                            "</div>" +
+                        "</body>" +
+                    "</html>";
+
+            helper.setText(htmlContent, true);
+        } catch (MessagingException e) {
+            return false;
+        }
         javaMailSender.send(message);
+        return true;
     }
 
     // 회원 가입시 이메일 체크

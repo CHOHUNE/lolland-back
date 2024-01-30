@@ -26,16 +26,23 @@ public class MemberEmailController {
 
     // 회원 id찾기 메일 보내기
     @PostMapping("findId")
-    public void sendIdMail(@RequestBody EmailSendCodeDto emailSendCodeDto) {
-
-        service.emailFindId(emailSendCodeDto);
+    public ResponseEntity sendIdMail(@RequestBody EmailSendCodeDto emailSendCodeDto) {
+        if (service.emailFindId(emailSendCodeDto)){
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     // 비밀번호 찾기 메일 보내기
     @PostMapping("findPassword")
-    public void sendPasswordMail(@RequestBody EmailSendCodeDto emailSendCodeDto) {
+    public ResponseEntity sendPasswordMail(@RequestBody EmailSendCodeDto emailSendCodeDto) {
 
-        service.sendPasswordMail(emailSendCodeDto);
+        if(service.sendPasswordMail(emailSendCodeDto)){
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     // 회원 가입시 이메일 체크
