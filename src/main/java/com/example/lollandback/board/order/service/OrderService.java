@@ -3,10 +3,7 @@ package com.example.lollandback.board.order.service;
 import com.example.lollandback.board.order.domain.Order;
 import com.example.lollandback.board.order.domain.OrderProductDetails;
 import com.example.lollandback.board.order.domain.OrderStatus;
-import com.example.lollandback.board.order.dto.OrderRequestDto;
-import com.example.lollandback.board.order.dto.OrderResDto;
-import com.example.lollandback.board.order.dto.PaymentSuccessDto;
-import com.example.lollandback.board.order.dto.UpdateStockDto;
+import com.example.lollandback.board.order.dto.*;
 import com.example.lollandback.board.order.exception.CustomLogicException;
 import com.example.lollandback.board.order.exception.ExceptionCode;
 import com.example.lollandback.board.order.mapper.OrderMapper;
@@ -21,6 +18,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -31,8 +32,10 @@ public class OrderService {
     @Value("${toss.pay.secretKey}")
     private String testSecretKey;
 
+    @Value("${image.file.prefix}")
+    private String urlPrefix;
+
     public OrderResDto createOrderInfo(Long member_id, OrderRequestDto dto) {
-        System.out.println("OrderService.createOrderInfo");
         // 결제 요청 시 값들 논리 검증
         // 해당 제품이 구매 가능한 제품들인지 (delete 상태인지 아닌지 확인)
         List<ProductAndOptionDto> productAndOptionDto = dto.getProductAndOptionDto();
@@ -55,34 +58,25 @@ public class OrderService {
 
         // 총 주문금액이 맞는지
         if(checkTotalPrice.intValue() != totalPrice.intValue()) {
-            System.out.println("checkTotalPrice = " + checkTotalPrice);
-            System.out.println("totalPrice = " + totalPrice);
             throw new CustomLogicException(ExceptionCode.PAYMENT_MISMATCH);
         }
 
         // 맞으면 order / orderProductDetails 나누어서 저장하기
         // order
         Order order = new Order(member_id, dto);
-        System.out.println("order = " + order);
         orderMapper.saveOrder(order);
         // order 생성 후 orderProductDetails
         Long id = orderMapper.getOrderIdByNanoId(dto.getOrderId());
-        System.out.println("id = " + id);
         if(id != null) {
-            System.out.println("id != null");
             for (ProductAndOptionDto optionDto : productAndOptionDto) {
                 Double price = orderMapper.getPrice(optionDto.getProduct_id());
-                System.out.println("price = " + price);
                 Double total_price = price * optionDto.getQuantity();
-                System.out.println("total_price = " + total_price);
                 OrderProductDetails productDetails = new OrderProductDetails(id, total_price, optionDto);
-                System.out.println("productDetails = " + productDetails);
                 orderMapper.saveProductDetails(productDetails);
             }
 
             // 저장 후 결제에 필요한 데이터 생성
             OrderResDto orderResDto = new OrderResDto(id, dto);
-            System.out.println("orderResDto = " + orderResDto);
             return orderResDto;
         }
 
@@ -90,21 +84,23 @@ public class OrderService {
     }
 
     public PaymentSuccessDto tossPaymentSuccess(String paymentKey, String orderId, Long amount) throws JsonProcessingException {
-        System.out.println("OrderService.tossPaymentSuccess");
         Order order = verifyPayment(orderId, amount);
         PaymentSuccessDto response = requestPayment(paymentKey, orderId, amount);
         order.setOrder_status(OrderStatus.ORDERED);
         orderMapper.updateOrderStatus(order); // 주문 상태 변경
 
+        //주문 시각 변경
+        String approvedAt = response.getApprovedAt();
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+        OffsetDateTime offsetDateTime = OffsetDateTime.parse(approvedAt, formatter);
+        LocalDateTime update_time = offsetDateTime.toLocalDateTime();
+        orderMapper.updateOrderTime(order.getId(), update_time);
+
         // 옵션별로 재고 빼기
         List<UpdateStockDto> updateDto = orderMapper.findAllProductOptionByOrderId(order.getId());
-        System.out.println("updateDto = " + updateDto);
         for(UpdateStockDto dto : updateDto) {
-            System.out.println("dto = " + dto);
             Long quantity = dto.getQuantity().longValue();
-            System.out.println("quantity = " + quantity);
             int rows = orderMapper.subtractOptionStock(dto.getOption_id(), quantity);
-            System.out.println("rows = " + rows);
             // 총 재고 빼기
             orderMapper.subtractTotalStock(dto.getProduct_id(), dto.getQuantity());
         }
@@ -146,9 +142,37 @@ public class OrderService {
         return order;
     }
 
+    // --------- 주문 상태 변경 코드 ---------
     public void cancelOrderStatus(String orderId) {
         Order order = orderMapper.getOrderByNanoId(orderId);
         order.setOrder_status(OrderStatus.CANCELED);
         orderMapper.updateOrderStatus(order);
     }
+
+    public void cancelWaitOrderStatus(String orderId) {
+        Order order = orderMapper.getOrderByNanoId(orderId);
+        order.setOrder_status(OrderStatus.CANCEL_WAIT);
+        orderMapper.updateOrderStatus(order);
+    }
+
+    public List<OrderInfoDto> fetchMyOrderInfo(Long member_id) {
+        List<OrderInfoDto> orderInfo = orderMapper.fetchMyOrderInfo(member_id);
+        for(OrderInfoDto dto : orderInfo) {
+            Long product_id = orderMapper.getFirstProductId(dto.getId());
+            String imgUri = orderMapper.getImgUri(product_id, urlPrefix);
+            dto.setMain_img_uri(imgUri);
+        }
+
+        return orderInfo;
+    }
+
+    public OrderInfoDetailDto fetchOrderInfoDetail(Long orderId) {
+        OrderInfoDetailDto order = orderMapper.getOrderByOrderIndex(orderId);
+        order.setId(orderId);
+        List<OrderedProductDto> productList = orderMapper.getOrderProductAndOptionById(orderId);
+        order.setProductList(productList);
+
+        return order;
+    }
+
 }
