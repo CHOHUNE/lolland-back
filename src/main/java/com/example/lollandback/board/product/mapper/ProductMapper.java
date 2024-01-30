@@ -323,4 +323,13 @@ public interface ProductMapper {
             LIMIT 3;
             """)
     List<MainProductDto> mostReviewProduct();
+
+    @Select("""
+        SELECT po.option_name, SUM(od.quantity) AS totalQuantitySold
+        FROM orderproductdetails od 
+        JOIN productoptions po ON od.option_id = po.option_id
+        WHERE po.product_id = #{product_id}
+        GROUP BY od.option_id, po.option_name
+    """)
+    List<OptionSellRateDto> calculateSellRate(Long product_id);
 }

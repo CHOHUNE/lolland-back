@@ -153,4 +153,12 @@ public class ProductController {
         List<MainProductDto> products = productService.getMostReviewedProducts();
         return ResponseEntity.ok(products);
     }
+
+    // --------------------------- 옵션별 선호도(판매량) 리턴하는 로직 ---------------------------
+    @GetMapping("/sell-rate/{product_id}")
+    public ResponseEntity<List<OptionSellRateDto>> getSellRate(@PathVariable Long product_id) {
+        List<OptionSellRateDto> sellRates = productService.getSellRate(product_id);
+        return ResponseEntity.ok(sellRates);
+    }
+
 }

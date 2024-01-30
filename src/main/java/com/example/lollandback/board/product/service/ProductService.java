@@ -512,4 +512,10 @@ public class ProductService {
         });
         return product;
     }
+
+    public List<OptionSellRateDto> getSellRate(Long product_id) {
+        List<OptionSellRateDto> dto = productMapper.calculateSellRate(product_id);
+
+        return dto;
+    }
 }
