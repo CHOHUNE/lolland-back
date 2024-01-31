@@ -1,10 +1,12 @@
 package com.example.lollandback.board.product.service;
 
+import com.example.lollandback.board.cart.mapper.CartMapper;
 import com.example.lollandback.board.like.service.ProductLikeService;
 import com.example.lollandback.board.product.controller.CompanyNavDto;
 import com.example.lollandback.board.product.domain.*;
 import com.example.lollandback.board.product.dto.*;
 import com.example.lollandback.board.product.mapper.*;
+import com.example.lollandback.board.qna.mapper.QnaMapper;
 import com.example.lollandback.board.review.mapper.ReviewMapper;
 import com.example.lollandback.member.domain.Member;
 import lombok.RequiredArgsConstructor;
@@ -38,8 +40,11 @@ public class ProductService {
     private final ProductMainImg mainImgMapper;
     private final ProductOptionMapper productOptionMapper;
     private final ProductContentImg contentImgMapper;
-    private final ReviewMapper reviewMapper;
     private final ProductLikeService productLikeService;
+    private final ReviewMapper reviewMapper;
+    private final QnaMapper qnaMapper;
+    private final CartMapper cartMapper;
+
 
     // --------------------------- 상품 저장 시 대분류/소분류 보여주기 로직 ---------------------------
     public List<CategoryDto> getAllCategories() {
@@ -214,20 +219,24 @@ public class ProductService {
 //        // 4. 리뷰 삭제
 //        reviewMapper.deleteReviewByProductId(productId);
 //        // 5. q&a 삭제
-//
+//        qnaMapper.deleteAnswerByQuestionId(productId);
+//        qnaMapper.deleteQuestionById(productId);
+
 //        // 6. cart 삭제
-//
+//        cartMapper.deleteByCartId(productId);
+//        cartMapper.deleteSelected(productId);
+
 //        // 7. answer 삭제
 //
 //        // 8. productorder 삭제
 //
-//        // 9. 상품삭제
-//        productMapper.deleteByProduct(productId);
-//        // 10. 제조사 삭제
-//        companyMapper.deleteByCompany(productId);
-
-        // 찜목록 삭제
+          // 9. 찜목록 삭제
         productLikeService.removeList(productId);
+
+//        // 10. 상품삭제
+//        productMapper.deleteByProduct(productId);
+
+
         // 상품 숨김
         productMapper.deleteById(productId);
 
