@@ -73,4 +73,10 @@ public interface CartMapper {
         WHERE member_id = #{memberId}
     """)
     void deleteAllByMember(Long memberId);
+
+    @Delete("""
+        DELETE FROM cart
+        WHERE member_id = #{member_id} AND product_id = #{product_id} AND option_id = #{option_id}
+    """)
+    void deleteCartByMemberAndProductIds(Long member_id, Long product_id, Long option_id);
 }

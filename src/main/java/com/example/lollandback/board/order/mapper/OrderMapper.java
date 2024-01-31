@@ -17,8 +17,17 @@ public interface OrderMapper {
         SELECT id, order_name, total_price, order_status, order_reg_time
         FROM productorder
         WHERE member_id = #{member_id}
+        ORDER BY order_reg_time DESC
+        LIMIT #{from}, 10
     """)
-    List<OrderInfoDto> fetchMyOrderInfo(Long member_id);
+    List<OrderInfoDto> fetchMyOrderInfo(Integer from, Long member_id);
+
+    @Select("""
+        SELECT COUNT(*)
+        FROM productorder
+        WHERE member_id = #{member_id}
+    """)
+    int countAllMyOrderInfo(Long member_id);
 
     //첫번째 상품의 아이디만 가져오는 코드
     @Select("""

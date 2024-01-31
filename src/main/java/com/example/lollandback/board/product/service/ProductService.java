@@ -1,7 +1,7 @@
 package com.example.lollandback.board.product.service;
 
 import com.example.lollandback.board.like.service.ProductLikeService;
-import com.example.lollandback.board.product.controller.CompanyNavDto;
+import com.example.lollandback.board.product.dto.CompanyNavDto;
 import com.example.lollandback.board.product.domain.*;
 import com.example.lollandback.board.product.dto.*;
 import com.example.lollandback.board.product.mapper.*;
@@ -511,5 +511,11 @@ public class ProductService {
             productListImg.setProductImgs(productsImg);
         });
         return product;
+    }
+
+    public List<OptionSellRateDto> getSellRate(Long product_id) {
+        List<OptionSellRateDto> dto = productMapper.calculateSellRate(product_id);
+
+        return dto;
     }
 }

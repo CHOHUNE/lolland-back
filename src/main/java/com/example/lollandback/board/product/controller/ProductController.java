@@ -3,7 +3,6 @@ package com.example.lollandback.board.product.controller;
 import com.example.lollandback.board.product.domain.Category;
 import com.example.lollandback.board.product.domain.Company;
 import com.example.lollandback.board.product.domain.Product;
-import com.example.lollandback.board.product.domain.SubCategory;
 import com.example.lollandback.board.product.dto.*;
 import com.example.lollandback.board.product.service.ProductService;
 import com.example.lollandback.member.domain.Member;
@@ -154,4 +153,12 @@ public class ProductController {
         List<MainProductDto> products = productService.getMostReviewedProducts();
         return ResponseEntity.ok(products);
     }
+
+    // --------------------------- 옵션별 선호도(판매량) 리턴하는 로직 ---------------------------
+    @GetMapping("/sell-rate/{product_id}")
+    public ResponseEntity<List<OptionSellRateDto>> getSellRate(@PathVariable Long product_id) {
+        List<OptionSellRateDto> sellRates = productService.getSellRate(product_id);
+        return ResponseEntity.ok(sellRates);
+    }
+
 }
