@@ -131,4 +131,18 @@ public class OrderController {
         }
     }
 
+    @PostMapping("/admin/cancel")
+    public ResponseEntity cancelRequestConfirm(@RequestBody CancelRequestDto dto) {
+        try {
+            PaymentCancelDto response = orderService.cancelRequestConfirm(dto.getOrderId());
+            return ResponseEntity.ok(response);
+        } catch (CustomLogicException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Collections.singletonMap("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("error", e.getMessage()));
+        }
+    }
+
 }
