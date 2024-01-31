@@ -182,7 +182,6 @@ public class OrderService {
         Map<String, Object> pageInfo = new HashMap<>();
 
         int countAll = orderMapper.countCancelReqInfo();
-        int startPageNumber = 0;
         int nextPageNumber = page + 1;
         int prevPageNumber = page - 1;
         int lastPageNumber = (countAll - 1) / 9 + 1;
