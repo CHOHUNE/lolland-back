@@ -46,6 +46,23 @@ public class OrderController {
         }
     }
 
+    // 관리자가 취소 대기 목록 조회
+    @GetMapping("/cancel-req-member")
+    public ResponseEntity fetchCancelReqMember(@SessionAttribute("login") Member login,
+                                               @RequestParam(value = "page", defaultValue = "1") Integer page) {
+        String member_type = login.getMember_type();
+        try{
+            // 관리자 일때만 작동
+            if (member_type.equals("admin")) {
+                Map<String, Object> cancelInfo = orderService.fetchCancelReqInfo(page);
+                return ResponseEntity.ok(cancelInfo);
+            }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @PostMapping("/cancel-wait")
     public ResponseEntity cancelOrderRequest(@SessionAttribute("login") Member login,
                                              @RequestBody CancelRequestDto dto) {
@@ -113,4 +130,5 @@ public class OrderController {
                     .body(Collections.singletonMap("error", e.getMessage()));
         }
     }
+
 }

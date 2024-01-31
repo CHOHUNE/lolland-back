@@ -2,10 +2,8 @@ package com.example.lollandback.board.order.mapper;
 
 import com.example.lollandback.board.order.domain.Order;
 import com.example.lollandback.board.order.domain.OrderProductDetails;
-import com.example.lollandback.board.order.dto.OrderInfoDetailDto;
-import com.example.lollandback.board.order.dto.OrderInfoDto;
-import com.example.lollandback.board.order.dto.OrderedProductDto;
-import com.example.lollandback.board.order.dto.UpdateStockDto;
+import com.example.lollandback.board.order.dto.*;
+import com.example.lollandback.member.dto.MemberDto;
 import org.apache.ibatis.annotations.*;
 
 import java.time.LocalDateTime;
@@ -218,4 +216,28 @@ public interface OrderMapper {
     """)
     List<OrderedProductDto> getOrderProductAndOptionById(Long orderId);
 
+    // 결제 취소 대기 중 상품 조회
+    @Select("""
+        SELECT id, order_name, order_nano_id, total_price, order_status, order_reg_time
+        FROM productorder
+        WHERE order_status = 'CANCEL_WAIT'
+        LIMIT #{from}, 9
+    """)
+    List<OrderCancelReqDto> fetchCancelReqInfo(Integer from);
+
+    // 해당 주문건을 취소 요청 회원 정보 가져오기
+    @Select("""
+        SELECT m.id, m.member_login_id, m.member_email, m.member_name, m.member_phone_number 
+        FROM member m JOIN productorder op ON m.id = op.member_id 
+        WHERE op.id = #{orderId}
+    """)
+    MemberDto getCancelReqMemberInfo(Long orderId);
+
+    // 결제 취소 요청 수
+    @Select("""
+        SELECT COUNT(*)
+        FROM productorder
+        WHERE order_status = 'CANCEL_WAIT'
+    """)
+    int countCancelReqInfo();
 }
