@@ -92,6 +92,8 @@ public class OrderService {
         PaymentSuccessDto response = requestPayment(paymentKey, orderId, amount);
         order.setOrder_status(OrderStatus.ORDERED);
         orderMapper.updateOrderStatus(order); // 주문 상태 변경
+        order.setPaymentKey(response.getPaymentKey());
+        orderMapper.updatePaymentKey(order); // 주문 키 변경
 
         //주문 시각 변경
         String approvedAt = response.getApprovedAt();
@@ -112,25 +114,31 @@ public class OrderService {
         return response;
     }
 
-    private PaymentSuccessDto requestPayment(String paymentKey, String orderId, Long amount) {
-            RestTemplate restTemplate = new RestTemplate();
-            // 헤더 생성
-            HttpHeaders headers = new HttpHeaders();
-            String encodedAuthKey = new String(Base64.getEncoder().encode((testSecretKey + ":")
-                    .getBytes(StandardCharsets.UTF_8)));
-            headers.setBasicAuth(encodedAuthKey);
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+    public HttpHeaders createHeader() {
+        HttpHeaders headers = new HttpHeaders();
+        String encodedAuthKey = new String(Base64.getEncoder().encode((testSecretKey + ":")
+                .getBytes(StandardCharsets.UTF_8)));
+        headers.setBasicAuth(encodedAuthKey);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
-            //Param 생성
-            Map<String, Object> params = Map.of("orderId", orderId, "amount", amount, "paymentKey", paymentKey);
+        return headers;
+    }
 
-            //Response 받을 Dto 생성
-            PaymentSuccessDto response = null;
-            // 요청 전송
-            response = restTemplate.postForObject("https://api.tosspayments.com/v1/payments/confirm",
-                    new HttpEntity<>(params, headers), PaymentSuccessDto.class);
-            return response;
+    public PaymentSuccessDto requestPayment(String paymentKey, String orderId, Long amount) {
+        RestTemplate restTemplate = new RestTemplate();
+        // 헤더 생성
+        HttpHeaders headers = createHeader();
+
+        //Param 생성
+        Map<String, Object> params = Map.of("orderId", orderId, "amount", amount, "paymentKey", paymentKey);
+
+        //Response 받을 Dto 생성
+        PaymentSuccessDto response = null;
+        // 요청 전송
+        response = restTemplate.postForObject("https://api.tosspayments.com/v1/payments/confirm",
+                new HttpEntity<>(params, headers), PaymentSuccessDto.class);
+        return response;
     }
 
     private Order verifyPayment(String orderId, Long amount) {
@@ -158,6 +166,7 @@ public class OrderService {
         Order order = orderMapper.getOrderByNanoId(orderId);
         order.setOrder_status(OrderStatus.CANCEL_WAIT);
         orderMapper.updateOrderStatus(order);
+        orderMapper.updateCancelRegTime(order);
     }
 
     public Map<String, Object> fetchMyOrderInfo(Long member_id, Integer page) {
@@ -245,5 +254,45 @@ public class OrderService {
         map.put("pageInfo", pageInfo);
 
         return map;
+    }
+
+    public PaymentCancelDto cancelRequestConfirm(String orderId) {
+        Order order = orderMapper.getOrderByNanoId(orderId);
+        PaymentCancelDto response = requestCancelPayment(order.getPaymentKey());
+        order.setOrder_status(OrderStatus.CANCELED);
+        orderMapper.updateOrderStatus(order); //주문 취소 상태로 변경
+
+        // 주문 시각 변경
+        String approvedAt = response.getApprovedAt();
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+        OffsetDateTime offsetDateTime = OffsetDateTime.parse(approvedAt, formatter);
+        LocalDateTime update_time = offsetDateTime.toLocalDateTime();
+        orderMapper.updateOrderTime(order.getId(), update_time);
+
+        //옵션별로 재고 더하기
+        List<UpdateStockDto> updateDto = orderMapper.findAllProductOptionByOrderId(order.getId());
+        for(UpdateStockDto dto : updateDto) {
+            Long quantity = dto.getQuantity().longValue();
+            orderMapper.refillOptionStock(dto.getOption_id(), quantity);
+            orderMapper.refillTotalStock(dto.getProduct_id(), dto.getQuantity());
+        }
+
+        return response;
+    }
+
+    public PaymentCancelDto requestCancelPayment(String paymentKey) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = createHeader();
+
+        Map<String, String> requestBodyMap = new HashMap<>();
+        requestBodyMap.put("cancelReason", "고객이 취소를 원함");
+
+        HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(requestBodyMap, headers);
+
+        PaymentCancelDto response = null;
+
+        response = restTemplate.postForObject("https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel",
+                requestEntity, PaymentCancelDto.class);
+        return response;
     }
 }

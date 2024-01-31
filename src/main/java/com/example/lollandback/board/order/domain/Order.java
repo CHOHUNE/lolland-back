@@ -17,6 +17,7 @@ public class Order {
     private String address;
     private String postalCode;
     private String requirement;
+    private String paymentKey;
 
     public Order() {}
 
