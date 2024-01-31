@@ -167,6 +167,14 @@ public interface OrderMapper {
     """)
     void updateOrderTime(Long id, LocalDateTime update_time);
 
+    // 주문 취소 요청 시간 업데이트
+    @Update("""
+        UPDATE productorder
+        SET cancel_req_time = NOW()
+        WHERE id = #{id}
+    """)
+    void updateCancelRegTime(Order order);
+
     // paymentKey 업데이트 코드
     @Update("""
         UPDATE productorder
@@ -248,5 +256,6 @@ public interface OrderMapper {
         WHERE order_status = 'CANCEL_WAIT'
     """)
     int countCancelReqInfo();
+
 
 }

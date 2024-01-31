@@ -166,6 +166,7 @@ public class OrderService {
         Order order = orderMapper.getOrderByNanoId(orderId);
         order.setOrder_status(OrderStatus.CANCEL_WAIT);
         orderMapper.updateOrderStatus(order);
+        orderMapper.updateCancelRegTime(order);
     }
 
     public Map<String, Object> fetchMyOrderInfo(Long member_id, Integer page) {
