@@ -13,6 +13,7 @@ public class OrderCancelReqDto {
     private Long id;
     private String main_img_uri;
     private String order_name;
+    private String order_nano_id;
     private Double total_price;
     private OrderStatus order_status;
     private LocalDateTime order_reg_time;

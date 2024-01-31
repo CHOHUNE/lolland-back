@@ -209,7 +209,7 @@ public interface OrderMapper {
 
     // 결제 취소 대기 중 상품 조회
     @Select("""
-        SELECT id, order_name, total_price, order_status, order_reg_time
+        SELECT id, order_name, order_nano_id, total_price, order_status, order_reg_time
         FROM productorder
         WHERE order_status = 'CANCEL_WAIT'
         LIMIT #{from}, 9

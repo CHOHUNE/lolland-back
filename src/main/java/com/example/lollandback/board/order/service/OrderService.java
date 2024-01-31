@@ -176,6 +176,7 @@ public class OrderService {
     }
 
 
+    // --------- 관리자 페이지 에서 취소 요청 목록 ---------
     public Map<String, Object> fetchCancelReqInfo(Integer page) {
         // 페이지 정보
         Map<String, Object> map = new HashMap<>();

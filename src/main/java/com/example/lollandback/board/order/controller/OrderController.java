@@ -45,7 +45,6 @@ public class OrderController {
         }
     }
 
-    // TODO : 취소 요청 보낸 목록 만들기
     // 관리자가 취소 대기 목록 조회
     @GetMapping("/cancel-req-member")
     public ResponseEntity fetchCancelReqMember(@SessionAttribute("login") Member login,
@@ -54,7 +53,6 @@ public class OrderController {
         try{
             // 관리자 일때만 작동
             if (member_type.equals("admin")) {
-                // List<OrderCancelReqDto> cancelInfo = orderService.fetchCancelReqInfo(page);
                 Map<String, Object> cancelInfo = orderService.fetchCancelReqInfo(page);
                 return ResponseEntity.ok(cancelInfo);
             }
@@ -130,6 +128,5 @@ public class OrderController {
                     .body(Collections.singletonMap("error", e.getMessage()));
         }
     }
-
 
 }
