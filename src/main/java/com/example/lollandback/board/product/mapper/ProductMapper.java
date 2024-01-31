@@ -174,7 +174,7 @@ public interface ProductMapper {
             AND co.company_name LIKE #{keyword}
         </if>
         ORDER BY p.product_reg_time DESC
-        LIMIT #{from}, 16
+        LIMIT #{from}, 8
         </script>
 """)
     List<Product> findByCategoryId(Long category_id, Integer from, String keyword, String category);
@@ -190,7 +190,7 @@ public interface ProductMapper {
                 AND p.subcategory_id = #{subcategory_id}
                 AND p.product_status = 'none'
                 AND p.product_name LIKE #{keyword}
-                LIMIT #{from}, 16
+                LIMIT #{from}, 8
             """)
     List<Product> findByCategoryIdAndSubcategoryId(Long category_id, Long subcategory_id, Integer from, String keyword, String category);
 
@@ -252,7 +252,7 @@ public interface ProductMapper {
             AND co.company_name LIKE #{keyword}
         </if>
         ORDER BY p.product_reg_time DESC
-        LIMIT #{from}, 16
+        LIMIT #{from}, 8
         </script>
         """)
     List<Product> companyList(int from, String keyword, String category, Long companyId);
