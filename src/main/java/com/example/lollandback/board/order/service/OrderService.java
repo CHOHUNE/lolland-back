@@ -1,5 +1,6 @@
 package com.example.lollandback.board.order.service;
 
+import com.example.lollandback.board.cart.mapper.CartMapper;
 import com.example.lollandback.board.order.domain.Order;
 import com.example.lollandback.board.order.domain.OrderProductDetails;
 import com.example.lollandback.board.order.domain.OrderStatus;
@@ -28,6 +29,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderMapper orderMapper;
+    private final CartMapper cartMapper;
 
     @Value("${toss.pay.secretKey}")
     private String testSecretKey;
@@ -73,6 +75,8 @@ public class OrderService {
                 Double total_price = price * optionDto.getQuantity();
                 OrderProductDetails productDetails = new OrderProductDetails(id, total_price, optionDto);
                 orderMapper.saveProductDetails(productDetails);
+                //주문된 상품 카트에서 삭제
+                cartMapper.deleteCartByMemberAndProductIds(member_id, optionDto.getProduct_id(), optionDto.getOption_id());
             }
 
             // 저장 후 결제에 필요한 데이터 생성
@@ -104,6 +108,7 @@ public class OrderService {
             // 총 재고 빼기
             orderMapper.subtractTotalStock(dto.getProduct_id(), dto.getQuantity());
         }
+
         return response;
     }
 
@@ -155,15 +160,43 @@ public class OrderService {
         orderMapper.updateOrderStatus(order);
     }
 
-    public List<OrderInfoDto> fetchMyOrderInfo(Long member_id) {
-        List<OrderInfoDto> orderInfo = orderMapper.fetchMyOrderInfo(member_id);
+    public Map<String, Object> fetchMyOrderInfo(Long member_id, Integer page) {
+        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> pageInfo = new HashMap<>();
+
+        int countAll = orderMapper.countAllMyOrderInfo(member_id);
+
+        int lastPageNumber = (countAll - 1) / 10 + 1;
+        int startPageNumber = (page - 1) / 10 * 10 + 1;
+        int endPageNumber = startPageNumber + 9;
+        endPageNumber = Math.min(endPageNumber, lastPageNumber);
+        int prevPageNumber = startPageNumber - 10;
+        int nextPageNumber = endPageNumber + 1;
+
+        pageInfo.put("currentPageNumber", page);
+        pageInfo.put("startPageNumber", startPageNumber);
+        pageInfo.put("endPageNumber", endPageNumber);
+        if (prevPageNumber > 0) {
+            pageInfo.put("prevPageNumber", prevPageNumber);
+        }
+        if (nextPageNumber <= lastPageNumber) {
+            pageInfo.put("nextPageNumber", nextPageNumber);
+        }
+
+        int from = (page - 1) * 10;
+
+        List<OrderInfoDto> orderInfo = orderMapper.fetchMyOrderInfo(from, member_id);
+
         for(OrderInfoDto dto : orderInfo) {
             Long product_id = orderMapper.getFirstProductId(dto.getId());
             String imgUri = orderMapper.getImgUri(product_id, urlPrefix);
             dto.setMain_img_uri(imgUri);
         }
 
-        return orderInfo;
+        map.put("orderList", orderInfo);
+        map.put("pageInfo", pageInfo);
+
+        return map;
     }
 
     public OrderInfoDetailDto fetchOrderInfoDetail(Long orderId) {

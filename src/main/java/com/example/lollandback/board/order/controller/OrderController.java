@@ -21,11 +21,12 @@ public class OrderController {
     private final OrderService orderService;
 
     @GetMapping("/my")
-    public ResponseEntity fetchMyOrderInfo(@SessionAttribute("login") Member login) {
+    public ResponseEntity fetchMyOrderInfo(@SessionAttribute("login") Member login,
+                                           @RequestParam(value="p", defaultValue = "1")Integer page) {
         Long member_id = login.getId();
         try{
-            List<OrderInfoDto> orderInfo = orderService.fetchMyOrderInfo(member_id);
-            return ResponseEntity.ok(orderInfo);
+            Map<String, Object> map = orderService.fetchMyOrderInfo(member_id, page);
+            return ResponseEntity.ok(map);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -91,6 +92,7 @@ public class OrderController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(Collections.singletonMap("error", e.getMessage()));
             } catch (Exception e) {
+                e.printStackTrace();
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
         } else {

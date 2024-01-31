@@ -1,4 +1,4 @@
-package com.example.lollandback.board.product.controller;
+package com.example.lollandback.board.product.dto;
 
 import com.example.lollandback.board.product.domain.Company;
 import com.example.lollandback.board.product.dto.CategoryDto;
