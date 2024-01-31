@@ -175,10 +175,31 @@ public class OrderService {
         return order;
     }
 
-    public List<OrderCancelReqDto> fetchCancelReqInfo(Integer page) {
+    // 페이징 작업중
+    //public List<OrderCancelReqDto> fetchCancelReqInfo(Integer page) {
+    public Map<String, Object> fetchCancelReqInfo(Integer page) {
+        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> pageInfo = new HashMap<>();
+
+        int countAll = orderMapper.countCancelReqInfo();
+        int startPageNumber = 0;
+        int nextPageNumber = page + 1;
+        int prevPageNumber = page - 1;
+        int lastPageNumber = (countAll - 1) / 9 + 1;
+
+        pageInfo.put("lastPageNumber", lastPageNumber);
+
+        if(nextPageNumber <= lastPageNumber) {
+            pageInfo.put("nextPageNumber", nextPageNumber);
+        }
+
+        if(prevPageNumber > 0) {
+            pageInfo.put("prevPageNumber", prevPageNumber);
+        }
 
         int from = (page - 1) * 9;
 
+        // 취소 요청 정보
         List<OrderCancelReqDto> orderCancelReqDto = orderMapper.fetchCancelReqInfo(from);
         for(OrderCancelReqDto dto : orderCancelReqDto) {
             Long product_id = orderMapper.getFirstProductId(dto.getId());
@@ -186,6 +207,10 @@ public class OrderService {
             dto.setMain_img_uri(imgUri);
             dto.setMembersDto(orderMapper.getCancelReqMemberInfo(dto.getId()));
         }
-        return orderCancelReqDto;
+
+        map.put("orderCancelReqDto", orderCancelReqDto);
+        map.put("pageInfo", pageInfo);
+
+        return map;
     }
 }

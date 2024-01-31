@@ -52,8 +52,10 @@ public class OrderController {
                                                @RequestParam(value = "page", defaultValue = "1") Integer page) {
         String member_type = login.getMember_type();
         try{
+            // 관리자 일때만 작동
             if (member_type.equals("admin")) {
-                List<OrderCancelReqDto> cancelInfo = orderService.fetchCancelReqInfo(page);
+                // List<OrderCancelReqDto> cancelInfo = orderService.fetchCancelReqInfo(page);
+                Map<String, Object> cancelInfo = orderService.fetchCancelReqInfo(page);
                 return ResponseEntity.ok(cancelInfo);
             }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
