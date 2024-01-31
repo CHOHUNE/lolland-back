@@ -48,11 +48,12 @@ public class OrderController {
     // TODO : 취소 요청 보낸 목록 만들기
     // 관리자가 취소 대기 목록 조회
     @GetMapping("/cancel-req-member")
-    public ResponseEntity fetchCancelReqMember(@SessionAttribute("login") Member login) {
+    public ResponseEntity fetchCancelReqMember(@SessionAttribute("login") Member login,
+                                               @RequestParam(value = "page", defaultValue = "1") Integer page) {
         String member_type = login.getMember_type();
         try{
             if (member_type.equals("admin")) {
-                List<OrderCancelReqDto> cancelInfo = orderService.fetchCancelReqInfo();
+                List<OrderCancelReqDto> cancelInfo = orderService.fetchCancelReqInfo(page);
                 return ResponseEntity.ok(cancelInfo);
             }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

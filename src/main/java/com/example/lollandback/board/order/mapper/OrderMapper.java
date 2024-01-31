@@ -212,8 +212,9 @@ public interface OrderMapper {
         SELECT id, order_name, total_price, order_status, order_reg_time
         FROM productorder
         WHERE order_status = 'CANCEL_WAIT'
+        LIMIT #{from}, 9
     """)
-    List<OrderCancelReqDto> fetchCancelReqInfo();
+    List<OrderCancelReqDto> fetchCancelReqInfo(Integer from);
 
     // 해당 주문건을 취소한 회원 정보 가져오기
     @Select("""
@@ -222,4 +223,5 @@ public interface OrderMapper {
         WHERE op.id = #{orderId}
     """)
     MemberDto getCancelReqMemberInfo(Long orderId);
+
 }

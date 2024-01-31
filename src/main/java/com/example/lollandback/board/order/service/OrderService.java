@@ -175,8 +175,11 @@ public class OrderService {
         return order;
     }
 
-    public List<OrderCancelReqDto> fetchCancelReqInfo() {
-        List<OrderCancelReqDto> orderCancelReqDto = orderMapper.fetchCancelReqInfo();
+    public List<OrderCancelReqDto> fetchCancelReqInfo(Integer page) {
+
+        int from = (page - 1) * 9;
+
+        List<OrderCancelReqDto> orderCancelReqDto = orderMapper.fetchCancelReqInfo(from);
         for(OrderCancelReqDto dto : orderCancelReqDto) {
             Long product_id = orderMapper.getFirstProductId(dto.getId());
             String imgUri = orderMapper.getImgUri(product_id, urlPrefix);
