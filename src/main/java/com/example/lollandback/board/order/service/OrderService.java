@@ -175,4 +175,14 @@ public class OrderService {
         return order;
     }
 
+    public List<OrderCancelReqDto> fetchCancelReqInfo() {
+        List<OrderCancelReqDto> orderCancelReqDto = orderMapper.fetchCancelReqInfo();
+        for(OrderCancelReqDto dto : orderCancelReqDto) {
+            Long product_id = orderMapper.getFirstProductId(dto.getId());
+            String imgUri = orderMapper.getImgUri(product_id, urlPrefix);
+            dto.setMain_img_uri(imgUri);
+            dto.setMembersDto(orderMapper.getCancelReqMemberInfo(dto.getId()));
+        }
+        return orderCancelReqDto;
+    }
 }
