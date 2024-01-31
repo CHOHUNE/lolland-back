@@ -209,17 +209,26 @@ public interface OrderMapper {
 
     // 결제 취소 대기 중 상품 조회
     @Select("""
-        SELECT id, order_name, total_price, order_status, order_reg_time
+        SELECT id, order_name, order_nano_id, total_price, order_status, order_reg_time
         FROM productorder
         WHERE order_status = 'CANCEL_WAIT'
+        LIMIT #{from}, 9
     """)
-    List<OrderCancelReqDto> fetchCancelReqInfo();
+    List<OrderCancelReqDto> fetchCancelReqInfo(Integer from);
 
-    // 해당 주문건을 취소한 회원 정보 가져오기
+    // 해당 주문건을 취소 요청 회원 정보 가져오기
     @Select("""
         SELECT m.id, m.member_login_id, m.member_email, m.member_name, m.member_phone_number 
         FROM member m JOIN productorder op ON m.id = op.member_id 
         WHERE op.id = #{orderId}
     """)
     MemberDto getCancelReqMemberInfo(Long orderId);
+
+    // 결제 취소 요청 수
+    @Select("""
+        SELECT COUNT(*)
+        FROM productorder
+        WHERE order_status = 'CANCEL_WAIT'
+    """)
+    int countCancelReqInfo();
 }

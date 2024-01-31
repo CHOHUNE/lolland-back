@@ -175,14 +175,42 @@ public class OrderService {
         return order;
     }
 
-    public List<OrderCancelReqDto> fetchCancelReqInfo() {
-        List<OrderCancelReqDto> orderCancelReqDto = orderMapper.fetchCancelReqInfo();
+
+    // --------- 관리자 페이지 에서 취소 요청 목록 ---------
+    public Map<String, Object> fetchCancelReqInfo(Integer page) {
+        // 페이지 정보
+        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> pageInfo = new HashMap<>();
+
+        int countAll = orderMapper.countCancelReqInfo();
+        int nextPageNumber = page + 1;
+        int prevPageNumber = page - 1;
+        int lastPageNumber = (countAll - 1) / 9 + 1;
+
+        pageInfo.put("lastPageNumber", lastPageNumber);
+
+        if(nextPageNumber <= lastPageNumber) {
+            pageInfo.put("nextPageNumber", nextPageNumber);
+        }
+
+        if(prevPageNumber > 0) {
+            pageInfo.put("prevPageNumber", prevPageNumber);
+        }
+
+        int from = (page - 1) * 9;
+
+        // 취소 요청 정보
+        List<OrderCancelReqDto> orderCancelReqDto = orderMapper.fetchCancelReqInfo(from);
         for(OrderCancelReqDto dto : orderCancelReqDto) {
             Long product_id = orderMapper.getFirstProductId(dto.getId());
             String imgUri = orderMapper.getImgUri(product_id, urlPrefix);
             dto.setMain_img_uri(imgUri);
             dto.setMembersDto(orderMapper.getCancelReqMemberInfo(dto.getId()));
         }
-        return orderCancelReqDto;
+
+        map.put("orderCancelReqDto", orderCancelReqDto);
+        map.put("pageInfo", pageInfo);
+
+        return map;
     }
 }
