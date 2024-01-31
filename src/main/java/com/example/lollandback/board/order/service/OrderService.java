@@ -175,9 +175,9 @@ public class OrderService {
         return order;
     }
 
-    // 페이징 작업중
-    //public List<OrderCancelReqDto> fetchCancelReqInfo(Integer page) {
+
     public Map<String, Object> fetchCancelReqInfo(Integer page) {
+        // 페이지 정보
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> pageInfo = new HashMap<>();
 
