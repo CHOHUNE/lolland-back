@@ -221,6 +221,7 @@ public interface OrderMapper {
         SELECT id, order_name, order_nano_id, total_price, order_status, order_reg_time
         FROM productorder
         WHERE order_status = 'CANCEL_WAIT'
+        ORDER BY cancel_req_time DESC
         LIMIT #{from}, 9
     """)
     List<OrderCancelReqDto> fetchCancelReqInfo(Integer from);
@@ -240,4 +241,5 @@ public interface OrderMapper {
         WHERE order_status = 'CANCEL_WAIT'
     """)
     int countCancelReqInfo();
+
 }
