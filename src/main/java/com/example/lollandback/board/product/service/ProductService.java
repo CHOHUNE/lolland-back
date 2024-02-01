@@ -358,11 +358,11 @@ public class ProductService {
         Map<String, Object> pageInfo = new HashMap<>();
 
         int countAll = productMapper.countCategoryProductAll(categoryId, "%" + keyword + "%", category);
-        int lastPageNumber = (countAll - 1) / 10 + 1;
-        int startPageNumber = (page - 1) / 10 * 10 + 1;
-        int endPageNumber = startPageNumber + 9;
+        int lastPageNumber = (countAll - 1) / 8 + 1;
+        int startPageNumber = (page - 1) / 8 * 8 + 1;
+        int endPageNumber = startPageNumber + 7;
         endPageNumber = Math.min(endPageNumber, lastPageNumber);
-        int prevPageNumber = startPageNumber - 10;
+        int prevPageNumber = startPageNumber - 8;
         int nextPageNumber = endPageNumber + 1;
 
         pageInfo.put("currentPageNumber", page);
@@ -375,7 +375,7 @@ public class ProductService {
             pageInfo.put("nextPageNumber", nextPageNumber);
         }
 
-        int from = (page - 1) * 3;
+        int from = (page - 1) * 8;
         List<Product> products = productMapper.findByCategoryId(categoryId, from, "%" + keyword + "%", category);
         products.forEach(productListImg -> {
             List<ProductImg> productsImg = mainImgMapper.selectNamesByCategoryId(productListImg.getProduct_id());
@@ -396,11 +396,11 @@ public class ProductService {
 
         int countAll = productMapper.countSubCategoryProductAll(category_id, subcategory_id, "%" + keyword + "%", category);
 
-        int lastPageNumber = (countAll - 1) / 10 + 1;
-        int startPageNumber = (page - 1) / 10 * 10 + 1;
-        int endPageNumber = startPageNumber + 9;
+        int lastPageNumber = (countAll - 1) / 8 + 1;
+        int startPageNumber = (page - 1) / 8 * 8 + 1;
+        int endPageNumber = startPageNumber + 7;
         endPageNumber = Math.min(endPageNumber, lastPageNumber);
-        int prevPageNumber = startPageNumber - 10;
+        int prevPageNumber = startPageNumber - 8;
         int nextPageNumber = endPageNumber + 1;
 
         pageInfo.put("currentPageNumber", page);
@@ -413,7 +413,7 @@ public class ProductService {
             pageInfo.put("nextPageNumber", nextPageNumber);
         }
 
-        int from = (page - 1) * 3;
+        int from = (page - 1) * 8;
 
         List<Product> products = productMapper.findByCategoryIdAndSubcategoryId(category_id, subcategory_id, from, "%" + keyword + "%", category);
         products.forEach(productListImg -> {
@@ -452,11 +452,11 @@ public class ProductService {
         Map<String, Object> pageInfo = new HashMap<>();
 
         int countAll = productMapper.countAllCompany("%" + keyword + "%", category, companyId);
-        int lastPageNumber = (countAll - 1) / 10 + 1;
-        int startPageNumber = (page - 1) / 10 * 10 + 1;
-        int endPageNumber = startPageNumber + 9;
+        int lastPageNumber = (countAll - 1) / 8 + 1;
+        int startPageNumber = (page - 1) / 8 * 8 + 1;
+        int endPageNumber = startPageNumber + 7;
         endPageNumber = Math.min(endPageNumber, lastPageNumber);
-        int prevPageNumber = startPageNumber - 10;
+        int prevPageNumber = startPageNumber - 8;
         int nextPageNumber = endPageNumber + 1;
 
         pageInfo.put("currentPageNumber", page);
@@ -469,7 +469,7 @@ public class ProductService {
             pageInfo.put("nextPageNumber", nextPageNumber);
         }
 
-        int from = (page - 1) * 10;
+        int from = (page - 1) * 8;
 
         List<Product> product = productMapper.companyList(from, "%" + keyword + "%", category, companyId);
         product.forEach(productListImg -> {
@@ -496,7 +496,7 @@ public class ProductService {
         List<CategoryDto> categoryDtoList = new ArrayList<>();
         // 해당 대분류의 소분류
         for (Category category : categories) {
-            List<SubCategoryDto> subcategory = companyMapper.getSubCategoryByCompany(companyId);
+            List<SubCategoryDto> subcategory = companyMapper.getSubCategoryByCompany(companyId, category.getCategory_id());
             CategoryDto categoryDto = new CategoryDto(category, subcategory);
             categoryDtoList.add(categoryDto);
         }

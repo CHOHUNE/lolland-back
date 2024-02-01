@@ -2,6 +2,7 @@ package com.example.lollandback.board.product.mapper;
 
 import com.example.lollandback.board.product.domain.Category;
 import com.example.lollandback.board.product.domain.Company;
+import com.example.lollandback.board.product.dto.CategoryDto;
 import com.example.lollandback.board.product.dto.ProductUpdateDto;
 import com.example.lollandback.board.product.dto.SubCategoryDto;
 import org.apache.ibatis.annotations.*;
@@ -70,7 +71,7 @@ public interface ProductCompanyMapper {
         FROM subcategory sub
             RIGHT JOIN product p ON sub.subcategory_id = p.subcategory_id
             LEFT JOIN company c ON p.company_id = c.company_id
-        WHERE c.company_id = #{companyId}
+        WHERE c.company_id = #{companyId} AND sub.category_id = #{category_id}
     """)
-    List<SubCategoryDto> getSubCategoryByCompany(Long companyId);
+    List<SubCategoryDto> getSubCategoryByCompany(Long companyId, Long category_id);
 }
