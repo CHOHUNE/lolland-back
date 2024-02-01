@@ -36,7 +36,7 @@ public class OrderController {
     public ResponseEntity fetchOrderInfoDetail(@SessionAttribute("login") Member login, @RequestParam Long orderId) {
         try{
             OrderInfoDetailDto orderInfo = orderService.fetchOrderInfoDetail(orderId);
-            if(orderInfo.member_id != login.getId()) {
+            if(!orderInfo.getMember_id().equals(login.getId())) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
             return ResponseEntity.ok(orderInfo);
