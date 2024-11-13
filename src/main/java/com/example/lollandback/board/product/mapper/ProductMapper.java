@@ -314,11 +314,12 @@ public interface ProductMapper {
 
 //   ------------------------- 리뷰가 가장 많은 3개의 상품 보여주기 --------------------------
     @Select("""
-            SELECT p.product_id, p.product_name, c.company_name, p.product_price, p.product_content, COUNT(r.review_id) AS review_count
+            SELECT p.product_id, p.product_name, c.company_name, p.product_price, p.product_content, 
+       COUNT(r.review_id) AS review_count
             FROM product p
             JOIN review r ON p.product_id = r.product_id
             JOIN company c ON p.company_id = c.company_id
-            GROUP BY P.product_id
+            GROUP BY p.product_id
             ORDER BY review_count DESC
             LIMIT 3;
             """)
